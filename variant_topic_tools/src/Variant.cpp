@@ -24,7 +24,8 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Variant::Variant() {
+Variant::Variant(const DataType& type) :
+  type(type) {
 }
 
 Variant::Variant(const Variant& src) :
@@ -47,6 +48,10 @@ Variant::Value::~Value() {
 
 const DataType& Variant::getType() const {
   return type;
+}
+
+bool Variant::hasType() const {
+  return type.isValid();
 }
 
 bool Variant::isEmpty() const {

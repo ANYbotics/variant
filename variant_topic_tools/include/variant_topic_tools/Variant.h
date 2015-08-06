@@ -36,7 +36,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Default constructor
       */ 
-    Variant();
+    Variant(const DataType& type = DataType());
     
     /** \brief Constructor (templated version taking a value)
       */ 
@@ -66,7 +66,12 @@ namespace variant_topic_tools {
       */
     const DataType& getType() const;
     
-    /** \brief True, if the variant is empty
+    /** \brief True, if the variant has a type
+      */
+    bool hasType() const;
+    
+    /** \brief True, if the variant is empty, i.e., does not have a value
+      *   assigned
       */
     bool isEmpty() const;
     
@@ -174,7 +179,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */ 
-      ValueT(const T& value);
+      ValueT(const T& value = T());
       
       /** \brief Destructor
         */ 

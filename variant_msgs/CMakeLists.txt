@@ -10,9 +10,10 @@ project(variant_msgs)
 # set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  std_msgs
+find_package(catkin REQUIRED
+  COMPONENTS
+    message_generation
+    std_msgs
 )
 
 ####################################

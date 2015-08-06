@@ -67,16 +67,6 @@ namespace variant_topic_tools {
     struct TypeTraits {
       template <class A> struct FromArray;
       
-      template <typename T> struct FromArray<T*> {
-        typedef T ElementType;
-        static const size_t NumElements = 0;
-      };
-      
-      template <typename T, size_t N> struct FromArray<T[N]> {
-        typedef T ElementType;
-        static const size_t NumElements = N;
-      };
-      
       template <typename T> struct FromArray<std::vector<T> > {
         typedef T ElementType;
         static const size_t NumElements = 0;

@@ -52,35 +52,31 @@ template <typename T> void Variant::setValue(const T& value) {
     else
       throw InvalidDataTypeException();
   }
-  else if (typeid(T) == this->type.getTypeInfo())
-    boost::static_pointer_cast<ValueT<T> >(this->value)->value = value;
+  else if (typeid(T) == this->type.getTypeInfo()) {
+    if (this->value)
+      boost::static_pointer_cast<ValueT<T> >(this->value)->value = value;
+    else
+      this->value.reset(new ValueT<T>(value));
+  }
   else
     throw DataTypeMismatchException(type.getIdentifier(),
       DataType(typeid(T)).getIdentifier());
 }
 
 template <typename T> T& Variant::getValue() {
-  if (value) {
-    if (typeid(T) == this->type.getTypeInfo())
-      return boost::static_pointer_cast<ValueT<T> >(value)->value;
-    else
-      throw DataTypeMismatchException(type.getIdentifier(),
-        DataType(typeid(T)).getIdentifier());
+  if (typeid(T) == this->type.getTypeInfo()) {
+    if (!this->value)
+      this->value.reset(new ValueT<T>());
+    
+    return boost::static_pointer_cast<ValueT<T> >(value)->value;
   }
   else
-    throw InvalidDataTypeException();
+    throw DataTypeMismatchException(type.getIdentifier(),
+      DataType(typeid(T)).getIdentifier());
 }
 
 template <typename T> const T& Variant::getValue() const {
-  if (value) {
-    if (typeid(T) == this->type.getTypeInfo())
-      return boost::static_pointer_cast<ValueT<T> >(value)->value;
-    else
-      throw DataTypeMismatchException(type.getIdentifier(),
-        DataType(typeid(T)).getIdentifier());
-  }
-  else
-    throw InvalidDataTypeException();
+  return const_cast<Variant*>(this)->template getValue<T>();
 }
 
 template <typename T>

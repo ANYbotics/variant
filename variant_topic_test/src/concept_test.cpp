@@ -17,7 +17,6 @@
  ******************************************************************************/
 
 #include <std_msgs/Bool.h>
-#include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 
 #include <variant_topic_tools/DataTypeRegistry.h>
@@ -25,8 +24,6 @@
 int main(int argc, char **argv) {
   variant_topic_tools::DataTypeRegistry registry;
 
-  registry.addArrayDataType<unsigned char[3]>();
-  registry.addArrayDataType<unsigned char*>();
   registry.addArrayDataType<int, 3>();
   registry.addArrayDataType<int, 0>();
   registry.addArrayDataType<boost::array<double, 3> >();
@@ -39,14 +36,15 @@ int main(int argc, char **argv) {
     ros::message_traits::definition<std_msgs::Bool>());
   registry.addMessageDataType("my_msgs/Double").addVariable<double>("data");
   registry.addMessageDataType("my_msgs/Complex",
-    "float64 PI=3.14159\nstring COMMENT=This is a complex message type.\n"
-    "float64 real\nfloat64 imaginary\n");
+    "float64 PI=3.14159\n"
+    "string COMMENT=This is a complex message type.\n"
+    "float64 real\n"
+    "float64 imaginary\n");
   
   std::cout << registry << "\n";
   std::cout << "\n";
 
   std::cout << registry.getDataType<int8_t>() << "\n";
-  std::cout << registry.getDataType<uint8_t>() << "\n";
   std::cout << "\n";
   
   variant_topic_tools::Variant v1 = registry["float64"].createVariant();

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(variant_topic_tools)
+project(variant_topic_test)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -9,13 +9,16 @@ project(variant_topic_tools)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 # set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED
   COMPONENTS
     cmake_modules
+    std_msgs
     roscpp
-    roslib
     variant_msgs
+    variant_topic_tools
 )
 
 ###################################
@@ -28,12 +31,12 @@ find_package(catkin REQUIRED
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES variant_topic_tools
+  LIBRARIES variant_topic_test
   CATKIN_DEPENDS
     roscpp
-    roslib
+    std_msgs
     variant_msgs
+    variant_topic_tools
 )
 
 ###########
@@ -43,64 +46,40 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a cpp library
-add_library(variant_topic_tools
-  src/ArrayDataType.cpp
-  src/BuiltinDataType.cpp
-  src/DataType.cpp
-  src/DataTypeRegistry.cpp
-  src/Exceptions.cpp
-  src/Message.cpp
-  src/MessageConstant.cpp
-  src/MessageDataType.cpp
-  src/MessageDefinition.cpp
-  src/MessageField.cpp
-  src/MessageFieldCollection.cpp
-  src/MessageHeader.cpp
-  src/MessageMember.cpp
-  src/MessageSerializer.cpp
-  src/MessageTraits.cpp
-  src/MessageType.cpp
-  src/MessageVariable.cpp
-  src/Serialization.cpp
-  src/Variant.cpp
-)
-
+## Declare a cpp executable
 add_executable(
-  echo
-  src/echo.cpp
+  concept_test
+  src/concept_test.cpp
 )
 add_executable(
-  info
-  src/info.cpp
-)
-add_executable(
-  relay
-  src/relay.cpp
-)
-
-## Specify libraries to link a library or executable target against
-target_link_libraries(
-  variant_topic_tools
-  ${catkin_LIBRARIES}
+  pub_test
+  src/pub_test.cpp
 )
 
 target_link_libraries(
-  echo
-  variant_topic_tools
+  concept_test
   ${catkin_LIBRARIES}
 )
 target_link_libraries(
-  info
-  variant_topic_tools
+  pub_test
   ${catkin_LIBRARIES}
 )
+
+###########
+## Tests ##
+###########
+
+catkin_add_gtest(variant_topic_test
+  test/variant_topic_test
+  test/DataTypeTest.cpp
+  test/DataTypeRegistryTest.cpp
+  test/VariantTest.cpp
+)
+
 target_link_libraries(
-  relay
-  variant_topic_tools
+  variant_topic_test
   ${catkin_LIBRARIES}
 )
