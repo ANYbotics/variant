@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageSerializer.h"
+#include "variant_topic_tools/BuiltinDataType.h"
 
 namespace variant_topic_tools {
 
@@ -24,70 +24,35 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageSerializer::MessageSerializer() {
+BuiltinDataType::BuiltinDataType() {
 }
 
-MessageSerializer::MessageSerializer(const DataType& dataType) {
-  boost::unordered_map<DataType, MessageSerializer>::const_iterator
-    it = getInstances().find(dataType);
-    
-  if (it != getInstances().end())
-    impl = it->second.impl;
+BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
+  DataType(src) {
 }
 
-MessageSerializer::MessageSerializer(const MessageSerializer& src) :
-  impl(src.impl) {
+BuiltinDataType::BuiltinDataType(const DataType& src) :
+  DataType(src) {
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl));
 }
 
-MessageSerializer::~MessageSerializer() {
+BuiltinDataType::~BuiltinDataType() {
 }
 
-MessageSerializer::Impl::Impl(const DataType& dataType) :
-  dataType(dataType) {
+BuiltinDataType::Impl::Impl(const std::string& identifier) :
+  identifier(identifier) {
 }
 
-MessageSerializer::Impl::~Impl() {
-}
-
-MessageSerializer::Instances::Instances() {
-//   createSimple<bool>("bool");
-//   createSimple<double>("float64");
-//   createSimple<float>("float32");
-//   createSimple<int16_t>("int16");
-//   createSimple<int32_t>("int32");
-//   createSimple<int64_t>("int64");
-//   createSimple<int8_t>("int8");
-//   createSimple<uint16_t>("uint16");
-//   createSimple<uint32_t>("uint32");
-//   createSimple<uint64_t>("uint64");
-//   createSimple<uint8_t>("uint8");
-//   
-//   createBuiltin<ros::Duration>("duration");
-//   createBuiltin<std::string>("string");
-//   createBuiltin<ros::Time>("time");
-}
-
-MessageSerializer::Instances::~Instances() {
+BuiltinDataType::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-DataType MessageSerializer::getDataType() const {
-  if (impl)
-    return impl->dataType;
-  else
-    return DataType();
-}
-
-bool MessageSerializer::Impl::isValid() const {
-  return dataType;
-}
-
-MessageSerializer::Instances& MessageSerializer::getInstances() {
-  static boost::shared_ptr<Instances> instances(new Instances());
-  return *instances;
+const std::string& BuiltinDataType::Impl::getIdentifier() const {
+  return identifier;
 }
 
 }

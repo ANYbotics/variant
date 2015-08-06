@@ -16,38 +16,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Variant.h>
+/** \file TypeInfoHash.h
+  * \brief Header file providing the TypeInfoHash class interface
+  */
+
+#ifndef VARIANT_TOPIC_TOOLS_TYPE_INFO_HASH_H
+#define VARIANT_TOPIC_TOOLS_TYPE_INFO_HASH_H
+
+#include <typeinfo>
 
 namespace variant_topic_tools {
+  /** \brief Type information hash
+    */
+  class TypeInfoHash {
+  public:
+    /** \brief Type information hash operator
+      */
+    inline size_t operator()(const std::type_info* typeInfo) const {
+      return reinterpret_cast<size_t>(typeInfo);
+    };
+  };
+};
 
-/*****************************************************************************/
-/* Constructors and Destructor                                               */
-/*****************************************************************************/
-
-template <typename T>
-DataType::ImplT<T>::ImplT() {
-}
-
-template <typename T>
-DataType::ImplT<T>::~ImplT() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <typename T>
-const std::type_info& DataType::ImplT<T>::getTypeInfo() const {
-  return typeid(T);
-}
-
-/*****************************************************************************/
-/* Methods                                                                   */
-/*****************************************************************************/
-
-template <typename T>
-VariantPtr DataType::ImplT<T>::createVariant() const {
-  return VariantPtr(new Variant(T()));
-}
-
-}
+#endif

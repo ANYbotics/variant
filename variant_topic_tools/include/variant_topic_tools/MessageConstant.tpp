@@ -16,38 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Variant.h>
-
 namespace variant_topic_tools {
-
-/*****************************************************************************/
-/* Constructors and Destructor                                               */
-/*****************************************************************************/
-
-template <typename T>
-DataType::ImplT<T>::ImplT() {
-}
-
-template <typename T>
-DataType::ImplT<T>::~ImplT() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <typename T>
-const std::type_info& DataType::ImplT<T>::getTypeInfo() const {
-  return typeid(T);
-}
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T>
-VariantPtr DataType::ImplT<T>::createVariant() const {
-  return VariantPtr(new Variant(T()));
+template <typename T> MessageConstant MessageConstant::create(const
+    std::string& name, const T& value) {
+  MessageConstant messageConstant;
+  messageConstant.impl.reset(new Impl(name, value));
+  
+  return messageConstant;
 }
 
 }

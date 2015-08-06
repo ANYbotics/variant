@@ -23,6 +23,8 @@
 #ifndef VARIANT_TOPIC_TOOLS_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_VARIANT_H
 
+#include <boost/type_traits.hpp>
+
 #include <ros/ros.h>
 
 #include <variant_topic_tools/DataType.h>
@@ -34,7 +36,11 @@ namespace variant_topic_tools {
   public:
     /** \brief Default constructor
       */ 
-    template <typename T> Variant(const T& value = T());
+    Variant();
+    
+    /** \brief Constructor (templated version taking a value)
+      */ 
+    template <typename T> Variant(const T& value);
     
     /** \brief Copy constructor
       */ 
@@ -44,9 +50,16 @@ namespace variant_topic_tools {
       */ 
     ~Variant();
     
-    /** \brief Access the variant's value
+    /** \brief Set the variant's value
       */
     template <typename T> void setValue(const T& value);
+    
+    /** \brief Retrieve the variant's value (non-const version)
+      */
+    template <typename T> T& getValue();
+    
+    /** \brief Retrieve the variant's value (const version)
+      */
     template <typename T> const T& getValue() const;
     
     /** \brief Access the type of the variant's value
@@ -60,6 +73,10 @@ namespace variant_topic_tools {
     /** \brief Clear the variant
       */
     void clear();
+    
+    /** \brief Read the variant from a stream
+      */
+    void read(std::istream& stream);
     
     /** \brief Write the variant to a stream
       */
@@ -86,6 +103,28 @@ namespace variant_topic_tools {
     bool operator!=(const Variant& variant) const;
     
   protected:
+    /** \brief Type traits
+      */
+    struct TypeTraits {
+      template <typename T, class Enable = void> struct EqualTo {
+        static bool compare(const T& lhs, const T& rhs);
+      };
+        
+      template <typename T> struct EqualTo<T, typename boost::enable_if<
+          boost::has_equal_to<T, T, bool> >::type> {
+        static bool compare(const T& lhs, const T& rhs);
+      };
+      
+      template <typename T, class Enable = void> struct ReadFrom {
+        static void read(std::istream& stream, T& value);
+      };
+      
+      template <typename T> struct ReadFrom<T, typename boost::enable_if<
+          boost::has_right_shift<std::istream, T&> >::type> {
+        static void read(std::istream& stream, T& value);
+      };
+    };
+    
     /** \brief Forward declaration of the variant value type
       */
     class Value;
@@ -119,6 +158,10 @@ namespace variant_topic_tools {
         */
       virtual ValuePtr clone() const = 0;    
       
+      /** \brief Read the variant from a stream (abstract declaration)
+        */
+      virtual void read(std::istream& stream) = 0;
+    
       /** \brief Write this variant value to a stream (abstract declaration)
         */
       virtual void write(std::ostream& stream) const = 0;    
@@ -131,7 +174,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */ 
-      ValueT(const T& invariant);
+      ValueT(const T& value);
       
       /** \brief Destructor
         */ 
@@ -146,28 +189,35 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
+      /** \brief Read the variant from a stream (implementation)
+        */
+      void read(std::istream& stream);
+    
       /** \brief Write this variant value to a stream (implementation)
         */
       void write(std::ostream& stream) const;
       
-      /** \brief The invariant value
+      /** \brief The strong-typed value
         */
-      T invariant;
+      T value;
     };
 
-    /** \brief The data type
+    /** \brief The variant's data type
       */
     DataType type;
     
-    /** \brief The data value
+    /** \brief The variant's data value
       */
     ValuePtr value;
   };
   
+  /** \brief Operator for reading the variant from a stream
+    */
+  std::istream& operator>>(std::istream& stream, Variant& variant);
+  
   /** \brief Operator for writing the variant to a stream
     */
-  std::ostream& operator<<(std::ostream& stream, const Variant&
-    messageData);
+  std::ostream& operator<<(std::ostream& stream, const Variant& variant);
 };
 
 #include <variant_topic_tools/Variant.tpp>

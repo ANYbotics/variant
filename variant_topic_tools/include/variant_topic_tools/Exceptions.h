@@ -26,20 +26,58 @@
 #include <ros/ros.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant topic tools exception type
-    */
+  /** \brief Exception thrown in case of an invalid operation
+    */ 
+  class InvalidOperationException :
+    public ros::Exception {
+  public:
+    /** \brief Default constructor
+      */
+    InvalidOperationException();
+  };
   
-  /** \brief Exception thrown in case of an invalid message data type
+  /** \brief Exception thrown in case of an invalid data type
     */ 
   class InvalidDataTypeException :
     public ros::Exception {
   public:
-    /** \brief Constructor
+    /** \brief Default constructor
       */
-    InvalidDataTypeException(const std::string& dataType);
+    InvalidDataTypeException();
   };
   
-  /** \brief Exception thrown in case of a message data type mismatch
+  /** \brief Exception thrown in case of an attempted modification of
+    *   an immutable data type
+    */ 
+  class ImmutableDataTypeException :
+    public ros::Exception {
+  public:
+    /** \brief Default constructor
+      */
+    ImmutableDataTypeException();
+  };
+  
+  /** \brief Exception thrown in case of a non-existent data type
+    */ 
+  class NoSuchDataTypeException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    NoSuchDataTypeException(const std::string& identifier);
+  };
+  
+  /** \brief Exception thrown in case of an ambiguous data type identifier
+    */ 
+  class AmbiguousDataTypeIdentifierException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    AmbiguousDataTypeIdentifierException(const std::string& identifier);
+  };
+  
+  /** \brief Exception thrown in case of a data type mismatch
     */ 
   class DataTypeMismatchException :
     public ros::Exception {
@@ -48,6 +86,26 @@ namespace variant_topic_tools {
       */
     DataTypeMismatchException(const std::string& expectedDataType, const
       std::string& providedDataType);
+  };
+  
+  /** \brief Exception thrown in case of an invalid message member
+    */ 
+  class InvalidMessageMemberException :
+    public ros::Exception {
+  public:
+    /** \brief Default constructor
+      */
+    InvalidMessageMemberException();
+  };
+  
+  /** \brief Exception thrown in case of a non-existent message member
+    */ 
+  class NoSuchMessageMemberException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    NoSuchMessageMemberException(size_t index);
   };
   
   /** \brief Exception thrown in case of a message MD5 sum mismatch
@@ -61,24 +119,28 @@ namespace variant_topic_tools {
       std::string& providedMD5Sum);
   };
   
-  /** \brief Exception thrown in case of a bad message field name
+  /** \brief Exception thrown in case of a non-existent message field
     */ 
-  class BadFieldNameException :
+  class NoSuchMessageFieldException :
     public ros::Exception {
   public:
-    /** \brief Constructor
+    /** \brief Constructor (overloaded version taking a field index)
       */
-    BadFieldNameException(const std::string& name);
+    NoSuchMessageFieldException(size_t index);
+    
+    /** \brief Constructor (overloaded version taking a field name)
+      */
+    NoSuchMessageFieldException(const std::string& name);
   };
   
-  /** \brief Exception thrown in case of a bad message field index
+  /** \brief Exception thrown in case of an invalid message type
     */ 
-  class BadFieldIndexException :
+  class InvalidMessageTypeException :
     public ros::Exception {
   public:
     /** \brief Constructor
       */
-    BadFieldIndexException(size_t index);
+    InvalidMessageTypeException(const std::string& invalidMessageType);
   };
   
   /** \brief Exception thrown in case of an error to parse the message
@@ -93,7 +155,7 @@ namespace variant_topic_tools {
       line, const std::string& what);
   };
   
-  /** \brief Exception thrown in case of a package not found
+  /** \brief Exception thrown in case of a package not being found
     */ 
   class PackageNotFoundException :
     public ros::Exception {

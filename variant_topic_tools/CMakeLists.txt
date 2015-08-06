@@ -48,16 +48,23 @@ include_directories(
 
 ## Declare a cpp library
 add_library(variant_topic_tools
+  src/ArrayDataType.cpp
+  src/BuiltinDataType.cpp
   src/DataType.cpp
+  src/DataTypeRegistry.cpp
   src/Exceptions.cpp
   src/Message.cpp
+  src/MessageConstant.cpp
+  src/MessageDataType.cpp
   src/MessageDefinition.cpp
   src/MessageField.cpp
   src/MessageFieldCollection.cpp
   src/MessageHeader.cpp
+  src/MessageMember.cpp
   src/MessageSerializer.cpp
   src/MessageTraits.cpp
   src/MessageType.cpp
+  src/MessageVariable.cpp
   src/Serialization.cpp
   src/Variant.cpp
 )

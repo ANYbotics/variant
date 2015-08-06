@@ -23,7 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 
-#include <ros/ros.h>
+#include <boost/unordered_map.hpp>
 
 #include <variant_topic_tools/Variant.h>
 
@@ -164,7 +164,8 @@ namespace variant_topic_tools {
     /** \brief Message serializer instances
       */
     class Instances:
-      public boost::unordered_map<DataType, MessageSerializer> {
+      public boost::unordered_map<DataType, MessageSerializer,
+        DataType::Hash> {
     public:
       /** \brief Default constructor
         */

@@ -16,7 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Variant.h>
+#include <sstream>
+
+#include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageConstant.h"
 
 namespace variant_topic_tools {
 
@@ -24,30 +27,84 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T>
-DataType::ImplT<T>::ImplT() {
+MessageConstant::MessageConstant() {
 }
 
-template <typename T>
-DataType::ImplT<T>::~ImplT() {
+MessageConstant::MessageConstant(const std::string& name, const Variant&
+    value) {
+  impl.reset(new Impl(name, value));
+}
+
+MessageConstant::MessageConstant(const std::string& name, const DataType&
+    type, const std::string& value) {
+  Variant variantValue = type.createVariant();
+  
+  if (!variantValue.isEmpty()) {
+    if (type.getTypeInfo() != typeid(std::string)) {
+      std::istringstream stream(value);
+      stream >> variantValue;
+    }
+    else
+      variantValue = value;
+    
+    impl.reset(new Impl(name, variantValue));
+  }
+}
+
+MessageConstant::MessageConstant(const MessageConstant& src) :
+  MessageMember(src) {
+}
+
+MessageConstant::MessageConstant(const MessageMember& src) :
+  MessageMember(src) {
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<MessageConstant::Impl>(impl));
+}
+
+MessageConstant::~MessageConstant() {
+}
+
+MessageConstant::Impl::Impl(const std::string& name, const Variant& value) :
+  MessageMember::Impl(name),
+  value(value) {
+  if (!value.getType().isValid())
+    throw InvalidDataTypeException();
+}
+
+MessageConstant::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T>
-const std::type_info& DataType::ImplT<T>::getTypeInfo() const {
-  return typeid(T);
+const Variant& MessageConstant::getValue() const {
+  if (!impl) {
+    static Variant value;
+    return value;
+  }
+  else
+    return boost::static_pointer_cast<Impl>(impl)->value;
+}
+
+const DataType& MessageConstant::Impl::getType() const {
+  return value.getType();
+}
+
+size_t MessageConstant::Impl::getSize() const {
+  return 0;
+}
+
+bool MessageConstant::Impl::isFixedSize() const {
+  return true;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T>
-VariantPtr DataType::ImplT<T>::createVariant() const {
-  return VariantPtr(new Variant(T()));
+void MessageConstant::Impl::write(std::ostream& stream) const {
+  stream << value.getType() << " " << name << "=" << value;
 }
 
 }

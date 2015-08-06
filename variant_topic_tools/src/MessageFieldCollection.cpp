@@ -50,14 +50,14 @@ MessageField& MessageFieldCollection::getField(size_t index) {
   if (index < fieldsInOrder.size())
     return *(fieldsInOrder[index]);
   else
-    throw BadFieldIndexException(index);
+    throw NoSuchMessageFieldException(index);
 }
 
 const MessageField& MessageFieldCollection::getField(size_t index) const {
   if (index < fieldsInOrder.size())
     return *(fieldsInOrder[index]);
   else
-    throw BadFieldIndexException(index);
+    throw NoSuchMessageFieldException(index);
 }
 
 MessageField& MessageFieldCollection::getField(const std::string& name) {
@@ -92,7 +92,7 @@ MessageField& MessageFieldCollection::getField(const std::string& name,
     }      
   }
 
-  throw BadFieldNameException(name);;
+  throw NoSuchMessageFieldException(name);
 }
 
 bool MessageFieldCollection::hasField(const std::string& name) const {

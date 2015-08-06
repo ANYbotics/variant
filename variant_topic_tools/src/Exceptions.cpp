@@ -26,9 +26,27 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-InvalidDataTypeException::InvalidDataTypeException(const std::string&
-    dataType) :
-  ros::Exception("Data type ["+dataType+"] is invalid") {
+InvalidOperationException::InvalidOperationException() :
+  ros::Exception("Attempted execution of an invalid operation") {
+}
+
+InvalidDataTypeException::InvalidDataTypeException() :
+  ros::Exception("Attempted use of an invalid data type") {
+}
+
+ImmutableDataTypeException::ImmutableDataTypeException() :
+  ros::Exception("Attempted modification of an immutable data type") {
+}
+
+NoSuchDataTypeException::NoSuchDataTypeException(const std::string&
+    identifier) :
+  ros::Exception("Data type ["+identifier+"] does not exist") {
+}
+
+AmbiguousDataTypeIdentifierException::AmbiguousDataTypeIdentifierException(
+    const std::string& identifier) :
+  ros::Exception("Data type identifier ["+identifier+
+    "] is used ambiguously") {
 }
 
 DataTypeMismatchException::DataTypeMismatchException(const std::string&
@@ -37,21 +55,36 @@ DataTypeMismatchException::DataTypeMismatchException(const std::string&
     "] mismatches expected data type ["+expectedDataType+"]") {
 }
 
+InvalidMessageMemberException::InvalidMessageMemberException() :
+  ros::Exception("Attempted use of an invalid message member") {
+}
+
+NoSuchMessageMemberException::NoSuchMessageMemberException(size_t index) :
+  ros::Exception("Member with index ["+boost::lexical_cast<std::string>(index)+
+    "] does not exist") {
+}
+
 MD5SumMismatchException::MD5SumMismatchException(const std::string&
     expectedMD5Sum, const std::string& providedMD5Sum) :
   ros::Exception("Provided MD5 sum ["+providedMD5Sum+
     "] mismatches expected MD5 sum ["+expectedMD5Sum+"]") {
 }
 
-BadFieldNameException::BadFieldNameException(const std::string& name) :
+NoSuchMessageFieldException::NoSuchMessageFieldException(size_t index) :
+  ros::Exception("Field with index ["+boost::lexical_cast<std::string>(index)+
+    "] does not exist") {
+}
+
+NoSuchMessageFieldException::NoSuchMessageFieldException(const std::string&
+    name) :
   ros::Exception("Field with name ["+name+"] does not exist") {
 }
 
-BadFieldIndexException::BadFieldIndexException(size_t index) :
-  ros::Exception("Field index ["+boost::lexical_cast<std::string>(index)+
-    "] out of range") {
+InvalidMessageTypeException::InvalidMessageTypeException(const std::string&
+    invalidMessageType) :
+  ros::Exception("Message type ["+invalidMessageType+"] is invalid") {
 }
-
+  
 DefinitionParseException::DefinitionParseException(const std::string&
     dataType, const std::string& line, const std::string& what) :
   ros::Exception("Error parsing the definition for ["+dataType+"]: "+

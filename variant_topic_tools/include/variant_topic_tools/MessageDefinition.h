@@ -31,6 +31,7 @@
 #include <ros/ros.h>
 
 #include <variant_topic_tools/Forwards.h>
+#include <variant_topic_tools/MessageDataType.h>
 #include <variant_topic_tools/MessageField.h>
 #include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageType.h>
@@ -40,11 +41,19 @@ namespace variant_topic_tools {
     */
   class MessageDefinition :
     public MessageFieldCollection,
-    public boost::enable_shared_from_this<MessageDefinition>{
+    public boost::enable_shared_from_this<MessageDefinition> {
   public:
     /** \brief Default constructor
       */ 
-    MessageDefinition(const MessageType& messageType = MessageType());
+    MessageDefinition();
+    
+    /** \brief Constructor (overloaded version accepting a message type)
+      */ 
+    MessageDefinition(const MessageType& messageType);
+    
+    /** \brief Constructor (overloaded version accepting a message data type)
+      */ 
+    MessageDefinition(const MessageDataType& messageDataType);
     
     /** \brief Copy constructor
       */ 
@@ -56,9 +65,14 @@ namespace variant_topic_tools {
     
     /** \brief Access the message type represented by this message definition
       */ 
-    void setMessageType(const MessageType& type);
-    MessageType& getMessageType();
+    void setMessageType(const MessageType& messageType);
     const MessageType& getMessageType() const;
+    
+    /** \brief Access the message data type represented by this message
+      *   definition
+      */ 
+    void setMessageDataType(const MessageDataType& messageDataType);
+    const MessageDataType& getMessageDataType() const;
     
     /** \brief True, if this message definition is valid
       */ 
@@ -71,7 +85,7 @@ namespace variant_topic_tools {
     
     /** \brief Clear the message definition
       */
-    virtual void clear();
+    void clear();
     
     /** \brief Write the message definition to a stream
       */
@@ -80,6 +94,7 @@ namespace variant_topic_tools {
     
   protected:
     MessageType messageType;
+    MessageDataType messageDataType;
     
     /** \brief Parse the message definition
       */

@@ -21,7 +21,6 @@
 #include <ros/package.h>
 
 #include <boost/regex.hpp>
-#include <boost/concept_check.hpp>
 
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageDefinition.h"
@@ -32,14 +31,21 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
+MessageDefinition::MessageDefinition() {
+}
+
 MessageDefinition::MessageDefinition(const MessageType& messageType) {
-  if (messageType.isValid())
-    setMessageType(messageType);
+  setMessageType(messageType);
+}
+
+MessageDefinition::MessageDefinition(const MessageDataType& messageDataType) {
+  setMessageDataType(messageDataType);
 }
 
 MessageDefinition::MessageDefinition(const MessageDefinition& src) :
   MessageFieldCollection(src),
-  messageType(src.messageType) {
+  messageType(src.messageType),
+  messageDataType(src.messageDataType) {
 }
 
 MessageDefinition::~MessageDefinition() {
@@ -50,33 +56,36 @@ MessageDefinition::~MessageDefinition() {
 /*****************************************************************************/
 
 void MessageDefinition::setMessageType(const MessageType& messageType) {
-  if (this->messageType != messageType) {
-    clear();
+  clear();
+  
+  if (messageType.isValid()) {
+    this->messageType = messageType;
     
-    if (messageType.isValid()) {
-      this->messageType = messageType;
-      
-      try {
-        parse();
-      }
-      catch (const DefinitionParseException& exception) {
-        clear();
-        throw exception;
-      }
+    try {
+      parse();
+    }
+    catch (const DefinitionParseException& exception) {
+      clear();
+      throw exception;
     }
   }
-}
-
-MessageType& MessageDefinition::getMessageType() {
-  return messageType;
 }
 
 const MessageType& MessageDefinition::getMessageType() const {
   return messageType;
 }
 
+void MessageDefinition::setMessageDataType(const MessageDataType&
+    messageDataType) {
+  setMessageType(messageDataType);
+}
+
+const MessageDataType& MessageDefinition::getMessageDataType() const {
+  return messageDataType;
+}
+
 bool MessageDefinition::isValid() const {
-  return messageType.isValid();
+  return messageDataType.isValid();
 }
 
 /*****************************************************************************/
@@ -98,11 +107,11 @@ void MessageDefinition::load(const std::string& messageDataType) {
     if (type == "Header")
       package = "std_msgs";
     else
-      throw InvalidDataTypeException(messageDataType);
+      throw InvalidMessageTypeException(messageDataType);
   }
   
   if (type.empty())
-    throw InvalidDataTypeException(messageDataType);
+    throw InvalidDataTypeException();
   
   std::string packagePath = ros::package::getPath(package);
   if (packagePath.empty())

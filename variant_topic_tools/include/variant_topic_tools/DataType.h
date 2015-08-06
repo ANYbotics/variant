@@ -26,26 +26,55 @@
 #include <typeinfo>
 #include <vector>
 
-#include <boost/unordered_map.hpp>
-
 #include <ros/ros.h>
 
+#include <variant_topic_tools/Forwards.h>
+
 namespace variant_topic_tools {
-  /** \brief Data type information
+  /** \brief Data type
     */
   class DataType {
-  friend struct boost::hash<DataType>;
+  friend class DataTypeHash;
+  friend class DataTypeRegistry;
   public:
+    /** \brief Data type hash
+      */
+    class Hash {
+    public:
+      /** \brief Data type hash operator
+        */
+      inline size_t operator()(const DataType& dataType) const {
+        return reinterpret_cast<size_t>(dataType.impl.get());
+      };
+    };
+
     /** \brief Default constructor
       */ 
     DataType();
     
-    /** \brief Constructor for creating a data type by identifier
+    /** \brief Constructor (overloaded version taking an identifier)
       * 
-      * \note If the data type does not exist, it will be constructed as
-      *   invalid data type.
+      * \note If the data type matching the specified identifier cannot
+      *   be found in the data type registry, the instantiated data
+      *   type will be invalid.
       */ 
     DataType(const char* identifier);
+    
+    /** \brief Constructor (overloaded version taking a string identifier)
+      * 
+      * \note If the data type matching the specified identifier cannot
+      *   be found in the data type registry, the instantiated data
+      *   type will be invalid.
+      */ 
+    DataType(const std::string& identifier);
+    
+    /** \brief Constructor (overloaded version taking type information)
+      * 
+      * \note If the data type matching the specified type information
+      *   cannot be found in the data type registry, the instantiated
+      *   data type will be invalid.
+      */ 
+    DataType(const std::type_info& typeInfo);
     
     /** \brief Copy constructor
       */ 
@@ -57,65 +86,45 @@ namespace variant_topic_tools {
 
     /** \brief Retrieve the identifier representing this data type
       */ 
-    std::string getIdentifier() const;
+    const std::string& getIdentifier() const;
     
     /** \brief Retrieve the type information associated with this data type
+      *
+      * \note If no type information is available for this data type,
+      *   the type information for void will be returned. 
       */ 
-    const std::type_info& getInfo() const;
+    const std::type_info& getTypeInfo() const;
     
     /** \brief Retrieve the size of the instances of this data type
       * 
-      * \note For variable-size data types, the reported size is zero.
+      * \note For variable-size data types, the reported size will be zero.
       */ 
     size_t getSize() const;
     
-    /** \brief Retrieve the member type of an array data type
-      */ 
-    DataType getMemberType() const;
-    
-    /** \brief Retrieve the member types of a complex data type in their
-      *   defined order
-      */ 
-    std::vector<DataType> getMemberTypes() const;
-    
-    /** \brief True, if this data type represents a primitive data type,
-      *   as opposed to a compound data type
-      */ 
-    bool isPrimitive() const;
-    
-    /** \brief True, if this data type represents a simple data type
-      *  
-      * A "simple" data type is one whose instances, given a vector/array
-      * of them, can be memcpy'd directly.
-      */ 
-    bool isSimple() const;
-    
-    /** \brief True, if this data type represents a fixed-size data type
-      *  
-      * A fixed-size data type is one whose instances always have the same
-      * size.
-      */ 
-    bool isFixedSize() const;
-    
-    /** \brief True, if this data type represents an arithmetic data type
-      */ 
-    bool isArithmetic() const;
-    
-    /** \brief True, if this data type represents a string data type
-      */ 
-    bool isString() const;
-    
-    /** \brief True, if this data type represents an array data type
+    /** \brief True, if this data type represents an array type
       */ 
     bool isArray() const;
+    
+    /** \brief True, if this data type represents a built-in type
+      */ 
+    bool isBuiltin() const;
     
     /** \brief True, if this data type represents a message type
       */ 
     bool isMessage() const;
     
+    /** \brief True, if this data type represents a fixed-size data type,
+      *   as opposed to a variable-size data type
+      */ 
+    bool isFixedSize() const;
+
     /** \brief True, if this data type is valid
       */ 
     bool isValid() const;
+    
+    /** \brief True, if this data type has type information
+      */ 
+    bool hasTypeInfo() const;
     
     /** \brief Clear the data type
       */
@@ -125,28 +134,14 @@ namespace variant_topic_tools {
       */
     void write(std::ostream& stream) const;
     
+      /** \brief Create a variant from this data type
+        */ 
+    Variant createVariant() const;
+    
     /** \brief Void pointer conversion
       */
     inline operator void*() const {
-      return (impl && impl->isValid()) ? (void*)1 : (void*)0;
-    };
-    
-    /** \brief Lesser comparison operator
-      */
-    inline bool operator<(const DataType& dataType) const {
-      return (impl < dataType.impl);
-    };
-    
-    /** \brief Equality comparison operator
-      */
-    inline bool operator==(const DataType& dataType) const {
-      return (impl == dataType.impl);
-    };
-    
-    /** \brief Inequality comparison operator
-      */
-    inline bool operator!=(const DataType& dataType) const {
-      return (impl != dataType.impl);
+      return (impl) ? (void*)1 : (void*)0;
     };
     
   protected:
@@ -169,174 +164,92 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      Impl(const std::string& identifier);
+      Impl();
       
       /** \brief Destructor
         */
       virtual ~Impl();
 
+      /** \brief Retrieve the identifier representing this data type
+        *   (abstract declaration)
+        */ 
+      virtual const std::string& getIdentifier() const = 0;
+    
       /** \brief Retrieve the type information associated with this data type
         *   (abstract declaration)
         */ 
-      virtual const std::type_info& getInfo() const = 0;
+      virtual const std::type_info& getTypeInfo() const = 0;
     
       /** \brief Retrieve the size of the instances of this data type
         *   (abstract declaration)
         */
       virtual size_t getSize() const = 0;
       
-      /** \brief True, if this data type represents a primitive data type,
-        *   as opposed to a complex data type (abstract declaration)
-        */
-      virtual bool isPrimitive() const = 0;
-      
-      /** \brief True, if this data type represents a simple data type
-        *   (abstract declaration)
-        */
-      virtual bool isSimple() const = 0;
-      
-      /** \brief True, if this data type represents a fixed-size data type
-        *   (abstract declaration)
-        */
+      /** \brief True, if this data type represents a fixed-size data type,
+        *   as opposed to a variable-size data type (abstract declaration)
+        */ 
       virtual bool isFixedSize() const = 0;
       
-      /** \brief True, if this data type represents an arithmetic data type
-        *   (abstract declaration)
+      /** \brief Create a variant from this data type (abstract declaration)
         */ 
-      virtual bool isArithmetic() const = 0;
-    
-      /** \brief True, if this data type represents a string data type
-        *   (abstract declaration)
-        */ 
-      virtual bool isString() const = 0;
-      
-      /** \brief True, if this data type represents an array data type
-        *   (abstract declaration)
-        */ 
-      virtual bool isArray() const = 0;
-    
-      /** \brief True, if this data type represents an array data type
-        *   (abstract declaration)
-        */ 
-      virtual bool isMessage() const = 0;
-    
-      /** \brief True, if this data type is valid
-        */
-      bool isValid() const;
-
-      /** \brief The identifier representing this data type
-        */
-      std::string identifier;
-      
-      /** \brief The member types of this data type
-        */
-      std::vector<DataType> memberTypes;        
+      virtual VariantPtr createVariant() const = 0;
     };
     
-    /** \brief Data type implementation (templated version)
+    /** \brief Data type implementation (variant-typed version)
       */
-    template <typename T> class ImplT :
-      public Impl {
+    class ImplV :
+      public virtual Impl {
     public:
       /** \brief Constructor
         */
-      ImplT(const std::string& identifier);
+      ImplV();
+      
+      /** \brief Destructor
+        */
+      virtual ~ImplV();
+
+      /** \brief Retrieve the type information associated with this data type
+        *   (implementation)
+        */ 
+      const std::type_info& getTypeInfo() const;
+      
+      /** \brief Create a variant from this data type (implementation)
+        */ 
+      VariantPtr createVariant() const;
+   };
+   
+    /** \brief Data type implementation (templated strong-typed version)
+      */
+    template <typename T> class ImplT :
+      public virtual Impl {
+    public:
+      /** \brief Constructor
+        */
+      ImplT();
       
       /** \brief Destructor
         */
       virtual ~ImplT();
-      
+
       /** \brief Retrieve the type information associated with this data type
         *   (implementation)
         */ 
-      const std::type_info& getInfo() const;
-    
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
+      const std::type_info& getTypeInfo() const;
       
-      /** \brief True, if this data type represents a primitive data type,
-        *   as opposed to a complex data type (implementation)
-        */
-      bool isPrimitive() const;
-      
-      /** \brief True, if this data type represents a simple data type
-        *   (implementation)
-        */
-      bool isSimple() const;
-      
-      /** \brief True, if this data type represents a fixed-size data type
-        *   (implementation)
-        */
-      bool isFixedSize() const;
-      
-      /** \brief True, if this data type represents an arithmetic data type
-        *   (implementation)
+      /** \brief Create a variant from this data type (implementation)
         */ 
-      bool isArithmetic() const;
-      
-      /** \brief True, if this data type represents a string data type
-        *   (implementation)
-        */ 
-      bool isString() const;
-      
-      /** \brief True, if this data type represents an array data type
-        *   (implementation)
-        */ 
-      bool isArray() const;
-      
-      /** \brief True, if this data type represents a message type
-        *   (implementation)
-        */ 
-      bool isMessage() const;
-    };
-    
-    /** \brief Data type instances
-      */
-    class Instances:
-      public boost::unordered_map<std::string, DataType> {
-    public:
-      /** \brief Default constructor
-        */
-      Instances();
-      
-      /** \brief Destructor
-        */
-      ~Instances();
-      
-      /** \brief Add a non-message type
-        */
-      template <typename T> void add(const std::string& identifier);
-      
-      /** \brief Add a message type
-        */
-      template <typename T> void add();
-    };
-    
-    /** \brief Access the data type instances
-      */ 
-    static Instances& getInstances();
-    
+      VariantPtr createVariant() const;
+   };
+   
     /** \brief The data type's implementation
       */
     ImplPtr impl;
   };
-  
-  std::ostream& operator<<(std::ostream& stream, const DataType&
-    dataType);
-};
-
-namespace boost {
-  /** \brief Specialization of the data type hash function
+    
+  /** \brief Operator for writing the data type to a stream
     */
-  template <> struct hash<variant_topic_tools::DataType> {
-    size_t operator()(const variant_topic_tools::DataType& dataType)
-        const {
-      return reinterpret_cast<size_t>(dataType.impl.get());
-    };
-  };
-}
+  std::ostream& operator<<(std::ostream& stream, const DataType& dataType);
+};
 
 #include <variant_topic_tools/DataType.tpp>
 

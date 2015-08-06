@@ -16,12 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/ArrayDataType.h"
-#include "variant_topic_tools/BuiltinDataType.h"
-#include "variant_topic_tools/DataType.h"
-#include "variant_topic_tools/DataTypeRegistry.h"
-#include "variant_topic_tools/MessageDataType.h"
-#include "variant_topic_tools/Variant.h"
+#include "variant_topic_tools/MessageConstant.h"
+#include "variant_topic_tools/MessageMember.h"
+#include "variant_topic_tools/MessageVariable.h"
 
 namespace variant_topic_tools {
 
@@ -29,149 +26,93 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-DataType::DataType() {
+MessageMember::MessageMember() {
 }
 
-DataType::DataType(const char* identifier) {
-  DataTypeRegistry registry;
-  DataType dataType = registry.getDataType(identifier);
-  
-  impl = dataType.impl;
-}
-
-DataType::DataType(const std::string& identifier) {
-  DataTypeRegistry registry;
-  DataType dataType = registry.getDataType(identifier);
-  
-  impl = dataType.impl;
-}
-
-DataType::DataType(const std::type_info& typeInfo) {
-  DataTypeRegistry registry;
-  DataType dataType = registry.getDataType(typeInfo);
-  
-  impl = dataType.impl;
-}
-
-DataType::DataType(const DataType& src) :
+MessageMember::MessageMember(const MessageMember& src) :
   impl(src.impl) {
 }
 
-DataType::~DataType() {
+MessageMember::~MessageMember() {
 }
 
-DataType::Impl::Impl() {
+MessageMember::Impl::Impl(const std::string& name) :
+  name(name) {
 }
 
-DataType::Impl::~Impl() {
-}
-
-DataType::ImplV::ImplV() {
-}
-
-DataType::ImplV::~ImplV() {
+MessageMember::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-const std::string& DataType::getIdentifier() const {
+const std::string& MessageMember::getName() const {
   if (!impl) {
-    static std::string identifier;
-    return identifier;
+    static std::string name;
+    return name;
   }
   else
-    return impl->getIdentifier();
+    return impl->name;
 }
 
-const std::type_info& DataType::getTypeInfo() const {
-  if (impl)
-    return impl->getTypeInfo();
+const DataType& MessageMember::getType() const {
+  if (!impl) {
+    static DataType type;
+    return type;
+  }
   else
-    return typeid(void);
+    return impl->getType();
 }
 
-size_t DataType::getSize() const {
+size_t MessageMember::getSize() const {
   if (impl)
     return impl->getSize();
   else
     return 0;
 }
 
-bool DataType::isArray() const {
+bool MessageMember::isVariable() const {
   if (impl)
-    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl);
+    return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl);
   else
     return false;
 }
 
-bool DataType::isBuiltin() const {
+bool MessageMember::isConstant() const {
   if (impl)
-    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl);
+    return boost::dynamic_pointer_cast<MessageConstant::Impl>(impl);
   else
     return false;
 }
 
-bool DataType::isMessage() const {
-  if (impl)
-    return boost::dynamic_pointer_cast<MessageDataType::Impl>(impl);
-  else
-    return false;
-}
-
-bool DataType::isFixedSize() const {
+bool MessageMember::isFixedSize() const {
   if (impl)
     return impl->isFixedSize();
   else
-    return true;
-}
-
-bool DataType::isValid() const {
-  return impl;
-}
-
-bool DataType::hasTypeInfo() const {
-  if (impl)
-    return (impl->getTypeInfo() != typeid(void));
-  else
     return false;
 }
 
-const std::type_info& DataType::ImplV::getTypeInfo() const {
-  return typeid(void);
+bool MessageMember::isValid() const {
+  return impl;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void DataType::clear() {
-  impl.reset();
-}
-
-void DataType::write(std::ostream& stream) const {
+void MessageMember::write(std::ostream& stream) const {
   if (impl)
-    stream << impl->getIdentifier();
-}
-
-Variant DataType::createVariant() const {
-  if (impl)
-    return *impl->createVariant();
-  else
-    return Variant();
-}
-
-VariantPtr DataType::ImplV::createVariant() const {
-  return VariantPtr(new Variant());
+    impl->write(stream);
 }
 
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
 
-std::ostream& operator<<(std::ostream& stream, const DataType& dataType) {
-  dataType.write(stream);
+std::ostream& operator<<(std::ostream& stream, const MessageMember&
+    messageMember) {
+  messageMember.write(stream);
   return stream;
 }
 

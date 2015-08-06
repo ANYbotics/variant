@@ -16,78 +16,45 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageSerializer.h"
-
 namespace variant_topic_tools {
 
 /*****************************************************************************/
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageSerializer::MessageSerializer() {
+template <typename T, size_t N>
+ArrayDataType::ImplT<T, N>::ImplT() :
+  Impl(typeid(T)) {
 }
 
-MessageSerializer::MessageSerializer(const DataType& dataType) {
-  boost::unordered_map<DataType, MessageSerializer>::const_iterator
-    it = getInstances().find(dataType);
-    
-  if (it != getInstances().end())
-    impl = it->second.impl;
-}
-
-MessageSerializer::MessageSerializer(const MessageSerializer& src) :
-  impl(src.impl) {
-}
-
-MessageSerializer::~MessageSerializer() {
-}
-
-MessageSerializer::Impl::Impl(const DataType& dataType) :
-  dataType(dataType) {
-}
-
-MessageSerializer::Impl::~Impl() {
-}
-
-MessageSerializer::Instances::Instances() {
-//   createSimple<bool>("bool");
-//   createSimple<double>("float64");
-//   createSimple<float>("float32");
-//   createSimple<int16_t>("int16");
-//   createSimple<int32_t>("int32");
-//   createSimple<int64_t>("int64");
-//   createSimple<int8_t>("int8");
-//   createSimple<uint16_t>("uint16");
-//   createSimple<uint32_t>("uint32");
-//   createSimple<uint64_t>("uint64");
-//   createSimple<uint8_t>("uint8");
-//   
-//   createBuiltin<ros::Duration>("duration");
-//   createBuiltin<std::string>("string");
-//   createBuiltin<ros::Time>("time");
-}
-
-MessageSerializer::Instances::~Instances() {
+template <typename T, size_t N>
+ArrayDataType::ImplT<T, N>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-DataType MessageSerializer::getDataType() const {
-  if (impl)
-    return impl->dataType;
-  else
-    return DataType();
+template <typename T, size_t N>
+size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
+  return N;
 }
 
-bool MessageSerializer::Impl::isValid() const {
-  return dataType;
+/*****************************************************************************/
+/* Methods                                                                   */
+/*****************************************************************************/
+
+template <class A> ArrayDataType ArrayDataType::create() {
+  return ArrayDataType::template create<typename
+    TypeTraits::FromArray<A>::ElementType,
+    TypeTraits::FromArray<A>::NumElements>();
 }
 
-MessageSerializer::Instances& MessageSerializer::getInstances() {
-  static boost::shared_ptr<Instances> instances(new Instances());
-  return *instances;
+template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
+  ArrayDataType arrayDataType;
+  arrayDataType.impl.reset(new ImplT<T, N>());
+  
+  return arrayDataType;
 }
 
 }

@@ -16,93 +16,49 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/Variant.h"
-
 namespace variant_topic_tools {
-
-/*****************************************************************************/
-/* Constructors and Destructor                                               */
-/*****************************************************************************/
-
-Variant::Variant() {
-}
-
-Variant::Variant(const Variant& src) :
-  type(src.type),
-  value(src.value ? src.value->clone() : ValuePtr()) {
-}
-
-Variant::~Variant() {
-}
-
-Variant::Value::Value() {
-}
-
-Variant::Value::~Value() {
-}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-const DataType& Variant::getType() const {
-  return type;
-}
-
-bool Variant::isEmpty() const {
-  return !value;
+template <typename T> DataType DataTypeRegistry::getDataType() const {
+  return this->getDataType(typeid(T));
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void Variant::clear() {
-  type.clear();
-  value.reset();
+template <class A> ArrayDataType DataTypeRegistry::addArrayDataType() {
+  ArrayDataType arrayDataType = ArrayDataType::template create<A>();
+  this->addDataType(arrayDataType);
+  
+  return arrayDataType;
 }
 
-void Variant::read(std::istream& stream) {
-  if (value)
-    value->read(stream);
+template <typename T, size_t N> ArrayDataType
+  DataTypeRegistry::addArrayDataType() {
+  ArrayDataType arrayDataType = ArrayDataType::template create<T, N>();
+  this->addDataType(arrayDataType);
+  
+  return arrayDataType;
 }
 
-void Variant::write(std::ostream& stream) const {
-  if (value)
-    value->write(stream);
+template <typename T> BuiltinDataType DataTypeRegistry::addBuiltinDataType(
+    const std::string& identifier) {
+  BuiltinDataType builtinDataType = BuiltinDataType::template
+    create<T>(identifier);
+  this->addDataType(builtinDataType);
+  
+  return builtinDataType;
 }
 
-/*****************************************************************************/
-/* Operators                                                                 */
-/*****************************************************************************/
-
-Variant& Variant::operator=(const Variant& src) {
-  type = src.type;
-  value = src.value ? src.value->clone() : ValuePtr();
-}
-
-bool Variant::operator==(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return value->isEqual(*variant.value);
-  else
-    return false;
-}
-    
-bool Variant::operator!=(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return !value->isEqual(*variant.value);
-  else
-    return true;
-}
-
-std::istream& operator>>(std::istream& stream, Variant& variant) {
-  variant.read(stream);
-  return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, const Variant& variant) {
-  variant.write(stream);
-  return stream;
+template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
+  MessageDataType messageDataType = MessageDataType::template create<T>();
+  this->addDataType(messageDataType);
+  
+  return messageDataType;
 }
 
 }

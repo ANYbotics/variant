@@ -31,6 +31,12 @@ MessageType::MessageType(const std::string& dataType, const std::string&
   definition(definition) {
 }
 
+MessageType::MessageType(const MessageDataType& dataType) :
+  dataType(dataType.getIdentifier()),
+  md5Sum(dataType.getMD5Sum()),
+  definition(dataType.getDefinition()) {
+}
+
 MessageType::MessageType(const MessageType& src) :
   dataType(src.dataType),
   md5Sum(src.md5Sum),
@@ -80,7 +86,8 @@ bool MessageType::isValid() const {
 void MessageType::write(std::ostream& stream, const std::string& indent)
     const {
   stream << indent << "Message data type: " << dataType << "\n";
-  stream << indent << "Message MD5 sum: " << md5Sum;
+  stream << indent << "Message MD5 sum: " << md5Sum << "\n";
+  stream << indent << "Message definition:\n" << definition;
 }
       
 /*****************************************************************************/

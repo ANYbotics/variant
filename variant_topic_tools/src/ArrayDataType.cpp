@@ -16,7 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageSerializer.h"
+#include "variant_topic_tools/ArrayDataType.h"
+#include "variant_topic_tools/Exceptions.h"
 
 namespace variant_topic_tools {
 
@@ -24,70 +25,82 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageSerializer::MessageSerializer() {
+ArrayDataType::ArrayDataType() {
 }
 
-MessageSerializer::MessageSerializer(const DataType& dataType) {
-  boost::unordered_map<DataType, MessageSerializer>::const_iterator
-    it = getInstances().find(dataType);
-    
-  if (it != getInstances().end())
-    impl = it->second.impl;
+ArrayDataType::ArrayDataType(const DataType& elementType, size_t numElements) {
+  impl.reset(new ImplV(elementType, numElements));
 }
 
-MessageSerializer::MessageSerializer(const MessageSerializer& src) :
-  impl(src.impl) {
+ArrayDataType::ArrayDataType(const ArrayDataType& src) :
+  DataType(src) {
 }
 
-MessageSerializer::~MessageSerializer() {
+ArrayDataType::ArrayDataType(const DataType& src) :
+  DataType(src) {
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl));
 }
 
-MessageSerializer::Impl::Impl(const DataType& dataType) :
-  dataType(dataType) {
+ArrayDataType::~ArrayDataType() {
 }
 
-MessageSerializer::Impl::~Impl() {
+ArrayDataType::Impl::Impl(const DataType& elementType) :
+  elementType(elementType) {
+  if (!elementType.isValid())
+    throw InvalidDataTypeException();  
 }
 
-MessageSerializer::Instances::Instances() {
-//   createSimple<bool>("bool");
-//   createSimple<double>("float64");
-//   createSimple<float>("float32");
-//   createSimple<int16_t>("int16");
-//   createSimple<int32_t>("int32");
-//   createSimple<int64_t>("int64");
-//   createSimple<int8_t>("int8");
-//   createSimple<uint16_t>("uint16");
-//   createSimple<uint32_t>("uint32");
-//   createSimple<uint64_t>("uint64");
-//   createSimple<uint8_t>("uint8");
-//   
-//   createBuiltin<ros::Duration>("duration");
-//   createBuiltin<std::string>("string");
-//   createBuiltin<ros::Time>("time");
+ArrayDataType::Impl::~Impl() {
 }
 
-MessageSerializer::Instances::~Instances() {
+ArrayDataType::ImplV::ImplV(const DataType& elementType, size_t numElements) :
+  Impl(elementType),
+  numElements(numElements) {
+}
+
+ArrayDataType::ImplV::~ImplV() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-DataType MessageSerializer::getDataType() const {
-  if (impl)
-    return impl->dataType;
+const DataType& ArrayDataType::getElementType() const {
+  if (!impl) {
+    static DataType elementType;
+    return elementType;
+  }
   else
-    return DataType();
+    return boost::dynamic_pointer_cast<Impl>(impl)->elementType;
 }
 
-bool MessageSerializer::Impl::isValid() const {
-  return dataType;
+size_t ArrayDataType::getNumElements() const {
+  if (impl)
+    return boost::dynamic_pointer_cast<Impl>(impl)->getNumElements();
+  else
+    return 0;
 }
 
-MessageSerializer::Instances& MessageSerializer::getInstances() {
-  static boost::shared_ptr<Instances> instances(new Instances());
-  return *instances;
+const std::string& ArrayDataType::Impl::getIdentifier() const {
+  if (identifier.empty()) {
+    identifier = elementType.getIdentifier()+(isFixedSize() ?
+      "["+boost::lexical_cast<std::string>(getNumElements())+"]" : "[]");
+  }
+
+  return identifier;
+}
+
+size_t ArrayDataType::Impl::getSize() const {
+  return getNumElements()*elementType.getSize();
+}
+
+bool ArrayDataType::Impl::isFixedSize() const {
+  return getNumElements();
+}
+
+size_t ArrayDataType::ImplV::getNumElements() const {
+  return numElements;
 }
 
 }

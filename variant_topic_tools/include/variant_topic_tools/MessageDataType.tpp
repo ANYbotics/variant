@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/Variant.h"
+#include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
 
@@ -24,85 +24,77 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Variant::Variant() {
+template <typename T>
+MessageDataType::ImplT<T>::ImplT() :
+  Impl(ros::message_traits::template definition<T>()) {
+  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
 }
 
-Variant::Variant(const Variant& src) :
-  type(src.type),
-  value(src.value ? src.value->clone() : ValuePtr()) {
-}
-
-Variant::~Variant() {
-}
-
-Variant::Value::Value() {
-}
-
-Variant::Value::~Value() {
+template <typename T>
+MessageDataType::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-const DataType& Variant::getType() const {
-  return type;
+template <typename T>
+const std::string& MessageDataType::ImplT<T>::getIdentifier() const {
+  static std::string identifier(ros::message_traits::template datatype<T>());
+  return identifier;
 }
 
-bool Variant::isEmpty() const {
-  return !value;
+template <typename T>
+size_t MessageDataType::ImplT<T>::getSize() const {
+  return ros::message_traits::template isFixedSize<T>() ? sizeof(T) : 0;
+}
+
+template <typename T>
+const std::string& MessageDataType::ImplT<T>::getMD5Sum() const {
+  static std::string md5Sum(ros::message_traits::template md5sum<T>());
+  return md5Sum;
+}
+
+template <typename T>
+const std::string& MessageDataType::ImplT<T>::getDefinition() const {
+  static std::string definition(ros::message_traits::template definition<T>());
+  return definition;
+}
+
+template <typename T>
+bool MessageDataType::ImplT<T>::isSimple() const {
+  return ros::message_traits::template isSimple<T>();
+}
+
+template <typename T>
+bool MessageDataType::ImplT<T>::isFixedSize() const {
+  return ros::message_traits::template isFixedSize<T>();
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void Variant::clear() {
-  type.clear();
-  value.reset();
+template <typename T> MessageDataType MessageDataType::create() {
+  MessageDataType messageDataType;
+  messageDataType.impl.reset(new ImplT<T>());
+  
+  return messageDataType;
 }
 
-void Variant::read(std::istream& stream) {
-  if (value)
-    value->read(stream);
+template <typename T> MessageConstant MessageDataType::addConstant(const
+    std::string& name, const T& value) {
+  return this->addConstant(name, Variant(value));
 }
 
-void Variant::write(std::ostream& stream) const {
-  if (value)
-    value->write(stream);
+template <typename T> MessageVariable MessageDataType::addVariable(const
+    std::string& name) {
+  return this->addVariable(name, typeid(T));
 }
 
-/*****************************************************************************/
-/* Operators                                                                 */
-/*****************************************************************************/
-
-Variant& Variant::operator=(const Variant& src) {
-  type = src.type;
-  value = src.value ? src.value->clone() : ValuePtr();
-}
-
-bool Variant::operator==(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return value->isEqual(*variant.value);
-  else
-    return false;
-}
-    
-bool Variant::operator!=(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return !value->isEqual(*variant.value);
-  else
-    return true;
-}
-
-std::istream& operator>>(std::istream& stream, Variant& variant) {
-  variant.read(stream);
-  return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, const Variant& variant) {
-  variant.write(stream);
-  return stream;
+template <typename T>
+void MessageDataType::ImplT<T>::addMember(const MessageMember& member) {
+  throw ImmutableDataTypeException();
 }
 
 }

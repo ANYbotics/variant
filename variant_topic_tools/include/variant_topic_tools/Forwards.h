@@ -27,6 +27,14 @@
 #include <ros/forwards.h>
 
 namespace variant_topic_tools {
+  /** \brief Forward declaration of the data type
+    */
+  class DataType;
+  
+  /** \brief Forward declaration of the data type registry
+    */
+  class DataTypeRegistry;
+  
   /** \brief Forward declaration of the message field collection
     */
   class MessageFieldCollection;
@@ -57,6 +65,16 @@ namespace variant_topic_tools {
   /** \brief Forward declaration of the message definition weak pointer type
     */
   typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
+  
+  /** \brief Forward declaration of the variant
+    */
+  class Variant;
+  /** \brief Forward declaration of the variant pointer type
+    */
+  typedef boost::shared_ptr<Variant> VariantPtr;
+  /** \brief Forward declaration of the variant weak pointer type
+    */
+  typedef boost::weak_ptr<Variant> VariantWPtr;
 };
 
 #endif

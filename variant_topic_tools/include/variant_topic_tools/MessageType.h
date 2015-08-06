@@ -23,12 +23,11 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 
-#include <ros/ros.h>
+#include <variant_topic_tools/MessageDataType.h>
 
 namespace variant_topic_tools {
   /** \brief Variant message type information
     */
-  
   class MessageType {
   public:
     /** \brief Default constructor
@@ -36,6 +35,10 @@ namespace variant_topic_tools {
     MessageType(const std::string& dataType = std::string(),
       const std::string& md5Sum = "*", const std::string&
       definition = std::string());
+    
+    /** \brief Constructor (overloaded version accepting a message data type)
+      */ 
+    MessageType(const MessageDataType& dataType);
     
     /** \brief Copy constructor
       */ 

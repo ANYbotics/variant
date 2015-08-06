@@ -16,7 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageSerializer.h"
+#include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageVariable.h"
 
 namespace variant_topic_tools {
 
@@ -24,70 +25,59 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageSerializer::MessageSerializer() {
+MessageVariable::MessageVariable() {
 }
 
-MessageSerializer::MessageSerializer(const DataType& dataType) {
-  boost::unordered_map<DataType, MessageSerializer>::const_iterator
-    it = getInstances().find(dataType);
-    
-  if (it != getInstances().end())
-    impl = it->second.impl;
+MessageVariable::MessageVariable(const std::string& name, const DataType&
+    type) {
+  impl.reset(new Impl(name, type));
 }
 
-MessageSerializer::MessageSerializer(const MessageSerializer& src) :
-  impl(src.impl) {
+MessageVariable::MessageVariable(const MessageVariable& src) :
+  MessageMember(src) {
 }
 
-MessageSerializer::~MessageSerializer() {
+MessageVariable::MessageVariable(const MessageMember& src) :
+  MessageMember(src) {
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<MessageVariable::Impl>(impl));
 }
 
-MessageSerializer::Impl::Impl(const DataType& dataType) :
-  dataType(dataType) {
+MessageVariable::~MessageVariable() {
 }
 
-MessageSerializer::Impl::~Impl() {
+MessageVariable::Impl::Impl(const std::string& name, const DataType& type) :
+  MessageMember::Impl(name),
+  type(type) {
+  if (!type.isValid())
+    throw InvalidDataTypeException();
 }
 
-MessageSerializer::Instances::Instances() {
-//   createSimple<bool>("bool");
-//   createSimple<double>("float64");
-//   createSimple<float>("float32");
-//   createSimple<int16_t>("int16");
-//   createSimple<int32_t>("int32");
-//   createSimple<int64_t>("int64");
-//   createSimple<int8_t>("int8");
-//   createSimple<uint16_t>("uint16");
-//   createSimple<uint32_t>("uint32");
-//   createSimple<uint64_t>("uint64");
-//   createSimple<uint8_t>("uint8");
-//   
-//   createBuiltin<ros::Duration>("duration");
-//   createBuiltin<std::string>("string");
-//   createBuiltin<ros::Time>("time");
-}
-
-MessageSerializer::Instances::~Instances() {
+MessageVariable::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-DataType MessageSerializer::getDataType() const {
-  if (impl)
-    return impl->dataType;
-  else
-    return DataType();
+const DataType& MessageVariable::Impl::getType() const {
+  return type;
 }
 
-bool MessageSerializer::Impl::isValid() const {
-  return dataType;
+size_t MessageVariable::Impl::getSize() const {
+  return type.getSize();
 }
 
-MessageSerializer::Instances& MessageSerializer::getInstances() {
-  static boost::shared_ptr<Instances> instances(new Instances());
-  return *instances;
+bool MessageVariable::Impl::isFixedSize() const {
+  return type.isFixedSize();
+}
+
+/*****************************************************************************/
+/* Methods                                                                   */
+/*****************************************************************************/
+
+void MessageVariable::Impl::write(std::ostream& stream) const {
+  stream << type << " " << name;
 }
 
 }
