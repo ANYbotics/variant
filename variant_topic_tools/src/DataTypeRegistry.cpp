@@ -121,15 +121,49 @@ void DataTypeRegistry::addDataType(const DataType& dataType) {
     boost::unordered_map<std::string, DataType>::iterator it =
       impl->dataTypesByIdentifier.find(dataType.getIdentifier());
       
-    if (it == impl->dataTypesByIdentifier.end())
+    if (it == impl->dataTypesByIdentifier.end()) {
       impl->dataTypesByIdentifier.insert(
         std::make_pair(dataType.getIdentifier(), dataType));
-    else
-      throw AmbiguousDataTypeIdentifierException(it->first);
-    
-    if (dataType.hasTypeInfo())
+      
+      if (dataType.hasTypeInfo())
+        impl->dataTypesByInfo.insert(
+          std::make_pair(&dataType.getTypeInfo(), dataType));
+    }
+    else if (!it->second.hasTypeInfo() && dataType.hasTypeInfo()) {
+      it->second = dataType;
+      
       impl->dataTypesByInfo.insert(
         std::make_pair(&dataType.getTypeInfo(), dataType));
+    }
+    else
+      throw AmbiguousDataTypeIdentifierException(it->first);    
+  }
+  else
+    throw InvalidDataTypeException();
+}
+
+void DataTypeRegistry::removeDataType(const DataType& dataType) {
+  if (dataType.isValid()) {
+    boost::unordered_map<std::string, DataType>::iterator it =
+      impl->dataTypesByIdentifier.find(dataType.getIdentifier());
+      
+    if ((it != impl->dataTypesByIdentifier.end()) &&
+        (it->second.impl == dataType.impl))
+      impl->dataTypesByIdentifier.erase(it);
+    
+    if (dataType.hasTypeInfo()) {
+      typedef boost::unordered_multimap<const std::type_info*, DataType,
+        TypeInfoHash>::iterator Iterator;
+        
+      std::pair<Iterator, Iterator> range =
+        impl->dataTypesByInfo.equal_range(&dataType.getTypeInfo());
+      for (Iterator it = range.first; it != range.second; ++it) {
+        if (it->second.impl == dataType.impl) {
+          impl->dataTypesByInfo.erase(it);
+          break;
+        }
+      }
+    }
   }
   else
     throw InvalidDataTypeException();

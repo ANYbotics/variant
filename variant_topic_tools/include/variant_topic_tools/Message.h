@@ -24,7 +24,6 @@
 #define VARIANT_TOPIC_TOOLS_MESSAGE_H
 
 #include <vector>
-#include <boost/concept_check.hpp>
 
 #include <ros/ros.h>
 
@@ -56,22 +55,40 @@ namespace variant_topic_tools {
       */ 
     ~Message();
 
-    /** \brief Access the message header
+    /** \brief Set the message header
       */
     void setHeader(const MessageHeader& header);
+    
+    /** \brief Retrieve the message header (non-const version)
+      */
     MessageHeader& getHeader();
+    
+    /** \brief Retrieve the message header (const version)
+      */
     const MessageHeader& getHeader() const;
     
-    /** \brief Access the message type
+    /** \brief Set the message type
       */
     void setType(const MessageType& type);
+    
+    /** \brief Retrieve the message type (non-const version)
+      */
     MessageType& getType();
+    
+    /** \brief Retrieve the message type (const version)
+      */
     const MessageType& getType() const;
 
-    /** \brief Access the message data
+    /** \brief Set the message data
       */
     void setData(const std::vector<uint8_t>& data);
+    
+    /** \brief Retrieve the message data (non-const version)
+      */
     std::vector<uint8_t>& getData();
+    
+    /** \brief Retrieve the message data (const version)
+      */
     const std::vector<uint8_t>& getData() const;
     
     /** \brief Access the message size
@@ -100,8 +117,16 @@ namespace variant_topic_tools {
     template <typename Stream> void write(Stream& stream) const;
 
   protected:
+    /** \brief The header of this message
+      */ 
     MessageHeader header;
+    
+    /** \brief The type of this message
+      */ 
     MessageType type;
+    
+    /** \brief The data of this message
+      */ 
     std::vector<uint8_t> data;
   };
 };

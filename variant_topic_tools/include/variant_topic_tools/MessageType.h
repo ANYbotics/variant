@@ -48,19 +48,28 @@ namespace variant_topic_tools {
       */ 
     ~MessageType();
 
-    /** \brief Access the data type of the message
+    /** \brief Set the data type of the message
       */ 
     void setDataType(const std::string& dataType);
+    
+    /** \brief Retrieve the data type of the message
+      */ 
     const std::string& getDataType() const;
     
-    /** \brief Access the MD5 sum of the message
+    /** \brief Set the MD5 sum of the message
       */ 
     void setMD5Sum(const std::string& md5Sum);
+    
+    /** \brief Retrieve the MD5 sum of the message
+      */ 
     const std::string& getMD5Sum() const;
     
-    /** \brief Access the message definition
+    /** \brief Set the message definition
       */ 
     void setDefinition(const std::string& definition);
+    
+    /** \brief Retrieve the message definition
+      */ 
     const std::string& getDefinition() const;
     
     /** \brief True, if this message type is valid
@@ -81,11 +90,21 @@ namespace variant_topic_tools {
     bool operator!=(const MessageType& type) const;
     
   protected:
+    /** \brief The data type of this message
+      */ 
     std::string dataType;
+    
+    /** \brief The MD5 sum of this message
+      */ 
     std::string md5Sum;
+    
+    /** \brief The definition of this message
+      */ 
     std::string definition;
   };
   
+  /** \brief Operator for writing the message type to a stream
+    */
   std::ostream& operator<<(std::ostream& stream, const MessageType&
     messageType);
 };

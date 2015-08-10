@@ -61,7 +61,16 @@ namespace variant_topic_tools {
     DataType getDataType(const std::type_info& typeInfo) const;
     
     /** \brief Retrieve a data type from the registry by type information
-      *   (templated version)
+      *   (templated non-const version)
+      * 
+      * \note This version of the accessor deliberately attempts to add
+      *   strong type information to an already registered array or message
+      *   data type.
+      */
+    template <typename T> DataType getDataType();
+    
+    /** \brief Retrieve a data type from the registry by type information
+      *   (templated const version)
       */
     template <typename T> DataType getDataType() const;
     
@@ -121,17 +130,36 @@ namespace variant_topic_tools {
     template <typename T> MessageDataType addMessageDataType();
     
     /** \brief Add a data type to the data type registry
-      * 
-      * \note If a data type with the same identifier or type information
-      *   already exists in the registry, it will be replaced.
       */
     void addDataType(const DataType& dataType);
+    
+    /** \brief Remove a data type from the data type registry
+      */
+    void removeDataType(const DataType& dataType);
     
     /** \brief Clear the data type registry
       */
     void clear();
     
   protected:
+    /** \brief Type traits
+      */
+    struct TypeTraits {
+      template <typename T, class Enable = void> struct DataTypeConstructor {
+        static DataType create();
+      };
+        
+      template <typename T> struct DataTypeConstructor<T, typename
+          boost::enable_if<ArrayDataType::TypeTraits::IsArray<T> >::type> {
+        static ArrayDataType create();
+      };
+      
+      template <typename T> struct DataTypeConstructor<T, typename
+          boost::enable_if<MessageDataType::TypeTraits::IsMessage<T> >::type> {
+        static MessageDataType create();
+      };      
+    };
+    
     /** \brief Data type implementation
       */
     class Impl {

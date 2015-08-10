@@ -34,7 +34,8 @@ BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
 BuiltinDataType::BuiltinDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(
+      impl->adaptee));
 }
 
 BuiltinDataType::~BuiltinDataType() {
@@ -53,6 +54,20 @@ BuiltinDataType::Impl::~Impl() {
 
 const std::string& BuiltinDataType::Impl::getIdentifier() const {
   return identifier;
+}
+
+/*****************************************************************************/
+/* Operators                                                                 */
+/*****************************************************************************/
+
+BuiltinDataType& BuiltinDataType::operator=(const DataType& src) {
+  DataType::operator=(src);
+  
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(
+      impl->adaptee));
+    
+  return *this;
 }
 
 }

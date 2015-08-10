@@ -55,7 +55,7 @@ bool BuiltinDataType::ImplT<T>::isFixedSize() const {
 template <typename T> BuiltinDataType BuiltinDataType::create(const
     std::string& identifier) {
   BuiltinDataType builtinDataType;
-  builtinDataType.impl.reset(new ImplT<T>(identifier));
+  builtinDataType.impl.reset(new DataType::ImplA(new ImplT<T>(identifier)));
   
   return builtinDataType;
 }

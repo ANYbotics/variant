@@ -77,7 +77,7 @@ bool MessageDataType::ImplT<T>::isFixedSize() const {
 
 template <typename T> MessageDataType MessageDataType::create() {
   MessageDataType messageDataType;
-  messageDataType.impl.reset(new ImplT<T>());
+  messageDataType.impl.reset(new DataType::ImplA(new ImplT<T>()));
   
   return messageDataType;
 }

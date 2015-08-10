@@ -18,56 +18,27 @@
 
 #include <gtest/gtest.h>
 
-#include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
-
-#include <variant_topic_tools/ArrayDataType.h>
-#include <variant_topic_tools/BuiltinDataType.h>
-#include <variant_topic_tools/DataTypeRegistry.h>
-#include <variant_topic_tools/MessageDataType.h>
+#include <variant_topic_tools/MD5Sum.h>
 
 using namespace variant_topic_tools;
 
-TEST (DataType, Array) {
-  DataTypeRegistry registry;
-  registry.addArrayDataType<int32_t, 3>();
-  registry.addArrayDataType<int32_t, 0>();
-  
-  ArrayDataType a1("int32[3]");
-  ArrayDataType a2("int32[]");
+TEST (MD5Sum, StringHashing) {
+  MD5Sum h1;
+  MD5Sum h2("0123456789abcdef");
+  MD5Sum h3("Franz jagt im komplett verwahrlosten Taxi quer durch Bayern");
+  MD5Sum h4("Frank jagt im komplett verwahrlosten Taxi quer durch Bayern");
+  MD5Sum h5;
+  h5 << "Franz" << " jagt" << " im" << " komplett"<< " verwahrlosten" <<
+    " Taxi" << " quer" << " durch" << " Bayern";
 
-  EXPECT_TRUE(a1.isValid());
-  EXPECT_TRUE(a1.isArray());
-  EXPECT_TRUE(a1.isFixedSize());
-  
-  EXPECT_TRUE(a2.isValid());
-  EXPECT_TRUE(a2.isArray());
-  EXPECT_FALSE(a2.isFixedSize());
-  
-  registry.removeDataType(a1);
-  registry.removeDataType(a2);
-}
-
-TEST (DataType, Builtin) {
-  BuiltinDataType b1("int32");
-
-  EXPECT_TRUE(b1.isValid());
-  EXPECT_TRUE(b1.isBuiltin());
-  EXPECT_TRUE(b1.hasTypeInfo());
-  EXPECT_EQ(typeid(int32_t), b1.getTypeInfo());
-  EXPECT_TRUE(b1.isFixedSize());
-  EXPECT_EQ(sizeof(int32_t), b1.getSize());
-  EXPECT_FALSE(b1.createVariant().isEmpty());
-}
-
-TEST (DataType, Message) {
-  DataTypeRegistry registry;
-  registry.addMessageDataType<std_msgs::Bool>();
-  
-  MessageDataType m1(ros::message_traits::datatype<std_msgs::Bool>());
-  
-  EXPECT_TRUE(m1.isValid());
-  EXPECT_TRUE(m1.isMessage());
-  
-  registry.removeDataType(m1);
+  EXPECT_EQ(0, h1.getNumDigestedBits());
+  EXPECT_EQ("d41d8cd98f00b204e9800998ecf8427e", h1.toString());
+  EXPECT_EQ(16*8, h2.getNumDigestedBits());
+  EXPECT_EQ("4032af8d61035123906e58e067140cc5", h2.toString());
+  EXPECT_EQ(59*8, h3.getNumDigestedBits());
+  EXPECT_EQ("a3cca2b2aa1e3b5b3b5aad99a8529074", h3.toString());
+  EXPECT_EQ(59*8, h4.getNumDigestedBits());
+  EXPECT_EQ("7e716d0e702df0505fc72e2b89467910", h4.toString());
+  EXPECT_EQ(59*8, h5.getNumDigestedBits());
+  EXPECT_EQ("a3cca2b2aa1e3b5b3b5aad99a8529074", h5.toString());
 }

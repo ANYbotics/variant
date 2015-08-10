@@ -29,7 +29,7 @@ ArrayDataType::ArrayDataType() {
 }
 
 ArrayDataType::ArrayDataType(const DataType& elementType, size_t numElements) {
-  impl.reset(new ImplV(elementType, numElements));
+  impl.reset(new DataType::ImplA(new ImplV(elementType, numElements)));
 }
 
 ArrayDataType::ArrayDataType(const ArrayDataType& src) :
@@ -39,7 +39,8 @@ ArrayDataType::ArrayDataType(const ArrayDataType& src) :
 ArrayDataType::ArrayDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(
+      impl->adaptee));
 }
 
 ArrayDataType::~ArrayDataType() {
@@ -72,12 +73,12 @@ const DataType& ArrayDataType::getElementType() const {
     return elementType;
   }
   else
-    return boost::dynamic_pointer_cast<Impl>(impl)->elementType;
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->elementType;
 }
 
 size_t ArrayDataType::getNumElements() const {
   if (impl)
-    return boost::dynamic_pointer_cast<Impl>(impl)->getNumElements();
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->getNumElements();
   else
     return 0;
 }
@@ -101,6 +102,20 @@ bool ArrayDataType::Impl::isFixedSize() const {
 
 size_t ArrayDataType::ImplV::getNumElements() const {
   return numElements;
+}
+
+/*****************************************************************************/
+/* Operators                                                                 */
+/*****************************************************************************/
+
+ArrayDataType& ArrayDataType::operator=(const DataType& src) {
+  DataType::operator=(src);
+  
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(
+      impl->adaptee));
+    
+  return *this;
 }
 
 }

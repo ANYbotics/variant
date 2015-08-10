@@ -54,6 +54,7 @@ add_library(variant_topic_tools
   src/DataType.cpp
   src/DataTypeRegistry.cpp
   src/Exceptions.cpp
+  src/MD5Sum.cpp
   src/Message.cpp
   src/MessageConstant.cpp
   src/MessageDataType.cpp

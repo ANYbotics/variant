@@ -51,7 +51,7 @@ namespace variant_topic_tools {
     
     /** \brief Destructor
       */ 
-    ~MessageDataType();
+    virtual ~MessageDataType();
   
     /** \brief Retrieve the MD5 sum of this message data type
       */
@@ -98,12 +98,24 @@ namespace variant_topic_tools {
       */
     void addMember(const MessageMember& member);
     
+    /** \brief Assignment operator
+      */
+    MessageDataType& operator=(const DataType& src);
+    
     /** \brief Operator for accessing the members of the message data type
       *   by index
       */
     const MessageMember& operator[](size_t index) const;
     
   protected:
+    /** \brief Type traits
+      */
+    struct TypeTraits {
+      template <typename T> struct IsMessage :
+        public ros::message_traits::IsMessage<T> {
+      };
+    };
+    
     /** \brief Message data type implementation
       */
     class Impl :

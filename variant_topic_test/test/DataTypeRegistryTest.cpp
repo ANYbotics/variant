@@ -37,12 +37,12 @@ TEST (DataTypeRegistry, Builtin) {
 TEST (DataTypeRegistry, Array) {
   DataTypeRegistry registry;
 
-  registry.addArrayDataType<int, 3>();
-  registry.addArrayDataType<int, 0>();
-  registry.addArrayDataType<boost::array<double, 3> >();
-  registry.addArrayDataType<std::vector<double> >();
-  registry.addArrayDataType("int8", 3);
-  registry.addArrayDataType(typeid(int8_t));
+  ArrayDataType a1 = registry.addArrayDataType<int, 3>();
+  ArrayDataType a2 = registry.addArrayDataType<int, 0>();
+  ArrayDataType a3 = registry.addArrayDataType<boost::array<double, 3> >();
+  ArrayDataType a4 = registry.addArrayDataType<std::vector<double> >();
+  ArrayDataType a5 = registry.addArrayDataType("int8", 3);
+  ArrayDataType a6 = registry.addArrayDataType(typeid(int8_t));
   
   typedef boost::array<int, 3> boost_array_int_3;
   typedef boost::array<double, 3> boost_array_double_3;
@@ -60,16 +60,25 @@ TEST (DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType("int8[3]").isArray());
   EXPECT_TRUE(registry.getDataType<std::vector<int8_t> >().isArray());
   EXPECT_TRUE(registry.getDataType("int8[]").isArray());
+  
+  registry.removeDataType(a1);
+  registry.removeDataType(a2);
+  registry.removeDataType(a3);
+  registry.removeDataType(a4);
+  registry.removeDataType(a5);
+  registry.removeDataType(a6);
 }
 
 TEST (DataTypeRegistry, Message) {
   DataTypeRegistry registry;
 
-  registry.addMessageDataType<std_msgs::String>();
-  registry.addMessageDataType(ros::message_traits::datatype<std_msgs::Bool>(),
+  MessageDataType m1 = registry.addMessageDataType<std_msgs::String>();
+  MessageDataType m2 = registry.addMessageDataType(
+    ros::message_traits::datatype<std_msgs::Bool>(),
     ros::message_traits::definition<std_msgs::Bool>());
-  registry.addMessageDataType("my_msgs/Double").addVariable<double>("data");
-  registry.addMessageDataType("my_msgs/Complex",
+  MessageDataType m3 = registry.addMessageDataType("my_msgs/Double");
+  m3.addVariable<double>("data");
+  MessageDataType m4 = registry.addMessageDataType("my_msgs/Complex",
     "float64 real\n"
     "float64 imaginary\n"
   );
@@ -80,4 +89,9 @@ TEST (DataTypeRegistry, Message) {
   EXPECT_TRUE(registry.getDataType<std_msgs::Bool>().isMessage());
   EXPECT_TRUE(registry.getDataType("my_msgs/Double").isMessage());
   EXPECT_TRUE(registry.getDataType("my_msgs/Complex").isMessage());
+  
+  registry.removeDataType(m1);
+  registry.removeDataType(m2);
+  registry.removeDataType(m3);
+  registry.removeDataType(m4);
 }

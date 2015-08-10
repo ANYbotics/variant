@@ -76,6 +76,7 @@ catkin_add_gtest(variant_topic_test
   test/variant_topic_test
   test/DataTypeTest.cpp
   test/DataTypeRegistryTest.cpp
+  test/MD5SumTest.cpp
   test/VariantTest.cpp
 )
 

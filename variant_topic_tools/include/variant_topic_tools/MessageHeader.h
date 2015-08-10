@@ -44,24 +44,42 @@ namespace variant_topic_tools {
       */ 
     ~MessageHeader();
 
-    /** \brief Access the name of the publishing node
+    /** \brief Set the name of the publishing node
       */ 
-    const std::string& getPublisher() const;
     void setPublisher(const std::string& publisher);
     
-    /** \brief Access the message publishing topic
+    /** \brief Retrieve the name of the publishing node
+      */ 
+    const std::string& getPublisher() const;
+    
+    /** \brief Set the message publishing topic
+      */ 
+    void setTopic(const std::string& topic);
+    
+    /** \brief Retrieve the message publishing topic
       */ 
     const std::string& getTopic() const;
-    void setTopic(const std::string& topic);
+    
+    /** \brief Set to true to indicate that the message publication is
+      *   latched
+      */ 
+    void setLatched(bool latched);
     
     /** \brief True, if the message publication is latched
       */ 
     bool isLatched() const;
-    void setLatched(bool latched);
 
   protected:
+    /** \brief The message publisher
+      */ 
     std::string publisher;
+    
+    /** \brief The message publishing topic
+      */ 
     std::string topic;
+    
+    /** \brief True, if the message publication is latched
+      */ 
     bool latched;
   };
 };

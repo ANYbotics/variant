@@ -52,7 +52,7 @@ template <class A> ArrayDataType ArrayDataType::create() {
 
 template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
   ArrayDataType arrayDataType;
-  arrayDataType.impl.reset(new ImplT<T, N>());
+  arrayDataType.impl.reset(new DataType::ImplA(new ImplT<T, N>()));
   
   return arrayDataType;
 }

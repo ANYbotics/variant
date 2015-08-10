@@ -60,6 +60,14 @@ DataType::DataType(const DataType& src) :
 DataType::~DataType() {
 }
 
+DataType::ImplA::ImplA(Impl* adaptee) :
+  adaptee(adaptee) {
+  BOOST_ASSERT(adaptee);
+}
+
+DataType::ImplA::~ImplA() {
+}
+
 DataType::Impl::Impl() {
 }
 
@@ -82,47 +90,47 @@ const std::string& DataType::getIdentifier() const {
     return identifier;
   }
   else
-    return impl->getIdentifier();
+    return impl->adaptee->getIdentifier();
 }
 
 const std::type_info& DataType::getTypeInfo() const {
   if (impl)
-    return impl->getTypeInfo();
+    return impl->adaptee->getTypeInfo();
   else
     return typeid(void);
 }
 
 size_t DataType::getSize() const {
   if (impl)
-    return impl->getSize();
+    return impl->adaptee->getSize();
   else
     return 0;
 }
 
 bool DataType::isArray() const {
   if (impl)
-    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl);
+    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl->adaptee);
   else
     return false;
 }
 
 bool DataType::isBuiltin() const {
   if (impl)
-    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl);
+    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl->adaptee);
   else
     return false;
 }
 
 bool DataType::isMessage() const {
   if (impl)
-    return boost::dynamic_pointer_cast<MessageDataType::Impl>(impl);
+    return boost::dynamic_pointer_cast<MessageDataType::Impl>(impl->adaptee);
   else
     return false;
 }
 
 bool DataType::isFixedSize() const {
   if (impl)
-    return impl->isFixedSize();
+    return impl->adaptee->isFixedSize();
   else
     return true;
 }
@@ -133,7 +141,7 @@ bool DataType::isValid() const {
 
 bool DataType::hasTypeInfo() const {
   if (impl)
-    return (impl->getTypeInfo() != typeid(void));
+    return (impl->adaptee->getTypeInfo() != typeid(void));
   else
     return false;
 }
@@ -152,12 +160,12 @@ void DataType::clear() {
 
 void DataType::write(std::ostream& stream) const {
   if (impl)
-    stream << impl->getIdentifier();
+    stream << impl->adaptee->getIdentifier();
 }
 
 Variant DataType::createVariant() const {
   if (impl)
-    return *impl->createVariant();
+    return *impl->adaptee->createVariant();
   else
     return Variant();
 }
@@ -169,6 +177,15 @@ VariantPtr DataType::ImplV::createVariant() const {
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
+
+DataType& DataType::operator=(const DataType& src) {
+  if (impl)
+    impl->adaptee = src.impl->adaptee;
+  else
+    impl = src.impl;
+  
+  return *this;
+}
 
 std::ostream& operator<<(std::ostream& stream, const DataType& dataType) {
   dataType.write(stream);

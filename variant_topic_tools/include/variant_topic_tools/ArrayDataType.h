@@ -51,7 +51,7 @@ namespace variant_topic_tools {
     
     /** \brief Destructor
       */ 
-    ~ArrayDataType();
+    virtual ~ArrayDataType();
   
     /** \brief Retrieve the element type of this array data type
       */
@@ -61,10 +61,26 @@ namespace variant_topic_tools {
       */
     size_t getNumElements() const;
     
+    /** \brief Assignment operator
+      */
+    ArrayDataType& operator=(const DataType& src);
+    
   protected:
     /** \brief Type traits
       */
     struct TypeTraits {
+      template <class A> struct IsArray :
+        public boost::false_type {
+      };
+      
+      template <typename T> struct IsArray<std::vector<T> > :
+        public boost::true_type {
+      };
+      
+      template <typename T, size_t N> struct IsArray<boost::array<T, N> > :
+        public boost::true_type {
+      };
+      
       template <class A> struct FromArray;
       
       template <typename T> struct FromArray<std::vector<T> > {

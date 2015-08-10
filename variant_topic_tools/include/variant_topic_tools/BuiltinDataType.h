@@ -47,7 +47,11 @@ namespace variant_topic_tools {
     
     /** \brief Destructor
       */ 
-    ~BuiltinDataType();
+    virtual ~BuiltinDataType();
+    
+    /** \brief Assignment operator
+      */
+    BuiltinDataType& operator=(const DataType& src);
     
   protected:
     /** \brief Built-in data type implementation

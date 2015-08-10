@@ -82,7 +82,7 @@ namespace variant_topic_tools {
     
     /** \brief Destructor
       */ 
-    ~DataType();
+    virtual ~DataType();
 
     /** \brief Retrieve the identifier representing this data type
       */ 
@@ -138,6 +138,10 @@ namespace variant_topic_tools {
         */ 
     Variant createVariant() const;
     
+    /** \brief Assignment operator
+      */
+    virtual DataType& operator=(const DataType& src);
+    
     /** \brief Void pointer conversion
       */
     inline operator void*() const {
@@ -145,7 +149,7 @@ namespace variant_topic_tools {
     };
     
   protected:
-    /** \brief Forward declaration of the data type implementation type
+    /** \brief Forward declaration of the data type implementation
       */
     class Impl;
     
@@ -158,6 +162,23 @@ namespace variant_topic_tools {
       */
     typedef boost::weak_ptr<Impl> ImplWPtr;
     
+    /** \brief Data type implementation adapter
+      */
+    class ImplA {
+    public:
+      /** \brief Constructor
+        */
+      ImplA(Impl* adaptee);
+      
+      /** \brief Destructor
+        */
+      ~ImplA();
+    
+      /** \brief The data type implementation adaptee
+        */
+      ImplPtr adaptee;
+    };
+      
     /** \brief Data type implementation
       */
     class Impl {
@@ -241,9 +262,19 @@ namespace variant_topic_tools {
       VariantPtr createVariant() const;
    };
    
+    /** \brief Declaration of the data type implementation adapter
+      *   pointer type
+      */
+    typedef boost::shared_ptr<ImplA> ImplAPtr;
+    
+    /** \brief Declaration of the data type implementation adapter
+      *   weak pointer type
+      */
+    typedef boost::weak_ptr<ImplA> ImplAWPtr;
+    
     /** \brief The data type's implementation
       */
-    ImplPtr impl;
+    ImplAPtr impl;
   };
     
   /** \brief Operator for writing the data type to a stream

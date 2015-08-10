@@ -34,12 +34,12 @@ MessageDataType::MessageDataType() {
 
 MessageDataType::MessageDataType(const std::string& identifier, const
     std::vector<MessageMember>& members) {
-  impl.reset(new ImplV(identifier, members));
+  impl.reset(new DataType::ImplA(new ImplV(identifier, members)));
 }
 
 MessageDataType::MessageDataType(const std::string& identifier, const
     std::string& definition) {
-  impl.reset(new ImplV(identifier, definition));
+  impl.reset(new DataType::ImplA(new ImplV(identifier, definition)));
 }
 
 MessageDataType::MessageDataType(const MessageDataType& src) :
@@ -49,7 +49,8 @@ MessageDataType::MessageDataType(const MessageDataType& src) :
 MessageDataType::MessageDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<MessageDataType::Impl>(impl));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<MessageDataType::Impl>(
+      impl->adaptee));
 }
 
 MessageDataType::~MessageDataType() {
@@ -134,7 +135,7 @@ const std::string& MessageDataType::getMD5Sum() const {
     return md5Sum;
   }
   else
-    return boost::dynamic_pointer_cast<Impl>(impl)->getMD5Sum();
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->getMD5Sum();
 }
 
 const std::string& MessageDataType::getDefinition() const {
@@ -143,26 +144,26 @@ const std::string& MessageDataType::getDefinition() const {
     return definition;
   }
   else
-    return boost::dynamic_pointer_cast<Impl>(impl)->getDefinition();
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->getDefinition();
 }
 
 size_t MessageDataType::getNumMembers() const {
   if (impl)
-    return boost::dynamic_pointer_cast<Impl>(impl)->members.size();
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->members.size();
   else
     return 0;
 }
 
 const MessageMember& MessageDataType::getMember(size_t index) const {
   if (index < getNumMembers())
-    return boost::dynamic_pointer_cast<Impl>(impl)->members[index];
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->members[index];
   else
     throw NoSuchMessageMemberException(index);
 }
 
 bool MessageDataType::isSimple() const {
   if (impl)
-    return boost::dynamic_pointer_cast<Impl>(impl)->isSimple();
+    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->isSimple();
   else
     return false;
 }
@@ -228,7 +229,7 @@ MessageVariable MessageDataType::addVariable(const std::string& name, const
 
 void MessageDataType::addMember(const MessageMember& member) {
   if (impl)
-    boost::dynamic_pointer_cast<Impl>(impl)->addMember(member);
+    boost::dynamic_pointer_cast<Impl>(impl->adaptee)->addMember(member);
   else
     throw InvalidDataTypeException();
 }
@@ -245,6 +246,16 @@ void MessageDataType::ImplV::addMember(const MessageMember& member) {
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
+
+MessageDataType& MessageDataType::operator=(const DataType& src) {
+  DataType::operator=(src);
+  
+  if (impl)
+    BOOST_ASSERT(boost::dynamic_pointer_cast<MessageDataType::Impl>(
+      impl->adaptee));
+    
+  return *this;
+}
 
 const MessageMember& MessageDataType::operator[](size_t index) const {
   return getMember(index);

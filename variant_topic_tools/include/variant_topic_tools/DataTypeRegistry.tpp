@@ -22,6 +22,19 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
+template <typename T> DataType DataTypeRegistry::getDataType() {
+  DataType dataType(this->getDataType(typeid(T)));
+  
+  if (!dataType.isValid()) {
+    dataType = TypeTraits::DataTypeConstructor<T>::create();
+    
+    if (dataType.isValid())
+      this->addDataType(dataType);
+  }
+  
+  return dataType;
+}
+
 template <typename T> DataType DataTypeRegistry::getDataType() const {
   return this->getDataType(typeid(T));
 }
@@ -59,6 +72,26 @@ template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
   this->addDataType(messageDataType);
   
   return messageDataType;
+}
+
+template <typename T, class Enable>
+DataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, Enable>::
+    create() {
+  return DataType();
+}
+
+template <typename T>
+ArrayDataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, typename
+    boost::enable_if<ArrayDataType::TypeTraits::IsArray<T> >::type>::
+    create() {
+  return ArrayDataType::template create<T>();
+}
+
+template <typename T>
+MessageDataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, typename
+    boost::enable_if<MessageDataType::TypeTraits::IsMessage<T> >::type>::
+    create() {
+  return MessageDataType::template create<T>();
 }
 
 }
