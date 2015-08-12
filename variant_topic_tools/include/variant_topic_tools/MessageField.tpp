@@ -16,87 +16,90 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageField.h"
-
 namespace variant_topic_tools {
 
 /*****************************************************************************/
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageField::MessageField(const std::string& name, const MessageType& type,
-    const std::string& value) :
+template <typename T>
+MessageField<T>::MessageField(const std::string& name, const T& value) :
   name(name),
-  type(type),
   value(value) {
 }
 
-MessageField::MessageField(const MessageField& src) :
-  MessageFieldCollection(src),
-  type(src.type),
+template <typename T>
+MessageField<T>::MessageField(const MessageField& src) :
+  MessageFieldCollection<T>(src),
   name(src.name),
   value(src.value) {
 }
 
-MessageField::~MessageField() {
+template <typename T>
+MessageField<T>::~MessageField() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-void MessageField::setName(const std::string& name) {
+template <typename T>
+void MessageField<T>::setName(const std::string& name) {
   this->name = name;
 }
 
-const std::string& MessageField::getName() const {
-  return name;
+template <typename T>
+const std::string& MessageField<T>::getName() const {
+  return this->name;
 }
 
-void MessageField::setType(const MessageType& type) {
-  this->type = type;
-}
-
-const MessageType& MessageField::getType() const {
-  return type;
-}
-
-void MessageField::setValue(const std::string& value) {
+template <typename T>
+void MessageField<T>::setValue(const T& value) {
   this->value = value;
 }
 
-const std::string& MessageField::getValue() const {
-  return value;
+template <typename T>
+const T& MessageField<T>::getValue() const {
+  return this->value;
 }
 
-bool MessageField::isConstant() const {
-  return !value.empty();
-}
-
-bool MessageField::isValid() const {
-  return type.isValid();
+template <typename T>
+bool MessageField<T>::isValid() const {
+  return TypeTraits::template isValid<T>(value);
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void MessageField::clear() {
-  MessageFieldCollection::clear();
-  
-  name.clear();
-  type = MessageType();
+template <typename T>
+template <typename U> bool MessageField<T>::TypeTraits::isValid(const U&
+    value, typename boost::enable_if_c<HasIsValid<U>::value>::type*) {
+  return value.isValid();
 }
 
-void MessageField::write(std::ostream& stream, const std::string& indent)
-    const {
-  stream << indent << type.getDataType() << " " << name;
-  if (!value.empty())
-    stream << " = " << value;
+template <typename T>
+template <typename U> bool MessageField<T>::TypeTraits::isValid(const U&
+    value, typename boost::disable_if_c<HasIsValid<U>::value>::type*) {
+  return true;
+}
+
+template <typename T>
+void MessageField<T>::clear() {
+  MessageFieldCollection<T>::clear();
   
-  for (size_t i = 0; i < fieldsInOrder.size(); ++i) {
+  this->name.clear();
+  this->value = T();
+}
+
+template <typename T>
+void MessageField<T>::write(std::ostream& stream, const std::string& indent)
+    const {
+  stream << indent << name << ": " << value;
+  
+  for (size_t i = 0; i < this->fieldsInOrder.size(); ++i) {
     stream << "\n";
-    fieldsInOrder[i]->write(stream, indent+"  ");
+    this->fieldsInOrder[i]->write(stream, indent+"  ");
   }
 }
 
@@ -104,8 +107,8 @@ void MessageField::write(std::ostream& stream, const std::string& indent)
 /* Operators                                                                 */
 /*****************************************************************************/
 
-std::ostream& operator<<(std::ostream& stream, const MessageField&
-    messageField) {
+template <typename T> std::ostream& operator<<(std::ostream& stream, const
+    MessageField<T>& messageField) {
   messageField.write(stream);
   return stream;
 }

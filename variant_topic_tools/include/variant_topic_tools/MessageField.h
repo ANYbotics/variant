@@ -29,43 +29,39 @@
 #include <variant_topic_tools/MessageType.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message field
+  /** \brief Message field template
     */
-  class MessageField :
-    public MessageFieldCollection {
+  template <typename T> class MessageField :
+    public MessageFieldCollection<T> {
   public:
     /** \brief Default constructor
       */ 
     MessageField(const std::string& name = std::string(), const
-      MessageType& type = MessageType(), const std::string&
-      value = std::string());
+      T& value = T());
     
     /** \brief Copy constructor
       */ 
-    MessageField(const MessageField& src);
+    MessageField(const MessageField<T>& src);
     
     /** \brief Destructor
       */ 
-    ~MessageField();
+    virtual ~MessageField();
     
-    /** \brief Access the name of the message field
+    /** \brief Set the name of the message field
       */
     void setName(const std::string& name);
+    
+    /** \brief Retrieve the name of the message field
+      */
     const std::string& getName() const;
     
-    /** \brief Access the type of the message field
+    /** \brief Set the value of the message field
       */
-    void setType(const MessageType& type);
-    const MessageType& getType() const;
+    void setValue(const T& value);
     
-    /** \brief Access the value of the message field
+    /** \brief Retrieve the value of the message field
       */
-    void setValue(const std::string& value);
-    const std::string& getValue() const;
-    
-    /** \brief True, if this message field is constant
-      */ 
-    bool isConstant() const;
+    const T& getValue() const;
     
     /** \brief True, if this message field is valid
       */ 
@@ -81,16 +77,39 @@ namespace variant_topic_tools {
       std::string()) const;
     
   protected:
+    /** \brief Type traits
+      */
+    struct TypeTraits {
+      template <typename U> struct HasIsValid {
+        template <typename V, bool (V::*)() const> struct Test {};
+        
+        template <typename V> static char test(Test<V, &V::isValid>*);
+        template <typename V> static int test(...);
+        
+        static const bool value = sizeof(test<U>(0)) == sizeof(char);
+      };
+
+      template <typename U> static bool isValid(const U& value,
+        typename boost::enable_if_c<HasIsValid<U>::value>::type* = 0);
+      template <typename U> static bool isValid(const U& value,
+        typename boost::disable_if_c<HasIsValid<U>::value>::type* = 0);
+    };
+
+    /** \brief The name of this message field
+      */ 
     std::string name;
-    MessageType type;
     
-    std::string value;
+    /** \brief The value of this message field
+      */ 
+    T value;
   };
   
   /** \brief Operator for writing the message field to a stream
     */
-  std::ostream& operator<<(std::ostream& stream, const MessageField&
-    messageField);
+  template <typename T> std::ostream& operator<<(std::ostream& stream,
+    const MessageField<T>& messageField);
 };
+
+#include <variant_topic_tools/MessageField.tpp>
 
 #endif

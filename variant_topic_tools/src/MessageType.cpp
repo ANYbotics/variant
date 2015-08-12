@@ -83,11 +83,8 @@ bool MessageType::isValid() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void MessageType::write(std::ostream& stream, const std::string& indent)
-    const {
-  stream << indent << "Message data type: " << dataType << "\n";
-  stream << indent << "Message MD5 sum: " << md5Sum << "\n";
-  stream << indent << "Message definition:\n" << definition;
+void MessageType::write(std::ostream& stream) const {
+  stream << dataType;
 }
       
 /*****************************************************************************/

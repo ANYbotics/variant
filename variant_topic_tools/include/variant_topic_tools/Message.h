@@ -47,6 +47,11 @@ namespace variant_topic_tools {
       MessageType& type = MessageType(), const std::vector<uint8_t>&
       data = std::vector<uint8_t>());
     
+    /** \brief Constructor (templated version taking a message
+      */ 
+    template <class M> Message(const M& message, const MessageHeader&
+      header = MessageHeader());
+    
     /** \brief Copy constructor
       */ 
     Message(const Message& src);
@@ -93,11 +98,11 @@ namespace variant_topic_tools {
     
     /** \brief Access the message size
       */
-    uint32_t getSize() const;
+    size_t getSize() const;
 
     /** \brief Morph the message
       */
-    template <class Invariant> void morph();
+    template <class M> void morph();
 
     /** \brief Attempt to convert the message to a variant
       */
@@ -105,7 +110,7 @@ namespace variant_topic_tools {
       
     /** \brief Attempt to convert the message to an invariant
       */
-    template <class Invariant> boost::shared_ptr<Invariant> toInvariant()
+    template <class M> boost::shared_ptr<M> toInvariant()
       const;
 
     /** \brief Read serialized message contents from stream

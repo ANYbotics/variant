@@ -16,52 +16,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file Forwards.h
-  * \brief Header file providing forward declarations for the variant topic
-  *   tools
-  */
+#include <gtest/gtest.h>
 
-#ifndef VARIANT_TOPIC_TOOLS_FORWARDS_H
-#define VARIANT_TOPIC_TOOLS_FORWARDS_H
+#include <variant_msgs/Test.h>
 
-#include <ros/forwards.h>
+#include <variant_topic_tools/DataTypeRegistry.h>
+#include <variant_topic_tools/MessageDefinition.h>
 
-namespace variant_topic_tools {
-  /** \brief Forward declaration of the data type
-    */
-  class DataType;
-  
-  /** \brief Forward declaration of the data type registry
-    */
-  class DataTypeRegistry;
-  
-  /** \brief Forward declaration of the message field collection
-    */
-  template <typename T> class MessageFieldCollection;
-  
-  /** \brief Forward declaration of the message field
-    */
-  template <typename T> class MessageField;
-  
-  /** \brief Forward declaration of the message definition
-    */
-  class MessageDefinition;
-  /** \brief Forward declaration of the message definition pointer type
-    */
-  typedef boost::shared_ptr<MessageDefinition> MessageDefinitionPtr;
-  /** \brief Forward declaration of the message definition weak pointer type
-    */
-  typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
-  
-  /** \brief Forward declaration of the variant
-    */
-  class Variant;
-  /** \brief Forward declaration of the variant pointer type
-    */
-  typedef boost::shared_ptr<Variant> VariantPtr;
-  /** \brief Forward declaration of the variant weak pointer type
-    */
-  typedef boost::weak_ptr<Variant> VariantWPtr;
-};
+using namespace variant_topic_tools;
 
-#endif
+TEST (MessageDefinition, Parse) {
+  DataTypeRegistry registry;
+  
+  MessageDefinition d1 = MessageDefinition::create<variant_msgs::Test>();
+  MessageDataType t1 = registry.getDataType(
+    ros::message_traits::datatype<variant_msgs::Test>());
+  
+  EXPECT_TRUE(t1.isValid());
+  EXPECT_EQ("header", t1[0].getName());
+  EXPECT_TRUE(t1[1].isConstant());
+  EXPECT_TRUE(t1[2].isVariable());
+  EXPECT_TRUE(t1[2].getType().isBuiltin());
+  EXPECT_TRUE(t1[4].getType().isMessage());
+  
+  registry.clear();
+}

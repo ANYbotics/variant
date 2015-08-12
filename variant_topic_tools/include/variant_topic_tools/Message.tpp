@@ -23,33 +23,43 @@
 namespace variant_topic_tools {
 
 /*****************************************************************************/
+/* Constructors and Destructor                                               */
+/*****************************************************************************/
+
+template <class M> Message::Message(const M& message, const MessageHeader&
+    header) :
+  header(header),
+  type(MessageType::template create<M>()),
+  data(ros::serialization::serializationLength(message)) {
+  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<M>::value);
+
+  ros::serialization::OStream stream(const_cast<uint8_t*>(data.data()),
+    data.size());
+  ros::serialization::serialize(stream, message);
+}
+
+/*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class Invariant> void Message::morph() {
-  MessageType type(
-    ros::message_traits::template datatype<Invariant>(),
-    ros::message_traits::template md5sum<Invariant>(),
-    ros::message_traits::template definition<Invariant>()
-  );
-  
-  this->setType(type);
+template <class M> void Message::morph() {
+  this->setType(MessageType::template create<M>());
 }
 
-template <class Invariant> boost::shared_ptr<Invariant> Message::toInvariant()
-    const {
-  if (ros::message_traits::template datatype<Invariant>() != type.dataType)
+template <class M> boost::shared_ptr<M> Message::toInvariant() const {
+  if (ros::message_traits::template datatype<M>() != type.getDataType())
     throw DataTypeMismatchException(ros::message_traits::template
-      datatype<Invariant>(), type.dataType);
+      datatype<M>(), type.getDataType());
   
-  if ((type.md5Sum != "*") &&
-      (ros::message_traits::template md5sum<Invariant>() != type.md5Sum))
+  if ((type.getMD5Sum() != "*") &&
+      (ros::message_traits::template md5sum<M>() != type.getMD5Sum()))
     throw MD5SumMismatchException(ros::message_traits::template 
-      md5sum<Invariant>(), type.md5Sum);
+      md5sum<M>(), type.getMD5Sum());
   
-  boost::shared_ptr<Invariant> invariant(new Invariant());
+  boost::shared_ptr<M> invariant(new M());
 
-  ros::serialization::IStream stream(data.data(), data.size());
+  ros::serialization::IStream stream(const_cast<uint8_t*>(data.data()),
+    data.size());
   ros::serialization::deserialize(stream, *invariant);
 
   return invariant;

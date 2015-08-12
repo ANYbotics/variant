@@ -61,12 +61,7 @@ TEST (DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType<std::vector<int8_t> >().isArray());
   EXPECT_TRUE(registry.getDataType("int8[]").isArray());
   
-  registry.removeDataType(a1);
-  registry.removeDataType(a2);
-  registry.removeDataType(a3);
-  registry.removeDataType(a4);
-  registry.removeDataType(a5);
-  registry.removeDataType(a6);
+  registry.clear();
 }
 
 TEST (DataTypeRegistry, Message) {
@@ -90,8 +85,5 @@ TEST (DataTypeRegistry, Message) {
   EXPECT_TRUE(registry.getDataType("my_msgs/Double").isMessage());
   EXPECT_TRUE(registry.getDataType("my_msgs/Complex").isMessage());
   
-  registry.removeDataType(m1);
-  registry.removeDataType(m2);
-  registry.removeDataType(m3);
-  registry.removeDataType(m4);
+  registry.clear();
 }

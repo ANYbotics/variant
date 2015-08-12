@@ -70,6 +70,11 @@ MD5SumMismatchException::MD5SumMismatchException(const std::string&
     "] mismatches expected MD5 sum ["+expectedMD5Sum+"]") {
 }
 
+AmbiguousMessageFieldNameException::AmbiguousMessageFieldNameException(
+    const std::string& name) :
+  ros::Exception("Message field name ["+name+"] is used ambiguously") {
+}
+
 NoSuchMessageFieldException::NoSuchMessageFieldException(size_t index) :
   ros::Exception("Field with index ["+boost::lexical_cast<std::string>(index)+
     "] does not exist") {

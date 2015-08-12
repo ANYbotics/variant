@@ -16,52 +16,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file Forwards.h
-  * \brief Header file providing forward declarations for the variant topic
-  *   tools
-  */
+#include <algorithm>
 
-#ifndef VARIANT_TOPIC_TOOLS_FORWARDS_H
-#define VARIANT_TOPIC_TOOLS_FORWARDS_H
-
-#include <ros/forwards.h>
+#include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
-  /** \brief Forward declaration of the data type
-    */
-  class DataType;
-  
-  /** \brief Forward declaration of the data type registry
-    */
-  class DataTypeRegistry;
-  
-  /** \brief Forward declaration of the message field collection
-    */
-  template <typename T> class MessageFieldCollection;
-  
-  /** \brief Forward declaration of the message field
-    */
-  template <typename T> class MessageField;
-  
-  /** \brief Forward declaration of the message definition
-    */
-  class MessageDefinition;
-  /** \brief Forward declaration of the message definition pointer type
-    */
-  typedef boost::shared_ptr<MessageDefinition> MessageDefinitionPtr;
-  /** \brief Forward declaration of the message definition weak pointer type
-    */
-  typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
-  
-  /** \brief Forward declaration of the variant
-    */
-  class Variant;
-  /** \brief Forward declaration of the variant pointer type
-    */
-  typedef boost::shared_ptr<Variant> VariantPtr;
-  /** \brief Forward declaration of the variant weak pointer type
-    */
-  typedef boost::weak_ptr<Variant> VariantWPtr;
-};
 
-#endif
+/*****************************************************************************/
+/* Accessors                                                                 */
+/*****************************************************************************/
+
+template <class M> void MessageDefinition::setMessageType() {
+  this->setMessageType(MessageType::template create<M>());
+}
+
+/*****************************************************************************/
+/* Methods                                                                   */
+/*****************************************************************************/
+
+template <class M> MessageDefinition MessageDefinition::create() {
+  return MessageDefinition(MessageType::template create<M>());
+}
+
+}

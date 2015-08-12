@@ -119,6 +119,16 @@ namespace variant_topic_tools {
       std::string& providedMD5Sum);
   };
   
+  /** \brief Exception thrown in case of an ambiguous message field name
+    */ 
+  class AmbiguousMessageFieldNameException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    AmbiguousMessageFieldNameException(const std::string& name);
+  };
+  
   /** \brief Exception thrown in case of a non-existent message field
     */ 
   class NoSuchMessageFieldException :

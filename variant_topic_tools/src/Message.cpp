@@ -80,7 +80,7 @@ const std::vector<uint8_t>& Message::getData() const {
   return data;
 }
 
-uint32_t Message::getSize() const {
+size_t Message::getSize() const {
   return data.size();
 }
 

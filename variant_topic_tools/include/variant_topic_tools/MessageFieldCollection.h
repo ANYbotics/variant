@@ -23,16 +23,18 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_COLLECTION_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_COLLECTION_H
 
-#include <map>
+#include <vector>
+
+#include <boost/unordered_map.hpp>
 
 #include <ros/ros.h>
 
 #include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message field
+  /** \brief Templated message field collection
     */
-  class MessageFieldCollection {
+  template <typename T> class MessageFieldCollection {
   public:
     /** \brief Default constructor
       */ 
@@ -40,7 +42,7 @@ namespace variant_topic_tools {
     
     /** \brief Copy constructor
       */ 
-    MessageFieldCollection(const MessageFieldCollection& src);
+    MessageFieldCollection(const MessageFieldCollection<T>& src);
     
     /** \brief Destructor
       */ 
@@ -53,22 +55,22 @@ namespace variant_topic_tools {
     /** \brief Access a field of the message field collection by index
       *   (non-const version)
       */
-    MessageField& getField(size_t index);
+    MessageField<T>& getField(size_t index);
     
     /** \brief Access a field of the message field collection by index
       *   (const version)
       */
-    const MessageField& getField(size_t index) const;
+    const MessageField<T>& getField(size_t index) const;
     
     /** \brief Access a field of the message field collection by name
       *   (non-const version)
       */
-    MessageField& getField(const std::string& name);
+    MessageField<T>& getField(const std::string& name);
     
     /** \brief Access a field of the message field collection by name
       *   (const version)
       */
-    const MessageField& getField(const std::string& name) const;
+    const MessageField<T>& getField(const std::string& name) const;
     
     /** \brief True, if the message field collection contains the
       *   field with the specified name
@@ -81,12 +83,17 @@ namespace variant_topic_tools {
 
     /** \brief Append a field to the message field collection
       */
-    void appendField(const MessageField& field);
+    void appendField(const MessageField<T>& field);
+    
+    /** \brief Append a field to the message field collection (overloaded
+      *   version taking a field name and a field value)
+      */
+    void appendField(const std::string& name, const T& value = T());
     
     /** \brief Merge this message field collection with another message
       *   field collection
       */
-    void merge(const MessageFieldCollection& collection);
+    void merge(const MessageFieldCollection<T>& collection);
     
     /** \brief Clear the message field collection
       */
@@ -95,34 +102,48 @@ namespace variant_topic_tools {
     /** \brief Operator for accessing the fields of the message field
       *   collection by index (non-const version)
       */
-    MessageField& operator[](size_t index);
+    MessageField<T>& operator[](size_t index);
     
     /** \brief Operator for accessing the fields of the message field
       *   collection by index (const version)
       */
-    const MessageField& operator[](size_t index) const;
+    const MessageField<T>& operator[](size_t index) const;
     
     /** \brief Operator for accessing the fields of the message field
       *   collection by name (non-const version)
       */
-    MessageField& operator[](const std::string& name);
+    MessageField<T>& operator[](const std::string& name);
     
     /** \brief Operator for accessing the fields of the message field
       *   collection by name (const version)
       */
-    const MessageField& operator[](const std::string& name) const;
+    const MessageField<T>& operator[](const std::string& name) const;
     
     /** \brief Operator for appending a field to the message field collection
       */
-    MessageFieldCollection& operator+=(const MessageField& field);
-  protected:
-    std::vector<MessageFieldPtr> fieldsInOrder;
-    std::map<std::string, MessageFieldPtr> fieldsByName;
+    MessageFieldCollection<T>& operator+=(const MessageField<T>& field);
     
-    /** \brief Recursively access a field of the message field collection
+  protected:
+    /** \brief Declaration of the message field pointer type
+      */
+    typedef boost::shared_ptr<MessageField<T> > MessageFieldPtr;
+    
+    /** \brief Declaration of the message field weak pointer type
+      */
+    typedef boost::weak_ptr<MessageField<T> > MessageFieldWPtr;
+    
+    /** \brief The message fields of the collection in order
+      */
+    std::vector<MessageFieldPtr> fieldsInOrder;
+    
+    /** \brief The message fields of the collection by name
+      */
+    boost::unordered_map<std::string, MessageFieldPtr> fieldsByName;
+    
+    /** \brief Recursively retrieve a field of the message field collection
       *   by name
       */
-    MessageField& getField(const std::string& name, size_t pos) const;
+    MessageField<T>& getField(const std::string& name, size_t pos) const;
     
     /** \brief True, if the message field collection or any of its fields
       *   contains the field with the specified name
@@ -130,5 +151,7 @@ namespace variant_topic_tools {
     bool hasField(const std::string& name, size_t pos) const;
   };
 };
+
+#include <variant_topic_tools/MessageFieldCollection.tpp>
 
 #endif

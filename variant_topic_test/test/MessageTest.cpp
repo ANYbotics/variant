@@ -19,54 +19,27 @@
 #include <gtest/gtest.h>
 
 #include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
 
-#include <variant_topic_tools/ArrayDataType.h>
-#include <variant_topic_tools/BuiltinDataType.h>
-#include <variant_topic_tools/DataTypeRegistry.h>
-#include <variant_topic_tools/MessageDataType.h>
+#include <variant_msgs/Test.h>
+
+#include <variant_topic_tools/Message.h>
 
 using namespace variant_topic_tools;
 
-TEST (DataType, Array) {
-  DataTypeRegistry registry;
-  registry.addArrayDataType<int32_t, 3>();
-  registry.addArrayDataType<int32_t, 0>();
+TEST (Message, Conversion) {
+  variant_msgs::Test m1;
+  m1.builtin_int = 42;
+  m1.builtin_string = "Test";
+  variant_topic_tools::Message m2 = m1;
+  variant_msgs::Test::Ptr m3 = m2.toInvariant<variant_msgs::Test>();
   
-  ArrayDataType a1("int32[3]");
-  ArrayDataType a2("int32[]");
-
-  EXPECT_TRUE(a1.isValid());
-  EXPECT_TRUE(a1.isArray());
-  EXPECT_TRUE(a1.isFixedSize());
-  
-  EXPECT_TRUE(a2.isValid());
-  EXPECT_TRUE(a2.isArray());
-  EXPECT_FALSE(a2.isFixedSize());
-  
-  registry.clear();
-}
-
-TEST (DataType, Builtin) {
-  BuiltinDataType b1("int32");
-
-  EXPECT_TRUE(b1.isValid());
-  EXPECT_TRUE(b1.isBuiltin());
-  EXPECT_TRUE(b1.hasTypeInfo());
-  EXPECT_EQ(typeid(int32_t), b1.getTypeInfo());
-  EXPECT_TRUE(b1.isFixedSize());
-  EXPECT_EQ(sizeof(int32_t), b1.getSize());
-  EXPECT_FALSE(b1.createVariant().isEmpty());
-}
-
-TEST (DataType, Message) {
-  DataTypeRegistry registry;
-  registry.addMessageDataType<std_msgs::Bool>();
-  
-  MessageDataType m1(ros::message_traits::datatype<std_msgs::Bool>());
-  
-  EXPECT_TRUE(m1.isValid());
-  EXPECT_TRUE(m1.isMessage());
-  
-  registry.clear();
+  EXPECT_EQ(ros::message_traits::datatype<variant_msgs::Test>(),
+    m2.getType().getDataType());
+  EXPECT_EQ(ros::message_traits::md5sum<variant_msgs::Test>(),
+    m2.getType().getMD5Sum());
+  EXPECT_EQ(ros::message_traits::definition<variant_msgs::Test>(),
+    m2.getType().getDefinition());
+  EXPECT_EQ(m1.builtin_int, m3->builtin_int);
+  EXPECT_EQ(m1.builtin_string, m3->builtin_string);
+  EXPECT_ANY_THROW(m2.toInvariant<std_msgs::Bool>());
 }

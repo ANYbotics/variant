@@ -40,7 +40,7 @@ namespace variant_topic_tools {
   /** \brief Message definition
     */
   class MessageDefinition :
-    public MessageFieldCollection,
+    public MessageFieldCollection<DataType>,
     public boost::enable_shared_from_this<MessageDefinition> {
   public:
     /** \brief Default constructor
@@ -63,20 +63,33 @@ namespace variant_topic_tools {
       */ 
     ~MessageDefinition();
     
-    /** \brief Access the message type represented by this message definition
+    /** \brief Set the message type represented by this message
+      *   definition
       */ 
     void setMessageType(const MessageType& messageType);
-    const MessageType& getMessageType() const;
     
-    /** \brief Access the message data type represented by this message
+    /** \brief Set the message type represented by this message
+      *   definition (templated version)
+      */ 
+    template <class M> void setMessageType();
+    
+    /** \brief Set the message data type represented by this message
       *   definition
       */ 
     void setMessageDataType(const MessageDataType& messageDataType);
+    
+    /** \brief Retrieve the message data type represented by this message
+      *   definition
+      */ 
     const MessageDataType& getMessageDataType() const;
     
     /** \brief True, if this message definition is valid
       */ 
     bool isValid() const;
+    
+    /** \brief Create a message definition
+      */ 
+    template <class M> static MessageDefinition create();
     
     /** \brief Load the definition of the message type corresponding to the
       *   specified data type
@@ -89,21 +102,22 @@ namespace variant_topic_tools {
     
     /** \brief Write the message definition to a stream
       */
-    void write(std::ostream& stream, const std::string& indent =
-      std::string()) const;
+    void write(std::ostream& stream) const;
     
   protected:
-    MessageType messageType;
+    /** \brief The message data type represented by this message definition
+      */ 
     MessageDataType messageDataType;
     
-    /** \brief Parse the message definition
+    /** \brief Parse a message definition
       */
-    void parse();
+    void parse(const std::string& messageDataType, const std::string&
+      messageDefinition);
     
     /** \brief Recursively fill the fields of the message definition
       */
-    void fillFields(const std::map<std::string, MessageFieldCollectionPtr>&
-      fields, MessageField& currentField);    
+    void fill(const DataType& currentDataType, MessageField<DataType>&
+      currentField);    
   };
   
   /** \brief Operator for writing the message definition to a stream
@@ -111,5 +125,7 @@ namespace variant_topic_tools {
   std::ostream& operator<<(std::ostream& stream, const MessageDefinition&
     messageDefinition);
 };
+
+#include <variant_topic_tools/MessageDefinition.tpp>
 
 #endif

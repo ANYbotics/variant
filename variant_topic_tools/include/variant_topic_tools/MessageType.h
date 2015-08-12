@@ -76,10 +76,13 @@ namespace variant_topic_tools {
       */
     bool isValid() const;
 
+    /** \brief Create a message type
+      */ 
+    template <class M> static MessageType create();
+    
     /** \brief Write the message type to a stream
       */
-    void write(std::ostream& stream, const std::string& indent =
-      std::string()) const;
+    void write(std::ostream& stream) const;
     
     /** \brief True, if this message type equals another message type
       */
@@ -108,5 +111,7 @@ namespace variant_topic_tools {
   std::ostream& operator<<(std::ostream& stream, const MessageType&
     messageType);
 };
+
+#include <variant_topic_tools/MessageType.tpp>
 
 #endif

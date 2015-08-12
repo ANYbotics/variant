@@ -16,52 +16,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file Forwards.h
-  * \brief Header file providing forward declarations for the variant topic
-  *   tools
-  */
+#include <gtest/gtest.h>
 
-#ifndef VARIANT_TOPIC_TOOLS_FORWARDS_H
-#define VARIANT_TOPIC_TOOLS_FORWARDS_H
+#include <variant_topic_tools/MessageFieldCollection.h>
 
-#include <ros/forwards.h>
+using namespace variant_topic_tools;
 
-namespace variant_topic_tools {
-  /** \brief Forward declaration of the data type
-    */
-  class DataType;
+TEST (MessageFieldCollection, Namespaces) {
+  variant_topic_tools::MessageFieldCollection<bool> c1;
   
-  /** \brief Forward declaration of the data type registry
-    */
-  class DataTypeRegistry;
-  
-  /** \brief Forward declaration of the message field collection
-    */
-  template <typename T> class MessageFieldCollection;
-  
-  /** \brief Forward declaration of the message field
-    */
-  template <typename T> class MessageField;
-  
-  /** \brief Forward declaration of the message definition
-    */
-  class MessageDefinition;
-  /** \brief Forward declaration of the message definition pointer type
-    */
-  typedef boost::shared_ptr<MessageDefinition> MessageDefinitionPtr;
-  /** \brief Forward declaration of the message definition weak pointer type
-    */
-  typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
-  
-  /** \brief Forward declaration of the variant
-    */
-  class Variant;
-  /** \brief Forward declaration of the variant pointer type
-    */
-  typedef boost::shared_ptr<Variant> VariantPtr;
-  /** \brief Forward declaration of the variant weak pointer type
-    */
-  typedef boost::weak_ptr<Variant> VariantWPtr;
-};
+  c1.appendField("field1");
+  c1.appendField("field2", true);
+  c1["field2"].appendField("field2_1");
 
-#endif
+  EXPECT_FALSE(c1.isEmpty());
+  EXPECT_EQ(2, c1.getNumFields());
+  
+  EXPECT_TRUE(c1.hasField("field1"));
+  EXPECT_TRUE(c1.hasField("/field2"));
+  EXPECT_TRUE(c1.hasField("field2/field2_1"));
+  EXPECT_TRUE(c1.hasField("/field2/field2_1"));
+  EXPECT_FALSE(c1.hasField("field3"));
+  EXPECT_FALSE(c1.hasField("field2/field2_2"));
+  
+  EXPECT_NO_THROW(c1.getField("field1"));
+  EXPECT_NO_THROW(c1.getField("/field2"));
+  EXPECT_NO_THROW(c1.getField("field2/field2_1"));
+  EXPECT_NO_THROW(c1.getField("/field2/field2_1"));
+  EXPECT_ANY_THROW(c1.getField("field3"));
+  EXPECT_ANY_THROW(c1.getField("field2/field2_2"));
+  
+  EXPECT_FALSE(c1["field1"].getValue());
+  EXPECT_TRUE(c1["field2"].getValue());
+  
+  c1.clear();
+  
+  EXPECT_TRUE(c1.isEmpty());
+}

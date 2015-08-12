@@ -87,6 +87,9 @@ MessageDataType::Impl::Impl(const std::string& definition) {
       std::string memberName(match[2].first, match[2].second);
       std::string memberType(match[1].first, match[1].second);
       
+      if (memberType == "Header")
+        memberType = "std_msgs/Header";
+      
       MessageVariable member(memberName, memberType);
       members.push_back(member);
     }
