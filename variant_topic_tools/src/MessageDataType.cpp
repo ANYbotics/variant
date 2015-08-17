@@ -18,10 +18,10 @@
 
 #include <sstream>
 
-#include <boost/regex.hpp>
-
+#include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageDataType.h"
+#include "variant_topic_tools/MessageDefinitionParser.h"
 
 namespace variant_topic_tools {
 
@@ -66,40 +66,33 @@ MessageDataType::Impl::Impl(const std::vector<MessageMember>& members) :
 MessageDataType::Impl::Impl(const std::string& definition) {
   BOOST_ASSERT(!definition.empty());
   
-  const std::string memberTypeExpression("[a-zA-Z][a-zA-Z1-9_/]*");
-  const std::string memberNameExpression("[a-zA-Z][a-zA-Z1-9_]*");
-  const std::string commentExpression("#.*");
-  
-  const boost::regex constantMemberExpression(
-    "^\\h*("+memberTypeExpression+")\\h+("+memberNameExpression+
-    ")\\h*=\\h*(.*)$");
-  const boost::regex variableMemberExpression(
-    "^\\h*("+memberTypeExpression+")\\h+("+memberNameExpression+
-    ")("+commentExpression+")?$");
-  
+  DataTypeRegistry registry;
   std::istringstream stream(definition);
   std::string line;
   
   while (std::getline(stream, line)) {
-    boost::smatch match;
+    std::string memberName, memberType, memberValue;
     
-    if (boost::regex_match(line, match, variableMemberExpression)) {
-      std::string memberName(match[2].first, match[2].second);
-      std::string memberType(match[1].first, match[1].second);
-      
+    if (MessageDefinitionParser::matchVariable(line, memberName,
+        memberType)) {
       if (memberType == "Header")
         memberType = "std_msgs/Header";
       
-      MessageVariable member(memberName, memberType);
-      members.push_back(member);
+      if (registry.getDataType(memberType).isValid()) {
+        MessageVariable member(memberName, memberType);
+        members.push_back(member);
+      }
+      else
+        throw NoSuchDataTypeException(memberType);
     }
-    else if (boost::regex_match(line, match, constantMemberExpression)) {
-      std::string memberName(match[2].first, match[2].second);
-      std::string memberType(match[1].first, match[1].second);
-      std::string memberValue(match[3].first, match[3].second);
-      
-      MessageConstant member(memberName, memberType, memberValue);
-      members.push_back(member);
+    else if (MessageDefinitionParser::matchConstant(line, memberName,
+        memberType, memberValue)) {
+      if (registry.getDataType(memberType).isValid()) {
+        MessageConstant member(memberName, memberType, memberValue);
+        members.push_back(member);
+      }
+      else
+        throw NoSuchDataTypeException(memberType);
     }
   }
 }

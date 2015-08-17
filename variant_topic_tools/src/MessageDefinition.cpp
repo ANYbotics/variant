@@ -16,15 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <fstream>
-
-#include <ros/package.h>
-
-#include <boost/regex.hpp>
+#include <list>
+#include <set>
 
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageDefinition.h"
+#include "variant_topic_tools/MessageDefinitionParser.h"
 
 namespace variant_topic_tools {
 
@@ -59,15 +57,24 @@ void MessageDefinition::setMessageType(const MessageType& messageType) {
   clear();
   
   if (messageType.isValid()) {
-    try {
-      parse(messageType.getDataType(), messageType.getDefinition());
-    }
-    catch (const DefinitionParseException& exception) {
-      clear();
-      throw exception;
-    }
+    DataType dataType(messageType.getDataType());
     
+    if (!dataType.isValid()) {
+      DataTypeRegistry registry;
+      std::vector<MessageType> messageTypes;
+
+      MessageDefinitionParser::parse(messageType.getDataType(),
+        messageType.getDefinition(), messageTypes);
+      
+      for (size_t i = messageTypes.size(); i > 0; --i) {
+        if (!registry.getDataType(messageTypes[i-1].getDataType()).isValid())
+          registry.addMessageDataType(messageTypes[i-1].getDataType(),
+            messageTypes[i-1].getDefinition());
+      }
+    }
+
     messageDataType = MessageDataType(messageType.getDataType());
+    fill(messageDataType, *this);
   }
 }
 
@@ -89,47 +96,12 @@ bool MessageDefinition::isValid() const {
 /*****************************************************************************/
 
 void MessageDefinition::load(const std::string& messageDataType) {
-  std::string package, type;
+  clear();
   
-  size_t i = messageDataType.find_first_of('/');
-  if ((i > 0) && (i != std::string::npos)) {
-    package = messageDataType.substr(0, i-1);
-    type = messageDataType.substr(i+1);
-  }
-  else
-    type = messageDataType;
+  MessageType messageType;
+  messageType.load(messageDataType);
   
-  if (package.empty()) {
-    if (type == "Header")
-      package = "std_msgs";
-    else
-      throw InvalidMessageTypeException(messageDataType);
-  }
-  
-  if (type.empty())
-    throw InvalidDataTypeException();
-  
-  std::string packagePath = ros::package::getPath(package);
-  if (packagePath.empty())
-    throw PackageNotFoundException(package);
-  
-  std::string messageFilename(package+"/"+type+".msg");
-  std::ifstream messageFile(messageFilename.c_str());
-
-  if (messageFile.is_open()) {
-    std::string messageDefinition;
-    
-    messageFile.seekg(0, std::ios::end);   
-    messageDefinition.reserve(messageFile.tellg());
-    messageFile.seekg(0, std::ios::beg);
-    
-    messageDefinition.assign((std::istreambuf_iterator<char>(messageFile)),
-      std::istreambuf_iterator<char>());
-  }
-  else
-    throw FileOpenException(messageFilename);
-  
-  messageFile.close();
+  setMessageType(messageType);
 }
 
 void MessageDefinition::clear() {
@@ -137,68 +109,16 @@ void MessageDefinition::clear() {
   messageDataType = MessageDataType();
 }
 
-void MessageDefinition::parse(const std::string& messageDataType, const
-    std::string& messageDefinition) {
-  BOOST_ASSERT(!messageDefinition.empty());
-  
-  std::vector<std::string> messageTypes;
-  std::vector<std::string> messageDefinitions;
-  
-  const boost::regex separatorExpression("=+");
-  const boost::regex messageTypeExpression(
-    "^\\h*MSG:\\h*([a-zA-Z][a-zA-Z1-9_/]*).*$");
-  
-  std::istringstream stream(messageDefinition);
-  std::string currentMessageType = messageDataType;
-  std::string currentMessageDefinition;
-  std::string line;  
-  
-  while (std::getline(stream, line)) {
-    boost::smatch match;
+void MessageDefinition::fill(const MessageDataType& currentDataType,
+    MessageFieldCollection<DataType>& currentCollection) {
+  for (size_t i = 0; i < currentDataType.getNumMembers(); ++i) {
+    currentCollection.appendField(currentDataType[i].getName(), 
+      currentDataType[i].getType());
     
-    if (boost::regex_match(line, match, messageTypeExpression)) {
-      if (!currentMessageDefinition.empty()) {
-        messageTypes.push_back(currentMessageType);
-        messageDefinitions.push_back(currentMessageDefinition);
-      }
-      
-      currentMessageType = std::string(match[1].first, match[1].second);
-      currentMessageDefinition.clear();      
-    }
-    else if (!boost::regex_match(line, match, separatorExpression))
-      currentMessageDefinition += line+"\n";
-  }
-
-  if (!currentMessageDefinition.empty()) {
-    messageTypes.push_back(currentMessageType);
-    messageDefinitions.push_back(currentMessageDefinition);
-  }
-  
-  DataTypeRegistry registry;
-  
-  for (size_t i = messageTypes.size(); i > 0; --i) {
-    if (!registry.getDataType(messageTypes[i-1]).isValid())
-      registry.addMessageDataType(messageTypes[i-1],
-        messageDefinitions[i-1]);
+    if (currentDataType[i].getType().isMessage())
+      fill(currentDataType[i].getType(), currentCollection[i]);
   }
 }
-
-void MessageDefinition::fill(const DataType& currentDataType,
-    MessageField<DataType>& currentField) {
-}
-
-// void MessageDefinition::fill(const std::map<std::string,
-//     MessageFieldCollectionPtr>& fields, MessageField& currentField) {
-//   std::map<std::string, MessageFieldCollectionPtr>::const_iterator it =
-//     fields.find(currentField.getType().getDataType());
-//   
-//   if (it != fields.end()) {
-//     currentField.merge(*(it->second));
-//     
-//     for (size_t i = 0; i < currentField.getNumFields(); ++i)
-//       fill(fields, currentField[i]);
-//   }
-// }
 
 void MessageDefinition::write(std::ostream& stream) const {
   stream << messageDataType.getDefinition();

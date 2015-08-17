@@ -24,7 +24,6 @@
 #define VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_H
 
 #include <variant_topic_tools/DataType.h>
-#include <boost/concept_check.hpp>
 
 namespace variant_topic_tools {
   /** \brief Message member

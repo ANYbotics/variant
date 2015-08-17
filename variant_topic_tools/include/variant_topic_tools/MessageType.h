@@ -80,6 +80,15 @@ namespace variant_topic_tools {
       */ 
     template <class M> static MessageType create();
     
+    /** \brief Attempt to load the message type corresponding to the specified
+      *   message data type
+      */
+    void load(const std::string& messageDataType);
+    
+    /** \brief Clear the message type
+      */
+    void clear();
+    
     /** \brief Write the message type to a stream
       */
     void write(std::ostream& stream) const;

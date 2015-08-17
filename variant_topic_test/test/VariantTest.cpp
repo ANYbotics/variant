@@ -22,7 +22,7 @@
 
 using namespace variant_topic_tools;
 
-TEST (Variant, Builtin) {
+TEST(Variant, Builtin) {
   Variant variant(DataType("float64"));
   
   EXPECT_TRUE(variant.hasType());

@@ -23,7 +23,6 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_DEFINITION_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_DEFINITION_H
 
-#include <map>
 #include <iostream>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -91,8 +90,8 @@ namespace variant_topic_tools {
       */ 
     template <class M> static MessageDefinition create();
     
-    /** \brief Load the definition of the message type corresponding to the
-      *   specified data type
+    /** \brief Attempt to load the message definition for the specified
+      *   message data type
       */
     void load(const std::string& messageDataType);
     
@@ -109,15 +108,10 @@ namespace variant_topic_tools {
       */ 
     MessageDataType messageDataType;
     
-    /** \brief Parse a message definition
-      */
-    void parse(const std::string& messageDataType, const std::string&
-      messageDefinition);
-    
     /** \brief Recursively fill the fields of the message definition
       */
-    void fill(const DataType& currentDataType, MessageField<DataType>&
-      currentField);    
+    void fill(const MessageDataType& currentDataType,
+      MessageFieldCollection<DataType>& currentCollection);    
   };
   
   /** \brief Operator for writing the message definition to a stream

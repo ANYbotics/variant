@@ -25,7 +25,7 @@
 
 using namespace variant_topic_tools;
 
-TEST (DataTypeRegistry, Builtin) {
+TEST(DataTypeRegistry, Builtin) {
   DataTypeRegistry registry;
 
   EXPECT_TRUE(registry.getDataType<int8_t>().isBuiltin());
@@ -34,7 +34,7 @@ TEST (DataTypeRegistry, Builtin) {
   EXPECT_TRUE(registry[typeid(int8_t)].isBuiltin());
 }
 
-TEST (DataTypeRegistry, Array) {
+TEST(DataTypeRegistry, Array) {
   DataTypeRegistry registry;
 
   ArrayDataType a1 = registry.addArrayDataType<int, 3>();
@@ -60,11 +60,17 @@ TEST (DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType("int8[3]").isArray());
   EXPECT_TRUE(registry.getDataType<std::vector<int8_t> >().isArray());
   EXPECT_TRUE(registry.getDataType("int8[]").isArray());
+  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).
+    getDataType("uint8[3]").isArray());
+  EXPECT_TRUE(registry.getDataType("uint8[3]").isArray());
+  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).
+    getDataType("uint8[]").isArray());
+  EXPECT_TRUE(registry.getDataType("uint8[]").isArray());
   
   registry.clear();
 }
 
-TEST (DataTypeRegistry, Message) {
+TEST(DataTypeRegistry, Message) {
   DataTypeRegistry registry;
 
   MessageDataType m1 = registry.addMessageDataType<std_msgs::String>();
@@ -73,17 +79,12 @@ TEST (DataTypeRegistry, Message) {
     ros::message_traits::definition<std_msgs::Bool>());
   MessageDataType m3 = registry.addMessageDataType("my_msgs/Double");
   m3.addVariable<double>("data");
-  MessageDataType m4 = registry.addMessageDataType("my_msgs/Complex",
-    "float64 real\n"
-    "float64 imaginary\n"
-  );
   
   EXPECT_TRUE(registry.getDataType<std_msgs::String>().isMessage());
   EXPECT_TRUE(registry.getDataType(
     ros::message_traits::datatype<std_msgs::String>()).isMessage());
   EXPECT_TRUE(registry.getDataType<std_msgs::Bool>().isMessage());
   EXPECT_TRUE(registry.getDataType("my_msgs/Double").isMessage());
-  EXPECT_TRUE(registry.getDataType("my_msgs/Complex").isMessage());
   
   registry.clear();
 }

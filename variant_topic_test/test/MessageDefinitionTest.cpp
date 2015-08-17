@@ -13,7 +13,7 @@
  * Lesser GNU General Public License for more details.                        *
  *                                                                            *
  * You should have received a copy of the Lesser GNU General Public License   *
- * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.       *.
  ******************************************************************************/
 
 #include <gtest/gtest.h>
@@ -25,12 +25,11 @@
 
 using namespace variant_topic_tools;
 
-TEST (MessageDefinition, Parse) {
+TEST(MessageDefinition, Parse) {
   DataTypeRegistry registry;
   
   MessageDefinition d1 = MessageDefinition::create<variant_msgs::Test>();
-  MessageDataType t1 = registry.getDataType(
-    ros::message_traits::datatype<variant_msgs::Test>());
+  MessageDataType t1 = d1.getMessageDataType();
   
   EXPECT_TRUE(t1.isValid());
   EXPECT_EQ("header", t1[0].getName());
@@ -38,6 +37,26 @@ TEST (MessageDefinition, Parse) {
   EXPECT_TRUE(t1[2].isVariable());
   EXPECT_TRUE(t1[2].getType().isBuiltin());
   EXPECT_TRUE(t1[4].getType().isMessage());
+
+  EXPECT_NO_THROW(d1.getField("header"));
+  EXPECT_NO_THROW(d1.getField("string/data"));
+  EXPECT_ANY_THROW(d1.getField("string/length"));
+  EXPECT_TRUE(d1.hasField("byte_constant"));
+  EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
+  
+  registry.clear();
+}
+
+TEST(MessageDefinition, Load) {
+  DataTypeRegistry registry;
+  
+  MessageDefinition d1;
+  EXPECT_NO_THROW(d1.load("variant_msgs/Test"));
+  EXPECT_NO_THROW(d1.getField("header"));
+  EXPECT_NO_THROW(d1.getField("string/data"));
+  EXPECT_ANY_THROW(d1.getField("string/length"));
+  EXPECT_TRUE(d1.hasField("byte_constant"));
+  EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
   
   registry.clear();
 }

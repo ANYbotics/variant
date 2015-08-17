@@ -19,6 +19,7 @@
 #include "variant_topic_tools/BuiltinDataType.h"
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageDefinitionParser.h"
 
 namespace variant_topic_tools {
 
@@ -67,6 +68,28 @@ DataTypeRegistry::Impl::~Impl() {
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
+
+DataType DataTypeRegistry::getDataType(const std::string& identifier) {
+  boost::unordered_map<std::string, DataType>::const_iterator it =
+    impl->dataTypesByIdentifier.find(identifier);
+  
+  if (it != impl->dataTypesByIdentifier.end())
+    return it->second;
+  
+  std::string name, elementType;
+  size_t size;
+  
+  if (MessageDefinitionParser::matchArrayType(identifier, elementType,
+      size)) {
+    boost::unordered_map<std::string, DataType>::const_iterator jt =
+      impl->dataTypesByIdentifier.find(elementType);
+    
+    if (jt != impl->dataTypesByIdentifier.end())
+      return addArrayDataType(jt->second, size);
+  }
+  
+  return DataType();
+}
 
 DataType DataTypeRegistry::getDataType(const std::string& identifier) const {
   boost::unordered_map<std::string, DataType>::const_iterator it =

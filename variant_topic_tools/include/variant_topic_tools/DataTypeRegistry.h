@@ -47,6 +47,18 @@ namespace variant_topic_tools {
     ~DataTypeRegistry();
 
     /** \brief Retrieve a data type from the registry by identifier
+      *   (non-const version)
+      * 
+      * \note This version of the accessor deliberately attempts to add
+      *   an array data type for an already registered message or built-in
+      *   data type. If no data type matching the given identifier or array
+      *   member type identifier exists in the data type registry, the
+      *   returned data type will be invalid.
+      */
+    DataType getDataType(const std::string& identifier);
+
+    /** \brief Retrieve a data type from the registry by identifier
+      *   (const version)
       * 
       * \note If no data type matching the given identifier exists in the
       *   data type registry, the returned data type will be invalid.

@@ -26,7 +26,7 @@
 
 using namespace variant_topic_tools;
 
-TEST (Message, Conversion) {
+TEST(Message, Conversion) {
   variant_msgs::Test m1;
   m1.builtin_int = 42;
   m1.builtin_string = "Test";

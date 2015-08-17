@@ -28,7 +28,7 @@
 
 using namespace variant_topic_tools;
 
-TEST (DataType, Array) {
+TEST(DataType, Array) {
   DataTypeRegistry registry;
   registry.addArrayDataType<int32_t, 3>();
   registry.addArrayDataType<int32_t, 0>();
@@ -47,7 +47,7 @@ TEST (DataType, Array) {
   registry.clear();
 }
 
-TEST (DataType, Builtin) {
+TEST(DataType, Builtin) {
   BuiltinDataType b1("int32");
 
   EXPECT_TRUE(b1.isValid());
@@ -59,14 +59,37 @@ TEST (DataType, Builtin) {
   EXPECT_FALSE(b1.createVariant().isEmpty());
 }
 
-TEST (DataType, Message) {
+TEST(DataType, Message) {
   DataTypeRegistry registry;
-  registry.addMessageDataType<std_msgs::Bool>();
   
-  MessageDataType m1(ros::message_traits::datatype<std_msgs::Bool>());
+  registry.addArrayDataType<double, 0>();
+  registry.addArrayDataType<double, 3>();
+  
+  MessageDataType m1 = registry.addMessageDataType<std_msgs::Bool>();
+  MessageDataType m2 = registry.addMessageDataType("my_msgs/Double");
+  m2.addVariable<double>("data");
+  MessageDataType m3 = registry.addMessageDataType("my_msgs/Complex",
+    "float64 real\n"
+    "float64 imaginary\n"
+  );
+  MessageDataType m4 = registry.addMessageDataType("my_msgs/Vector",
+    "float64[] data\n");
+  MessageDataType m5 = registry.addMessageDataType("my_msgs/Array",
+    "float64[3] data\n");
   
   EXPECT_TRUE(m1.isValid());
   EXPECT_TRUE(m1.isMessage());
+  EXPECT_TRUE(m1.hasTypeInfo());
+  EXPECT_EQ(typeid(std_msgs::Bool), m1.getTypeInfo());
+  EXPECT_TRUE(m2.isValid());
+  EXPECT_TRUE(m2.isMessage());
+  EXPECT_FALSE(m2.hasTypeInfo());
+  EXPECT_TRUE(m3.isValid());
+  EXPECT_TRUE(m3.isMessage());
+  EXPECT_FALSE(m3.hasTypeInfo());
+  EXPECT_TRUE(m4.isValid());
+  EXPECT_TRUE(m4.isMessage());
+  EXPECT_FALSE(m4.hasTypeInfo());
   
   registry.clear();
 }

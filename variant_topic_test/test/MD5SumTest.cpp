@@ -22,7 +22,7 @@
 
 using namespace variant_topic_tools;
 
-TEST (MD5Sum, StringHashing) {
+TEST(MD5Sum, StringHashing) {
   MD5Sum h1;
   MD5Sum h2("0123456789abcdef");
   MD5Sum h3("Franz jagt im komplett verwahrlosten Taxi quer durch Bayern");

@@ -59,6 +59,7 @@ add_library(variant_topic_tools
   src/MessageConstant.cpp
   src/MessageDataType.cpp
   src/MessageDefinition.cpp
+  src/MessageDefinitionParser.cpp
   src/MessageHeader.cpp
   src/MessageMember.cpp
   src/MessageSerializer.cpp
