@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/MessageDefinition.h>
+
 namespace variant_topic_tools {
 
 /*****************************************************************************/
@@ -91,6 +93,7 @@ template <typename T>
 MessageDataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, typename
     boost::enable_if<MessageDataType::TypeTraits::IsMessage<T> >::type>::
     create() {
+  MessageDefinition::template create<T>();
   return MessageDataType::template create<T>();
 }
 

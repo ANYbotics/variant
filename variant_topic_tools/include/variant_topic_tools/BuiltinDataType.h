@@ -57,7 +57,7 @@ namespace variant_topic_tools {
     /** \brief Built-in data type implementation
       */
     class Impl :
-      public virtual DataType::Impl {
+      public DataType::Impl {
     public:
       /** \brief Constructor
         */
@@ -81,7 +81,6 @@ namespace variant_topic_tools {
       *   version)
       */
     template <typename T> class ImplT :
-      public DataType::ImplT<T>,
       public Impl {
     public:
       /** \brief Constructor
@@ -92,6 +91,11 @@ namespace variant_topic_tools {
         */
       virtual ~ImplT();
     
+      /** \brief Retrieve the type information associated with this data type
+        *   (re-implementation)
+        */ 
+      const std::type_info& getTypeInfo() const;
+      
       /** \brief Retrieve the size of the instances of this data type
         *   (implementation)
         */
@@ -101,6 +105,14 @@ namespace variant_topic_tools {
         *   as opposed to a variable-size data type (implementation)
         */ 
       bool isFixedSize() const;
+      
+      /** \brief Create a serializer for this data type (re-implementation)
+        */ 
+      Serializer createSerializer() const;
+      
+      /** \brief Create a variant from this data type (re-implementation)
+        */ 
+      Variant createVariant() const;
     };
     
     /** \brief Create a built-in data type

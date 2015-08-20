@@ -16,40 +16,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file MessageSerializer.h
-  * \brief Header file providing the MessageSerializer class interface
+/** \file ArraySerializer.h
+  * \brief Header file providing the ArraySerializer class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
-#define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
+#ifndef VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
+#define VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
 
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
-  /** \brief Message serializer
+  /** \brief Array serializer
     */
-  class MessageSerializer :
+  class ArraySerializer :
     public Serializer {
-  friend class MessageDataType;
+  friend class ArrayDataType;
   public:
     /** \brief Default constructor
       */ 
-    MessageSerializer();
+    ArraySerializer();
     
     /** \brief Copy constructor
       */ 
-    MessageSerializer(const MessageSerializer& src);
+    ArraySerializer(const ArraySerializer& src);
     
     /** \brief Copy constructor (overloaded version taking a serializer)
       */ 
-    MessageSerializer(const Serializer& src);
+    ArraySerializer(const Serializer& src);
     
     /** \brief Destructor
       */ 
-    ~MessageSerializer();
+    ~ArraySerializer();
     
   protected:
-    /** \brief Message serializer implementation
+    /** \brief Array serializer implementation
       */
     class Impl :
       public virtual Serializer::Impl {
@@ -63,14 +63,14 @@ namespace variant_topic_tools {
       virtual ~Impl();
     };
     
-    /** \brief Message serializer implementation (variant-typed version)
+    /** \brief Array serializer implementation (variant-typed version)
       */
     class ImplV :
       public Impl {
     public:
       /** \brief Constructor
         */
-      ImplV(const std::vector<Serializer>& memberSerializers);
+      ImplV(const Serializer& elementSerializer, size_t numElements);
       
       /** \brief Destructor
         */
@@ -91,10 +91,10 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream);
     };
     
-    /** \brief Message serializer implementation (templated strong-typed
+    /** \brief Array serializer implementation (templated strong-typed
       *   version)
       */
-    template <typename T> class ImplT :
+    template <typename T, size_t N> class ImplT :
       public Impl {
     public:
       /** \brief Default constructor
@@ -120,18 +120,17 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream);
     };
     
-    /** \brief Constructor (overloaded version taking a sequence of member
-      *   serializers)
+    /** \brief Constructor (overloaded version taking an element serializer
+      *   and a number of elements)
       */ 
-    MessageSerializer(const std::vector<Serializer>& memberSerializers);
+    ArraySerializer(const Serializer& elementSerializer, size_t numElements);
     
-    
-    /** \brief Create a message serializer
+    /** \brief Create an array serializer
       */ 
-    template <typename T> static MessageSerializer create();
+    template <typename T, size_t N> static ArraySerializer create();
   };
 };
 
-#include <variant_topic_tools/MessageSerializer.tpp>
+#include <variant_topic_tools/ArraySerializer.tpp>
 
 #endif

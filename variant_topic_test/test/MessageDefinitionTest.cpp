@@ -30,6 +30,10 @@ TEST(MessageDefinition, Parse) {
   
   MessageDefinition d1 = MessageDefinition::create<variant_msgs::Test>();
   MessageDataType t1 = d1.getMessageDataType();
+  MessageType m2("my_msgs/Test", "*",
+    ros::message_traits::definition<variant_msgs::Test>());
+  MessageDefinition d2(m2);
+  MessageDataType t2 = d2.getMessageDataType();
   
   EXPECT_TRUE(t1.isValid());
   EXPECT_EQ("header", t1[0].getName());

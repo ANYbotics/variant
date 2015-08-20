@@ -27,7 +27,6 @@
 #include <variant_topic_tools/MessageConstant.h>
 #include <variant_topic_tools/MessageMember.h>
 #include <variant_topic_tools/MessageVariable.h>
-#include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
   /** \brief Message data type
@@ -119,7 +118,7 @@ namespace variant_topic_tools {
     /** \brief Message data type implementation
       */
     class Impl :
-      public virtual DataType::Impl {
+      public DataType::Impl {
     public:
       /** \brief Constructor (overloaded version taking a sequence of
         *   members)
@@ -161,7 +160,6 @@ namespace variant_topic_tools {
     /** \brief Message data type implementation (variant-typed version)
       */
     class ImplV :
-      public DataType::ImplV,
       public Impl {
     public:
       /** \brief Constructor (overloaded version taking an identifier and
@@ -208,6 +206,14 @@ namespace variant_topic_tools {
         */
       bool isFixedSize() const;
       
+      /** \brief Create a serializer for this data type (re-implementation)
+        */ 
+      Serializer createSerializer() const;
+      
+      /** \brief Create a variant from this data type (re-implementation)
+        */ 
+      Variant createVariant() const;
+      
       /** \brief Add a member to this message data type (implementation)
         */
       void addMember(const MessageMember& member);
@@ -225,10 +231,9 @@ namespace variant_topic_tools {
       *   version)
       */
     template <typename T> class ImplT :
-      public DataType::ImplT<T>,
       public Impl {
     public:
-      /** \brief Constructor
+      /** \brief Default constructor
         */
       ImplT();
       
@@ -240,6 +245,11 @@ namespace variant_topic_tools {
         *   (implementation)
         */ 
       const std::string& getIdentifier() const;
+      
+      /** \brief Retrieve the type information associated with this data type
+        *   (re-implementation)
+        */ 
+      const std::type_info& getTypeInfo() const;
       
       /** \brief Retrieve the size of the instances of this data type
         *   (implementation)
@@ -264,6 +274,14 @@ namespace variant_topic_tools {
       /** \brief True, if this message data type is simple (implementation)
         */
       bool isSimple() const;
+      
+      /** \brief Create a serializer for this data type (re-implementation)
+        */ 
+      Serializer createSerializer() const;
+      
+      /** \brief Create a variant from this data type (re-implementation)
+        */ 
+      Variant createVariant() const;
       
       /** \brief Add a member to this message data type (implementation)
         */

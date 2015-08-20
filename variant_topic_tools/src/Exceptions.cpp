@@ -26,8 +26,8 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-InvalidOperationException::InvalidOperationException() :
-  ros::Exception("Attempted execution of an invalid operation") {
+InvalidOperationException::InvalidOperationException(const std::string& what) :
+  ros::Exception("Attempted execution of an invalid operation: "+what) {
 }
 
 InvalidDataTypeException::InvalidDataTypeException() :
@@ -55,34 +55,28 @@ DataTypeMismatchException::DataTypeMismatchException(const std::string&
     "] mismatches expected data type ["+expectedDataType+"]") {
 }
 
-InvalidMessageMemberException::InvalidMessageMemberException() :
-  ros::Exception("Attempted use of an invalid message member") {
+AmbiguousMemberNameException::AmbiguousMemberNameException(
+    const std::string& name) :
+  ros::Exception("Member name ["+name+"] is used ambiguously") {
 }
 
-NoSuchMessageMemberException::NoSuchMessageMemberException(size_t index) :
+NoSuchMemberException::NoSuchMemberException(size_t index) :
   ros::Exception("Member with index ["+boost::lexical_cast<std::string>(index)+
     "] does not exist") {
+}
+
+NoSuchMemberException::NoSuchMemberException(const std::string& name) :
+  ros::Exception("Member with name ["+name+"] does not exist") {
+}
+
+InvalidMessageMemberException::InvalidMessageMemberException() :
+  ros::Exception("Attempted use of an invalid message member") {
 }
 
 MD5SumMismatchException::MD5SumMismatchException(const std::string&
     expectedMD5Sum, const std::string& providedMD5Sum) :
   ros::Exception("Provided MD5 sum ["+providedMD5Sum+
     "] mismatches expected MD5 sum ["+expectedMD5Sum+"]") {
-}
-
-AmbiguousMessageFieldNameException::AmbiguousMessageFieldNameException(
-    const std::string& name) :
-  ros::Exception("Message field name ["+name+"] is used ambiguously") {
-}
-
-NoSuchMessageFieldException::NoSuchMessageFieldException(size_t index) :
-  ros::Exception("Field with index ["+boost::lexical_cast<std::string>(index)+
-    "] does not exist") {
-}
-
-NoSuchMessageFieldException::NoSuchMessageFieldException(const std::string&
-    name) :
-  ros::Exception("Field with name ["+name+"] does not exist") {
 }
 
 InvalidMessageTypeException::InvalidMessageTypeException(const std::string&
@@ -103,6 +97,10 @@ PackageNotFoundException::PackageNotFoundException(const std::string&
 
 FileOpenException::FileOpenException(const std::string& filename) :
   ros::Exception("Error opening file ["+filename+"]") {
+}
+
+InvalidSerializerException::InvalidSerializerException() :
+  ros::Exception("Attempted use of an invalid serializer") {
 }
 
 }

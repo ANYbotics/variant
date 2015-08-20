@@ -16,7 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/DataTypeRegistry.h>
+#include <variant_topic_tools/BuiltinSerializer.h>
+#include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
 
@@ -39,6 +40,11 @@ BuiltinDataType::ImplT<T>::~ImplT() {
 /*****************************************************************************/
 
 template <typename T>
+const std::type_info& BuiltinDataType::ImplT<T>::getTypeInfo() const {
+  return typeid(T);
+}
+
+template <typename T>
 size_t BuiltinDataType::ImplT<T>::getSize() const {
   return ros::message_traits::template isFixedSize<T>() ? sizeof(T) : 0;
 }
@@ -58,6 +64,16 @@ template <typename T> BuiltinDataType BuiltinDataType::create(const
   builtinDataType.impl.reset(new DataType::ImplA(new ImplT<T>(identifier)));
   
   return builtinDataType;
+}
+
+template <typename T>
+Serializer BuiltinDataType::ImplT<T>::createSerializer() const {
+  return BuiltinSerializer::template create<T>();
+}
+
+template <typename T>
+Variant BuiltinDataType::ImplT<T>::createVariant() const {
+  return Variant(T());
 }
 
 }

@@ -25,15 +25,6 @@
 
 using namespace variant_topic_tools;
 
-TEST(DataTypeRegistry, Builtin) {
-  DataTypeRegistry registry;
-
-  EXPECT_TRUE(registry.getDataType<int8_t>().isBuiltin());
-  EXPECT_TRUE(registry.getDataType("int8").isBuiltin());
-  EXPECT_TRUE(registry["int8"].isBuiltin());
-  EXPECT_TRUE(registry[typeid(int8_t)].isBuiltin());
-}
-
 TEST(DataTypeRegistry, Array) {
   DataTypeRegistry registry;
 
@@ -68,6 +59,15 @@ TEST(DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType("uint8[]").isArray());
   
   registry.clear();
+}
+
+TEST(DataTypeRegistry, Builtin) {
+  DataTypeRegistry registry;
+
+  EXPECT_TRUE(registry.getDataType<int8_t>().isBuiltin());
+  EXPECT_TRUE(registry.getDataType("int8").isBuiltin());
+  EXPECT_TRUE(registry["int8"].isBuiltin());
+  EXPECT_TRUE(registry[typeid(int8_t)].isBuiltin());
 }
 
 TEST(DataTypeRegistry, Message) {

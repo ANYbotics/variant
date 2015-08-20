@@ -50,7 +50,9 @@ include_directories(
 ## Declare a cpp library
 add_library(variant_topic_tools
   src/ArrayDataType.cpp
+  src/ArraySerializer.cpp
   src/BuiltinDataType.cpp
+  src/BuiltinSerializer.cpp
   src/DataType.cpp
   src/DataTypeRegistry.cpp
   src/Exceptions.cpp
@@ -67,7 +69,11 @@ add_library(variant_topic_tools
   src/MessageType.cpp
   src/MessageVariable.cpp
   src/Serialization.cpp
+  src/Serializer.cpp
   src/Variant.cpp
+  src/VariantArray.cpp
+  src/VariantCollection.cpp
+  src/VariantMessage.cpp
 )
 
 add_executable(

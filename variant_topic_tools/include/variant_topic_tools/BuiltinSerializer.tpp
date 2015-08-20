@@ -25,29 +25,41 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-DataType::ImplT<T>::ImplT() {
+BuiltinSerializer::ImplT<T>::ImplT() {
+  BOOST_STATIC_ASSERT(!ros::message_traits::IsMessage<T>::value);
 }
 
 template <typename T>
-DataType::ImplT<T>::~ImplT() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <typename T>
-const std::type_info& DataType::ImplT<T>::getTypeInfo() const {
-  return typeid(T);
+BuiltinSerializer::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
+template <typename T> BuiltinSerializer BuiltinSerializer::create() {
+  BuiltinSerializer builtinSerializer;
+  builtinSerializer.impl.reset(new ImplT<T>());
+  
+  return builtinSerializer;
+}
+
 template <typename T>
-VariantPtr DataType::ImplT<T>::createVariant() const {
-  return VariantPtr(new Variant(T()));
+void BuiltinSerializer::ImplT<T>::serialize(ros::serialization::OStream&
+    stream, const Variant& value) {
+  ros::serialization::serialize(stream, value.template getValue<T>());
+}
+
+template <typename T>
+void BuiltinSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
+    stream, Variant& value) {
+  ros::serialization::deserialize(stream, value.template getValue<T>());
+}
+
+template <typename T>
+void BuiltinSerializer::ImplT<T>::advance(ros::serialization::IStream&
+    stream) {
+  Serializer::TypeTraits::template advance<T>(stream);
 }
 
 }

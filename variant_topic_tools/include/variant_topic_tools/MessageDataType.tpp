@@ -17,6 +17,8 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/Exceptions.h>
+#include "variant_topic_tools/MessageSerializer.h"
+#include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
 
@@ -42,6 +44,11 @@ template <typename T>
 const std::string& MessageDataType::ImplT<T>::getIdentifier() const {
   static std::string identifier(ros::message_traits::template datatype<T>());
   return identifier;
+}
+
+template <typename T>
+const std::type_info& MessageDataType::ImplT<T>::getTypeInfo() const {
+  return typeid(T);
 }
 
 template <typename T>
@@ -90,6 +97,16 @@ template <typename T> MessageConstant MessageDataType::addConstant(const
 template <typename T> MessageVariable MessageDataType::addVariable(const
     std::string& name) {
   return this->addVariable(name, typeid(T));
+}
+
+template <typename T>
+Serializer MessageDataType::ImplT<T>::createSerializer() const {
+  return MessageSerializer::template create<T>();
+}
+
+template <typename T>
+Variant MessageDataType::ImplT<T>::createVariant() const {
+  return Variant(T());
 }
 
 template <typename T>

@@ -48,26 +48,26 @@ namespace variant_topic_tools {
       */ 
     virtual ~MessageFieldCollection();
     
-    /** \brief Access the number of fields of the message field collection
+    /** \brief Retrieve the number of fields of the message field collection
       */
     size_t getNumFields() const;
     
-    /** \brief Access a field of the message field collection by index
+    /** \brief Retrieve a field of the message field collection by index
       *   (non-const version)
       */
     MessageField<T>& getField(size_t index);
     
-    /** \brief Access a field of the message field collection by index
+    /** \brief Retrieve a field of the message field collection by index
       *   (const version)
       */
     const MessageField<T>& getField(size_t index) const;
     
-    /** \brief Access a field of the message field collection by name
+    /** \brief Retrieve a field of the message field collection by name
       *   (non-const version)
       */
     MessageField<T>& getField(const std::string& name);
     
-    /** \brief Access a field of the message field collection by name
+    /** \brief Retrieve a field of the message field collection by name
       *   (const version)
       */
     const MessageField<T>& getField(const std::string& name) const;
@@ -99,22 +99,27 @@ namespace variant_topic_tools {
       */
     virtual void clear();
     
-    /** \brief Operator for accessing the fields of the message field
+    /** \brief Write the message field collection to a stream
+      */
+    virtual void write(std::ostream& stream, const std::string& indent =
+      std::string()) const;
+      
+    /** \brief Operator for retrieving the fields of the message field
       *   collection by index (non-const version)
       */
     MessageField<T>& operator[](size_t index);
     
-    /** \brief Operator for accessing the fields of the message field
+    /** \brief Operator for retrieving the fields of the message field
       *   collection by index (const version)
       */
     const MessageField<T>& operator[](size_t index) const;
     
-    /** \brief Operator for accessing the fields of the message field
+    /** \brief Operator for retrieving the fields of the message field
       *   collection by name (non-const version)
       */
     MessageField<T>& operator[](const std::string& name);
     
-    /** \brief Operator for accessing the fields of the message field
+    /** \brief Operator for retrieving the fields of the message field
       *   collection by name (const version)
       */
     const MessageField<T>& operator[](const std::string& name) const;
@@ -122,6 +127,16 @@ namespace variant_topic_tools {
     /** \brief Operator for appending a field to the message field collection
       */
     MessageFieldCollection<T>& operator+=(const MessageField<T>& field);
+    
+    /** \brief True, if this message field collection is equal to another
+      *   message field collection
+      */
+    bool operator==(const MessageFieldCollection<T>& collection) const;
+    
+    /** \brief True, if this message field collection is not equal to another
+      *   message field collection
+      */
+    bool operator!=(const MessageFieldCollection<T>& collection) const;
     
   protected:
     /** \brief Declaration of the message field pointer type
@@ -150,6 +165,11 @@ namespace variant_topic_tools {
       */
     bool hasField(const std::string& name, size_t pos) const;
   };
+  
+  /** \brief Operator for writing the message field collection to a stream
+    */
+  template <typename T> std::ostream& operator<<(std::ostream& stream,
+    const MessageFieldCollection<T>& collection);
 };
 
 #include <variant_topic_tools/MessageFieldCollection.tpp>

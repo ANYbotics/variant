@@ -59,7 +59,11 @@ namespace variant_topic_tools {
       */
     void setValue(const T& value);
     
-    /** \brief Retrieve the value of the message field
+    /** \brief Retrieve the value of the message field (non-const version)
+      */
+    T& getValue();
+    
+    /** \brief Retrieve the value of the message field (const version)
       */
     const T& getValue() const;
     
@@ -69,12 +73,21 @@ namespace variant_topic_tools {
     
     /** \brief Clear the message field
       */
-    virtual void clear();
+    void clear();
     
     /** \brief Write the message field to a stream
       */
     void write(std::ostream& stream, const std::string& indent =
       std::string()) const;
+    
+    /** \brief True, if this message field is equal to another message field
+      */
+    bool operator==(const MessageField<T>& field) const;
+    
+    /** \brief True, if this message field is not equal to another message
+      *   field
+      */
+    bool operator!=(const MessageField<T>& field) const;
     
   protected:
     /** \brief Type traits

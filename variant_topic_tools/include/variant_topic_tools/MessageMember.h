@@ -23,7 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_H
 
-#include <variant_topic_tools/DataType.h>
+#include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
   /** \brief Message member

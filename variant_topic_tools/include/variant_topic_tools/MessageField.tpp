@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <sstream>
+
 namespace variant_topic_tools {
 
 /*****************************************************************************/
@@ -59,6 +61,11 @@ void MessageField<T>::setValue(const T& value) {
 }
 
 template <typename T>
+T& MessageField<T>::getValue() {
+  return this->value;
+}
+
+template <typename T>
 const T& MessageField<T>::getValue() const {
   return this->value;
 }
@@ -95,17 +102,42 @@ void MessageField<T>::clear() {
 template <typename T>
 void MessageField<T>::write(std::ostream& stream, const std::string& indent)
     const {
-  stream << indent << name << ": " << value;
+  stream << indent << name << ": ";
+
+  std::stringstream valueStream;
+  valueStream << value;
+  std::string valueLine;
+  size_t numLines = 0;
   
-  for (size_t i = 0; i < this->fieldsInOrder.size(); ++i) {
+  while (std::getline(valueStream, valueLine)) {
+    if (!valueStream.eof() || numLines)
+      stream << "\n" << indent << "  ";
+    
+    stream << valueLine;
+    ++numLines;
+  }
+
+  if (!this->fieldsInOrder.empty()) {
     stream << "\n";
-    this->fieldsInOrder[i]->write(stream, indent+"  ");
+    MessageFieldCollection<T>::write(stream, indent+"  ");
   }
 }
 
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
+
+template <typename T>
+bool MessageField<T>::operator==(const MessageField<T>& field) const {
+  return (this->name == field.name) && (this->value == field.value) &&
+    MessageFieldCollection<T>::operator==(field);
+}
+
+template <typename T>
+bool MessageField<T>::operator!=(const MessageField<T>& field) const {
+  return (this->name != field.name) || (this->value != field.value) ||
+    MessageFieldCollection<T>::operator!=(field);
+}
 
 template <typename T> std::ostream& operator<<(std::ostream& stream, const
     MessageField<T>& messageField) {

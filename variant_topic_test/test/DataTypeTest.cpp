@@ -90,6 +90,9 @@ TEST(DataType, Message) {
   EXPECT_TRUE(m4.isValid());
   EXPECT_TRUE(m4.isMessage());
   EXPECT_FALSE(m4.hasTypeInfo());
+  EXPECT_TRUE(m5.isValid());
+  EXPECT_TRUE(m5.isMessage());
+  EXPECT_FALSE(m5.hasTypeInfo());
   
   registry.clear();
 }

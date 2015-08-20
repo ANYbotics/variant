@@ -97,29 +97,30 @@ void MessageType::load(const std::string& messageDataType) {
   clear();
   
   DataTypeRegistry registry;
-  std::list<std::string> requiredMessageDataTypes;
-  std::set<std::string> loadedMessageDataTypes;
+  std::set<std::string> requiredTypes;
+  std::list<std::string> requiredTypesInOrder;
   
-  requiredMessageDataTypes.push_back(messageDataType);
+  requiredTypes.insert(messageDataType);
+  requiredTypesInOrder.push_back(messageDataType);
   
-  while (!requiredMessageDataTypes.empty()) {
+  while (!requiredTypesInOrder.empty()) {
     std::string package, type;
-    std::string currentMessageDataType = requiredMessageDataTypes.front();
+    std::string currentType = requiredTypesInOrder.front();
     
-    size_t i = currentMessageDataType.find_first_of('/');
+    size_t i = currentType.find_first_of('/');
     
     if ((i > 0) && (i != std::string::npos)) {
-      package = currentMessageDataType.substr(0, i);
-      type = currentMessageDataType.substr(i+1);
+      package = currentType.substr(0, i);
+      type = currentType.substr(i+1);
     }
     else
-      type = currentMessageDataType;
+      type = currentType;
     
     if (package.empty()) {
       if (type == "Header")
         package = "std_msgs";
       else
-        throw InvalidMessageTypeException(currentMessageDataType);
+        throw InvalidMessageTypeException(currentType);
     }
     
     if (type.empty())
@@ -161,21 +162,21 @@ void MessageType::load(const std::string& messageDataType) {
             memberType = "std_msgs/Header";
           
           if (!registry.getDataType(memberType).isBuiltin() &&
-              loadedMessageDataTypes.find(memberType) ==
-              loadedMessageDataTypes.end())
-            requiredMessageDataTypes.push_back(memberType);
+              requiredTypes.find(memberType) == requiredTypes.end()) {
+            requiredTypes.insert(memberType);
+            requiredTypesInOrder.push_back(memberType);
+          }
         }
       }
       
       if (!definition.empty()) {
         definition += "\n"+std::string(80, '=')+"\n";
-        definition += "MSG: "+currentMessageDataType+"\n";
+        definition += "MSG: "+currentType+"\n";
       }
       definition += messageDefinition;
     }
     
-    loadedMessageDataTypes.insert(currentMessageDataType);
-    requiredMessageDataTypes.pop_front();
+    requiredTypesInOrder.pop_front();
   }
   
   if (!definition.empty())

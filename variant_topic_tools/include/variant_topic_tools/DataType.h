@@ -36,6 +36,7 @@ namespace variant_topic_tools {
   class DataType {
   friend class DataTypeHash;
   friend class DataTypeRegistry;
+  friend class Serializer;
   public:
     /** \brief Data type hash
       */
@@ -134,8 +135,12 @@ namespace variant_topic_tools {
       */
     void write(std::ostream& stream) const;
     
-      /** \brief Create a variant from this data type
-        */ 
+    /** \brief Create a serializer for this data type
+      */ 
+    Serializer createSerializer() const;
+    
+    /** \brief Create a variant from this data type
+      */ 
     Variant createVariant() const;
     
     /** \brief Assignment operator
@@ -146,6 +151,18 @@ namespace variant_topic_tools {
       */
     inline operator void*() const {
       return (impl) ? (void*)1 : (void*)0;
+    };
+    
+    /** \brief Equality comparison operator
+      */
+    inline bool operator==(const DataType& dataType) const {
+      return (impl == dataType.impl);
+    };
+    
+    /** \brief Inequality comparison operator
+      */
+    inline bool operator!=(const DataType& dataType) const {
+      return (impl != dataType.impl);
     };
     
   protected:
@@ -197,9 +214,8 @@ namespace variant_topic_tools {
       virtual const std::string& getIdentifier() const = 0;
     
       /** \brief Retrieve the type information associated with this data type
-        *   (abstract declaration)
         */ 
-      virtual const std::type_info& getTypeInfo() const = 0;
+      virtual const std::type_info& getTypeInfo() const;
     
       /** \brief Retrieve the size of the instances of this data type
         *   (abstract declaration)
@@ -211,57 +227,15 @@ namespace variant_topic_tools {
         */ 
       virtual bool isFixedSize() const = 0;
       
+      /** \brief Create a serializer for this data type (abstract declaration)
+        */ 
+      virtual Serializer createSerializer() const;
+      
       /** \brief Create a variant from this data type (abstract declaration)
         */ 
-      virtual VariantPtr createVariant() const = 0;
+      virtual Variant createVariant() const;
     };
     
-    /** \brief Data type implementation (variant-typed version)
-      */
-    class ImplV :
-      public virtual Impl {
-    public:
-      /** \brief Constructor
-        */
-      ImplV();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplV();
-
-      /** \brief Retrieve the type information associated with this data type
-        *   (implementation)
-        */ 
-      const std::type_info& getTypeInfo() const;
-      
-      /** \brief Create a variant from this data type (implementation)
-        */ 
-      VariantPtr createVariant() const;
-   };
-   
-    /** \brief Data type implementation (templated strong-typed version)
-      */
-    template <typename T> class ImplT :
-      public virtual Impl {
-    public:
-      /** \brief Constructor
-        */
-      ImplT();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
-
-      /** \brief Retrieve the type information associated with this data type
-        *   (implementation)
-        */ 
-      const std::type_info& getTypeInfo() const;
-      
-      /** \brief Create a variant from this data type (implementation)
-        */ 
-      VariantPtr createVariant() const;
-   };
-   
     /** \brief Declaration of the data type implementation adapter
       *   pointer type
       */
@@ -272,7 +246,7 @@ namespace variant_topic_tools {
       */
     typedef boost::weak_ptr<ImplA> ImplAWPtr;
     
-    /** \brief The data type's implementation
+    /** \brief The data type's implementation adapter
       */
     ImplAPtr impl;
   };
@@ -281,7 +255,5 @@ namespace variant_topic_tools {
     */
   std::ostream& operator<<(std::ostream& stream, const DataType& dataType);
 };
-
-#include <variant_topic_tools/DataType.tpp>
 
 #endif

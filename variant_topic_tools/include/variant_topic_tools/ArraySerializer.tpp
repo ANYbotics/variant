@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/ArraySerializer.h"
-#include <variant_topic_tools/VariantArray.h>
+#include <variant_topic_tools/ArrayDataType.h>
+#include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
 
@@ -26,53 +26,43 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::ImplT() :
-  Impl(typeid(T)) {
+ArraySerializer::ImplT<T, N>::ImplT() {
 }
 
 template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::~ImplT() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <typename T, size_t N>
-const std::type_info& ArrayDataType::ImplT<T, N>::getTypeInfo() const {
-  return typeid(typename ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType);
-}
-
-template <typename T, size_t N>
-size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
-  return N;
+ArraySerializer::ImplT<T, N>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class A> ArrayDataType ArrayDataType::create() {
-  return ArrayDataType::template create<typename
-    TypeTraits::FromArray<A>::ElementType,
-    TypeTraits::FromArray<A>::NumElements>();
-}
-
-template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
-  ArrayDataType arrayDataType;
-  arrayDataType.impl.reset(new DataType::ImplA(new ImplT<T, N>()));
+template <typename T, size_t N> ArraySerializer ArraySerializer::create() {
+  ArraySerializer arraySerializer;
+  arraySerializer.impl.reset(new ImplT<T, N>());
   
-  return arrayDataType;
+  return arraySerializer;
 }
 
 template <typename T, size_t N>
-Serializer ArrayDataType::ImplT<T, N>::createSerializer() const {
-  return ArraySerializer::template create<T, N>();
+void ArraySerializer::ImplT<T, N>::serialize(ros::serialization::OStream&
+    stream, const Variant& value) {
+  ros::serialization::serialize(stream, value.template getValue<typename
+    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>());
 }
 
 template <typename T, size_t N>
-Variant ArrayDataType::ImplT<T, N>::createVariant() const {
-  return static_cast<const Variant&>(VariantArray::template create<T, N>());
+void ArraySerializer::ImplT<T, N>::deserialize(ros::serialization::IStream&
+    stream, Variant& value) {
+  ros::serialization::deserialize(stream, value.template getValue<typename
+    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>());
+}
+
+template <typename T, size_t N>
+void ArraySerializer::ImplT<T, N>::advance(ros::serialization::IStream&
+    stream) {
+  Serializer::TypeTraits::template advance<typename
+    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>(stream);
 }
 
 }

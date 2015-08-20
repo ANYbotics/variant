@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <boost/type_traits.hpp>
+#include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
 
@@ -25,13 +25,8 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageSerializer::ImplT<T>::ImplT(const DataType& dataType) :
-  MessageSerializer::Impl(dataType) {
-  
-  boost::shared_ptr<T> invariant(new T());
-  std::vector<uint8_t> data;
-  ros::serialization::IStream stream(data.data(), 1);
-  ros::serialization::deserialize(stream, *invariant);
+MessageSerializer::ImplT<T>::ImplT() {
+  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
 }
 
 template <typename T>
@@ -39,45 +34,32 @@ MessageSerializer::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <typename T>
-size_t MessageSerializer::ImplT<T>::getSerializedLength(Variant& value)
-    const {
-  return ros::serialization::serializationLength(value.template getValue<T>());
-}
-
-/*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageSerializer MessageSerializer::createSimple(const
-    DataType& dataType) {
-  MessageSerializer serializer(dataType);
+template <typename T> MessageSerializer MessageSerializer::create() {
+  MessageSerializer messageSerializer;
+  messageSerializer.impl.reset(new ImplT<T>());
   
-  if (!serializer.impl) {
-    serializer.impl.reset(new ImplT<T>(dataType));
-    getInstances().insert(std::make_pair(dataType, serializer));
-  }
-  
-  return serializer;
+  return messageSerializer;
 }
 
 template <typename T>
-void MessageSerializer::ImplT<T>::read(ros::serialization::IStream& stream,
-    Variant& value) {
-  T invariant;
-  
-  ros::serialization::deserialize(stream, invariant);
-  
-  value.template setValue<T>(invariant);
-}
-
-template <typename T>
-void MessageSerializer::ImplT<T>::write(ros::serialization::OStream& stream,
-    const Variant& value) {
+void MessageSerializer::ImplT<T>::serialize(ros::serialization::OStream&
+    stream, const Variant& value) {
   ros::serialization::serialize(stream, value.template getValue<T>());
+}
+
+template <typename T>
+void MessageSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
+    stream, Variant& value) {
+  ros::serialization::deserialize(stream, value.template getValue<T>());
+}
+
+template <typename T>
+void MessageSerializer::ImplT<T>::advance(ros::serialization::IStream&
+    stream) {
+  Serializer::TypeTraits::template advance<T>(stream);
 }
 
 }

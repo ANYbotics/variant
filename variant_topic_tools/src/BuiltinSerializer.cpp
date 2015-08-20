@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/BuiltinDataType.h"
+#include "variant_topic_tools/BuiltinSerializer.h"
 
 namespace variant_topic_tools {
 
@@ -24,49 +24,26 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-BuiltinDataType::BuiltinDataType() {
+BuiltinSerializer::BuiltinSerializer() {
 }
 
-BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
-  DataType(src) {
+BuiltinSerializer::BuiltinSerializer(const BuiltinSerializer& src) :
+  Serializer(src) {
 }
 
-BuiltinDataType::BuiltinDataType(const DataType& src) :
-  DataType(src) {
+BuiltinSerializer::BuiltinSerializer(const Serializer& src) :
+  Serializer(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl));
 }
 
-BuiltinDataType::~BuiltinDataType() {
+BuiltinSerializer::~BuiltinSerializer() {
 }
 
-BuiltinDataType::Impl::Impl(const std::string& identifier) :
-  identifier(identifier) {
+BuiltinSerializer::Impl::Impl() {
 }
 
-BuiltinDataType::Impl::~Impl() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-const std::string& BuiltinDataType::Impl::getIdentifier() const {
-  return identifier;
-}
-
-/*****************************************************************************/
-/* Operators                                                                 */
-/*****************************************************************************/
-
-BuiltinDataType& BuiltinDataType::operator=(const DataType& src) {
-  DataType::operator=(src);
-  
-  if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(
-      impl->adaptee));
-    
-  return *this;
+BuiltinSerializer::Impl::~Impl() {
 }
 
 }

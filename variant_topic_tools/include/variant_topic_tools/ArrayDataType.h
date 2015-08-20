@@ -34,8 +34,10 @@ namespace variant_topic_tools {
     */
   class ArrayDataType :
     public DataType {
+  friend class ArraySerializer;
   friend class DataType;
   friend class DataTypeRegistry;
+  friend class VariantArray;
   public:
     /** \brief Default constructor
       */ 
@@ -105,7 +107,7 @@ namespace variant_topic_tools {
     /** \brief Array data type implementation
       */
     class Impl :
-      public virtual DataType::Impl {
+      public DataType::Impl {
     public:
       /** \brief Constructor
         */
@@ -147,12 +149,11 @@ namespace variant_topic_tools {
     /** \brief Array data type implementation (variant-typed version)
       */
     class ImplV :
-      public DataType::ImplV,
       public Impl {
     public:
       /** \brief Constructor
         */
-      ImplV(const DataType& elementType, size_t numElements = 0);
+      ImplV(const DataType& elementType, size_t numElements);
       
       /** \brief Destructor
         */
@@ -163,6 +164,14 @@ namespace variant_topic_tools {
         */
       size_t getNumElements() const;
       
+      /** \brief Create a serializer for this data type (re-implementation)
+        */ 
+      Serializer createSerializer() const;
+      
+      /** \brief Create a variant from this data type (re-implementation)
+        */ 
+      Variant createVariant() const;
+      
       /** \brief The number of elements of the array data type
         */
       size_t numElements;
@@ -171,10 +180,9 @@ namespace variant_topic_tools {
     /** \brief Array data type implementation (templated strong-typed version)
       */
     template <typename T, size_t N> class ImplT :
-      public DataType::ImplT<typename TypeTraits::ToArray<T, N>::ArrayType>,
       public Impl {
     public:
-      /** \brief Constructor
+      /** \brief Default constructor
         */
       ImplT();
       
@@ -182,10 +190,23 @@ namespace variant_topic_tools {
         */
       virtual ~ImplT();
       
+      /** \brief Retrieve the type information associated with this data type
+        *   (re-implementation)
+        */ 
+      const std::type_info& getTypeInfo() const;
+      
       /** \brief Retrieve the number of elements of this array data type
         *   (implementation)
         */
       size_t getNumElements() const;
+      
+      /** \brief Create a serializer for this data type (re-implementation)
+        */ 
+      Serializer createSerializer() const;
+      
+      /** \brief Create a variant from this data type (re-implementation)
+        */ 
+      Variant createVariant() const;
     };
     
     /** \brief Constructor (overloaded version taking an element type

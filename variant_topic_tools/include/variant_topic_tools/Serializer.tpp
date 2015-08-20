@@ -16,57 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/BuiltinDataType.h"
-
 namespace variant_topic_tools {
 
 /*****************************************************************************/
-/* Constructors and Destructor                                               */
+/* Methods                                                                   */
 /*****************************************************************************/
 
-BuiltinDataType::BuiltinDataType() {
+template <typename T> void Serializer::TypeTraits::advance(
+    ros::serialization::IStream& stream, typename boost::enable_if<
+    ros::message_traits::IsFixedSize<T> >::type*) {
+  stream.advance(sizeof(T));
 }
 
-BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
-  DataType(src) {
-}
-
-BuiltinDataType::BuiltinDataType(const DataType& src) :
-  DataType(src) {
-  if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl->adaptee));
-}
-
-BuiltinDataType::~BuiltinDataType() {
-}
-
-BuiltinDataType::Impl::Impl(const std::string& identifier) :
-  identifier(identifier) {
-}
-
-BuiltinDataType::Impl::~Impl() {
-}
-
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-const std::string& BuiltinDataType::Impl::getIdentifier() const {
-  return identifier;
-}
-
-/*****************************************************************************/
-/* Operators                                                                 */
-/*****************************************************************************/
-
-BuiltinDataType& BuiltinDataType::operator=(const DataType& src) {
-  DataType::operator=(src);
-  
-  if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(
-      impl->adaptee));
-    
-  return *this;
+template <typename T> void Serializer::TypeTraits::advance(
+    ros::serialization::IStream& stream, typename boost::disable_if<
+    ros::message_traits::IsFixedSize<T> >::type*) {
+  T value;
+  ros::serialization::deserialize(stream, value);
 }
 
 }

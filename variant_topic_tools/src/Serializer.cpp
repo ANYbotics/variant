@@ -16,8 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/ArraySerializer.h"
-#include <variant_topic_tools/VariantArray.h>
+#include "variant_topic_tools/DataType.h"
+#include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/Serializer.h"
 
 namespace variant_topic_tools {
 
@@ -25,54 +26,64 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::ImplT() :
-  Impl(typeid(T)) {
+Serializer::Serializer() {
 }
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::~ImplT() {
+Serializer::Serializer(const DataType& dataType) {
+  if (dataType.isValid())
+    impl = dataType.createSerializer().impl;
+}
+
+Serializer::Serializer(const Serializer& src) :
+  impl(src.impl) {
+}
+
+Serializer::~Serializer() {
+}
+
+Serializer::Impl::Impl() {
+}
+
+Serializer::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-const std::type_info& ArrayDataType::ImplT<T, N>::getTypeInfo() const {
-  return typeid(typename ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType);
-}
-
-template <typename T, size_t N>
-size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
-  return N;
+bool Serializer::isValid() const {
+  return impl;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class A> ArrayDataType ArrayDataType::create() {
-  return ArrayDataType::template create<typename
-    TypeTraits::FromArray<A>::ElementType,
-    TypeTraits::FromArray<A>::NumElements>();
+void Serializer::clear() {
+  impl.reset();
 }
 
-template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
-  ArrayDataType arrayDataType;
-  arrayDataType.impl.reset(new DataType::ImplA(new ImplT<T, N>()));
-  
-  return arrayDataType;
+void Serializer::serialize(ros::serialization::OStream& stream, const Variant&
+    value) {
+  if (impl)
+    impl->serialize(stream, value);
+  else
+    throw InvalidSerializerException();
 }
 
-template <typename T, size_t N>
-Serializer ArrayDataType::ImplT<T, N>::createSerializer() const {
-  return ArraySerializer::template create<T, N>();
+void Serializer::deserialize(ros::serialization::IStream& stream, Variant&
+    value) {
+  if (impl)
+    impl->deserialize(stream, value);
+  else
+    throw InvalidSerializerException();
 }
 
-template <typename T, size_t N>
-Variant ArrayDataType::ImplT<T, N>::createVariant() const {
-  return static_cast<const Variant&>(VariantArray::template create<T, N>());
+void Serializer::advance(ros::serialization::IStream& stream) {
+  if (impl)
+    impl->advance(stream);
+  else
+    throw InvalidSerializerException();
 }
 
 }

@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_VARIABLE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_VARIABLE_H
 
+#include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/MessageMember.h>
 
 namespace variant_topic_tools {

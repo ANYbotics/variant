@@ -21,6 +21,7 @@
 #include "variant_topic_tools/DataType.h"
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/MessageDataType.h"
+#include <variant_topic_tools/Serializer.h>
 #include "variant_topic_tools/Variant.h"
 
 namespace variant_topic_tools {
@@ -72,12 +73,6 @@ DataType::Impl::Impl() {
 }
 
 DataType::Impl::~Impl() {
-}
-
-DataType::ImplV::ImplV() {
-}
-
-DataType::ImplV::~ImplV() {
 }
 
 /*****************************************************************************/
@@ -146,7 +141,7 @@ bool DataType::hasTypeInfo() const {
     return false;
 }
 
-const std::type_info& DataType::ImplV::getTypeInfo() const {
+const std::type_info& DataType::Impl::getTypeInfo() const {
   return typeid(void);
 }
 
@@ -163,15 +158,27 @@ void DataType::write(std::ostream& stream) const {
     stream << impl->adaptee->getIdentifier();
 }
 
+Serializer DataType::createSerializer() const {
+  if (impl)
+    return impl->adaptee->createSerializer();
+  else
+    return Serializer();
+}
+
 Variant DataType::createVariant() const {
   if (impl)
-    return *impl->adaptee->createVariant();
+    return impl->adaptee->createVariant();
   else
     return Variant();
 }
 
-VariantPtr DataType::ImplV::createVariant() const {
-  return VariantPtr(new Variant());
+Serializer DataType::Impl::createSerializer() const {
+  return Serializer(getIdentifier());
+}
+
+Variant DataType::Impl::createVariant() const {
+  DataType dataType(getIdentifier());
+  return Variant(dataType);
 }
 
 /*****************************************************************************/

@@ -58,6 +58,10 @@ add_executable(
   pub_test
   src/pub_test.cpp
 )
+add_executable(
+  serialize_test
+  src/serialize_test.cpp
+)
 
 target_link_libraries(
   concept_test
@@ -65,6 +69,10 @@ target_link_libraries(
 )
 target_link_libraries(
   pub_test
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(
+  serialize_test
   ${catkin_LIBRARIES}
 )
 
@@ -82,6 +90,7 @@ catkin_add_gtest(variant_topic_test
   test/MessageFieldCollectionTest.cpp
   test/MessageTest.cpp
   test/MessageTypeTest.cpp
+  test/SerializerTest.cpp
   test/VariantTest.cpp
 )
 

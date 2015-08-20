@@ -33,10 +33,12 @@ namespace variant_topic_tools {
   /** \brief Variant type
     */  
   class Variant {
+  friend class DataType;
+  friend class VariantCollection;
   public:
     /** \brief Default constructor
       */ 
-    Variant(const DataType& type = DataType());
+    Variant();
     
     /** \brief Constructor (templated version taking a value)
       */ 
@@ -70,10 +72,34 @@ namespace variant_topic_tools {
       */
     bool hasType() const;
     
+    /** \brief True, if this variant represents an array
+      */ 
+    bool isArray() const;
+    
+    /** \brief True, if this variant represents a collection
+      */ 
+    bool isCollection() const;
+    
+    /** \brief True, if this variant represents a message
+      */ 
+    bool isMessage() const;
+    
     /** \brief True, if the variant is empty, i.e., does not have a value
       *   assigned
       */
     bool isEmpty() const;
+
+    /** \brief Retrieve this variant as variant array
+      */ 
+    VariantArray asArray() const;
+    
+    /** \brief Retrieve this variant as variant collection
+      */ 
+    VariantCollection asCollection() const;
+    
+    /** \brief Retrieve this variant as variant message
+      */ 
+    VariantMessage asMessage() const;
     
     /** \brief Clear the variant
       */
@@ -128,6 +154,15 @@ namespace variant_topic_tools {
           boost::has_right_shift<std::istream, T&> >::type> {
         static void read(std::istream& stream, T& value);
       };
+      
+      template <typename T, class Enable = void> struct WriteTo {
+        static void write(std::ostream& stream, const T& value);
+      };
+      
+      template <typename T> struct WriteTo<T, typename boost::enable_if<
+          boost::has_left_shift<std::ostream, const T&> >::type> {
+        static void write(std::ostream& stream, const T& value);
+      };
     };
     
     /** \brief Forward declaration of the variant value type
@@ -177,9 +212,13 @@ namespace variant_topic_tools {
     template <typename T> class ValueT :
       public Value {
     public:
-      /** \brief Constructor
+      /** \brief Default constructor
         */ 
       ValueT(const T& value = T());
+      
+      /** \brief Copy constructor
+        */ 
+      ValueT(const ValueT<T>& src);
       
       /** \brief Destructor
         */ 
@@ -214,6 +253,10 @@ namespace variant_topic_tools {
     /** \brief The variant's data value
       */
     ValuePtr value;
+    
+    /** \brief Constructor (overloaded version taking a data type)
+      */ 
+    Variant(const DataType& type);
   };
   
   /** \brief Operator for reading the variant from a stream

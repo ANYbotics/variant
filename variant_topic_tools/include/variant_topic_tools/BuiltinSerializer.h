@@ -16,40 +16,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file MessageSerializer.h
-  * \brief Header file providing the MessageSerializer class interface
+/** \file BuiltinSerializer.h
+  * \brief Header file providing the BuiltinSerializer class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
-#define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
+#ifndef VARIANT_TOPIC_TOOLS_BUILTIN_SERIALIZER_H
+#define VARIANT_TOPIC_TOOLS_BUILTIN_SERIALIZER_H
 
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
-  /** \brief Message serializer
+  /** \brief Built-in serializer
     */
-  class MessageSerializer :
+  class BuiltinSerializer :
     public Serializer {
-  friend class MessageDataType;
+  friend class BuiltinDataType;
   public:
     /** \brief Default constructor
       */ 
-    MessageSerializer();
+    BuiltinSerializer();
     
     /** \brief Copy constructor
       */ 
-    MessageSerializer(const MessageSerializer& src);
+    BuiltinSerializer(const BuiltinSerializer& src);
     
     /** \brief Copy constructor (overloaded version taking a serializer)
       */ 
-    MessageSerializer(const Serializer& src);
+    BuiltinSerializer(const Serializer& src);
     
     /** \brief Destructor
       */ 
-    ~MessageSerializer();
+    ~BuiltinSerializer();
     
   protected:
-    /** \brief Message serializer implementation
+    /** \brief Built-in data serializer implementation
       */
     class Impl :
       public virtual Serializer::Impl {
@@ -63,35 +63,7 @@ namespace variant_topic_tools {
       virtual ~Impl();
     };
     
-    /** \brief Message serializer implementation (variant-typed version)
-      */
-    class ImplV :
-      public Impl {
-    public:
-      /** \brief Constructor
-        */
-      ImplV(const std::vector<Serializer>& memberSerializers);
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplV();
-    
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);
-        
-      /** \brief Advance an input stream by the length of a serialized
-        *   value (implementation)
-        */ 
-      void advance(ros::serialization::IStream& stream);
-    };
-    
-    /** \brief Message serializer implementation (templated strong-typed
+    /** \brief Built-in serializer implementation (templated strong-typed
       *   version)
       */
     template <typename T> class ImplT :
@@ -105,6 +77,7 @@ namespace variant_topic_tools {
         */
       virtual ~ImplT();
     
+
       /** \brief Serialize a variant value (implementation)
         */ 
       void serialize(ros::serialization::OStream& stream, const
@@ -120,18 +93,12 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream);
     };
     
-    /** \brief Constructor (overloaded version taking a sequence of member
-      *   serializers)
+    /** \brief Create a built-in serializer
       */ 
-    MessageSerializer(const std::vector<Serializer>& memberSerializers);
-    
-    
-    /** \brief Create a message serializer
-      */ 
-    template <typename T> static MessageSerializer create();
+    template <typename T> static BuiltinSerializer create();    
   };
 };
 
-#include <variant_topic_tools/MessageSerializer.tpp>
+#include <variant_topic_tools/BuiltinSerializer.tpp>
 
 #endif

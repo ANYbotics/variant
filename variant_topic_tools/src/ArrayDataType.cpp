@@ -17,7 +17,9 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArrayDataType.h"
+#include "variant_topic_tools/ArraySerializer.h"
 #include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/VariantArray.h"
 
 namespace variant_topic_tools {
 
@@ -39,8 +41,7 @@ ArrayDataType::ArrayDataType(const ArrayDataType& src) :
 ArrayDataType::ArrayDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(
-      impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl->adaptee));
 }
 
 ArrayDataType::~ArrayDataType() {
@@ -73,12 +74,12 @@ const DataType& ArrayDataType::getElementType() const {
     return elementType;
   }
   else
-    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->elementType;
+    return boost::static_pointer_cast<Impl>(impl->adaptee)->elementType;
 }
 
 size_t ArrayDataType::getNumElements() const {
   if (impl)
-    return boost::dynamic_pointer_cast<Impl>(impl->adaptee)->getNumElements();
+    return boost::static_pointer_cast<Impl>(impl->adaptee)->getNumElements();
   else
     return 0;
 }
@@ -102,6 +103,21 @@ bool ArrayDataType::Impl::isFixedSize() const {
 
 size_t ArrayDataType::ImplV::getNumElements() const {
   return numElements;
+}
+
+/*****************************************************************************/
+/* Methods                                                                   */
+/*****************************************************************************/
+
+Serializer ArrayDataType::ImplV::createSerializer() const {
+  return ArraySerializer(elementType.createSerializer(), numElements);
+}
+
+Variant ArrayDataType::ImplV::createVariant() const {
+  ArrayDataType type(getIdentifier());
+  VariantArray variant(type, numElements);
+  
+  return static_cast<const Variant&>(variant);
 }
 
 /*****************************************************************************/

@@ -33,7 +33,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Default constructor
       */
-    InvalidOperationException();
+    InvalidOperationException(const std::string& what);
   };
   
   /** \brief Exception thrown in case of an invalid data type
@@ -88,6 +88,30 @@ namespace variant_topic_tools {
       std::string& providedDataType);
   };
   
+  /** \brief Exception thrown in case of an ambiguous member name
+    */ 
+  class AmbiguousMemberNameException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    AmbiguousMemberNameException(const std::string& name);
+  };
+  
+  /** \brief Exception thrown in case of a non-existent member
+    */ 
+  class NoSuchMemberException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor (overloaded version taking a field index)
+      */
+    NoSuchMemberException(size_t index);
+    
+    /** \brief Constructor (overloaded version taking a field name)
+      */
+    NoSuchMemberException(const std::string& name);
+  };
+  
   /** \brief Exception thrown in case of an invalid message member
     */ 
   class InvalidMessageMemberException :
@@ -96,16 +120,6 @@ namespace variant_topic_tools {
     /** \brief Default constructor
       */
     InvalidMessageMemberException();
-  };
-  
-  /** \brief Exception thrown in case of a non-existent message member
-    */ 
-  class NoSuchMessageMemberException :
-    public ros::Exception {
-  public:
-    /** \brief Constructor
-      */
-    NoSuchMessageMemberException(size_t index);
   };
   
   /** \brief Exception thrown in case of a message MD5 sum mismatch
@@ -117,30 +131,6 @@ namespace variant_topic_tools {
       */
     MD5SumMismatchException(const std::string& expectedMD5Sum, const
       std::string& providedMD5Sum);
-  };
-  
-  /** \brief Exception thrown in case of an ambiguous message field name
-    */ 
-  class AmbiguousMessageFieldNameException :
-    public ros::Exception {
-  public:
-    /** \brief Constructor
-      */
-    AmbiguousMessageFieldNameException(const std::string& name);
-  };
-  
-  /** \brief Exception thrown in case of a non-existent message field
-    */ 
-  class NoSuchMessageFieldException :
-    public ros::Exception {
-  public:
-    /** \brief Constructor (overloaded version taking a field index)
-      */
-    NoSuchMessageFieldException(size_t index);
-    
-    /** \brief Constructor (overloaded version taking a field name)
-      */
-    NoSuchMessageFieldException(const std::string& name);
   };
   
   /** \brief Exception thrown in case of an invalid message type
@@ -183,6 +173,16 @@ namespace variant_topic_tools {
     /** \brief Constructor
       */
     FileOpenException(const std::string& filename);
+  };
+  
+  /** \brief Exception thrown in case of an invalid serializer
+    */ 
+  class InvalidSerializerException :
+    public ros::Exception {
+  public:
+    /** \brief Default constructor
+      */
+    InvalidSerializerException();
   };
 };
 

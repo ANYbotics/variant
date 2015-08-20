@@ -54,7 +54,7 @@ MessageField<T>& MessageFieldCollection<T>::getField(size_t index) {
   if (index < this->fieldsInOrder.size())
     return *(this->fieldsInOrder[index]);
   else
-    throw NoSuchMessageFieldException(index);
+    throw NoSuchMemberException(index);
 }
 
 template <typename T>
@@ -63,7 +63,7 @@ const MessageField<T>& MessageFieldCollection<T>::getField(size_t index)
   if (index < this->fieldsInOrder.size())
     return *(this->fieldsInOrder[index]);
   else
-    throw NoSuchMessageFieldException(index);
+    throw NoSuchMemberException(index);
 }
 
 template <typename T>
@@ -102,7 +102,7 @@ MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name,
     }      
   }
 
-  throw NoSuchMessageFieldException(name);
+  throw NoSuchMemberException(name);
 }
 
 template <typename T>
@@ -157,7 +157,7 @@ void MessageFieldCollection<T>::appendField(const MessageField<T>& field) {
       this->fieldsInOrder.back()));
   }
   else
-    throw AmbiguousMessageFieldNameException(field.getName());
+    throw AmbiguousMemberNameException(field.getName());
 }
 
 template <typename T>
@@ -179,6 +179,16 @@ template <typename T>
 void MessageFieldCollection<T>::clear() {
   this->fieldsInOrder.clear();
   this->fieldsByName.clear();
+}
+
+template <typename T>
+void MessageFieldCollection<T>::write(std::ostream& stream, const std::string&
+    indent) const {
+  for (size_t i = 0; i < this->fieldsInOrder.size(); ++i) {
+    if (i)
+      stream << "\n";
+    this->fieldsInOrder[i]->write(stream, indent);
+  }
 }
 
 /*****************************************************************************/
@@ -213,6 +223,32 @@ MessageFieldCollection<T>& MessageFieldCollection<T>::operator+=(const
     MessageField<T>& field) {
   this->appendField(field);
   return *this;
+}
+
+template <typename T>
+bool MessageFieldCollection<T>::operator==(const MessageFieldCollection<T>&
+    collection) const {
+  if (this->fieldsInOrder.size() == collection.fieldsInOrder.size()) {
+    for (size_t i = 0; i < this->fieldsInOrder.size(); ++i)
+      if (*this->fieldsInOrder[i] != *collection.fieldsInOrder[i])
+        return false;
+      
+    return true;
+  }
+  else
+    return false;
+}
+
+template <typename T>
+bool MessageFieldCollection<T>::operator!=(const MessageFieldCollection<T>&
+    collection) const {
+  return !this->operator==(collection);
+}
+
+template <typename T> std::ostream& operator<<(std::ostream& stream, const
+    MessageFieldCollection<T>& collection) {
+  collection.write(stream);
+  return stream;
 }
 
 }

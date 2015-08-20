@@ -31,6 +31,18 @@ namespace variant_topic_tools {
     */
   class DataType;
   
+  /** \brief Forward declaration of the array data type
+    */
+  class ArrayDataType;
+  
+  /** \brief Forward declaration of the built-in data type
+    */
+  class BuiltinDataType;
+  
+  /** \brief Forward declaration of the message data type
+    */
+  class MessageDataType;
+  
   /** \brief Forward declaration of the data type registry
     */
   class DataTypeRegistry;
@@ -53,6 +65,16 @@ namespace variant_topic_tools {
     */
   typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
   
+  /** \brief Forward declaration of the serializer
+    */
+  class Serializer;
+  /** \brief Forward declaration of the serializer pointer type
+    */
+  typedef boost::shared_ptr<Serializer> SerializerPtr;
+  /** \brief Forward declaration of the serializer weak pointer type
+    */
+  typedef boost::weak_ptr<Serializer> SerializerWPtr;
+  
   /** \brief Forward declaration of the variant
     */
   class Variant;
@@ -62,6 +84,18 @@ namespace variant_topic_tools {
   /** \brief Forward declaration of the variant weak pointer type
     */
   typedef boost::weak_ptr<Variant> VariantWPtr;
+  
+  /** \brief Forward declaration of the variant array
+    */
+  class VariantArray;
+  
+  /** \brief Forward declaration of the variant collection
+    */
+  class VariantCollection;
+  
+  /** \brief Forward declaration of the variant message
+    */
+  class VariantMessage;
 };
 
 #endif

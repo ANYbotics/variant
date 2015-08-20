@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/DataType.h"
 #include "variant_topic_tools/MessageConstant.h"
 #include "variant_topic_tools/MessageMember.h"
 #include "variant_topic_tools/MessageVariable.h"

@@ -17,12 +17,18 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/Variant.h"
+#include "variant_topic_tools/VariantArray.h"
+#include "variant_topic_tools/VariantCollection.h"
+#include "variant_topic_tools/VariantMessage.h"
 
 namespace variant_topic_tools {
 
 /*****************************************************************************/
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
+
+Variant::Variant() {
+}
 
 Variant::Variant(const DataType& type) :
   type(type) {
@@ -54,6 +60,27 @@ bool Variant::hasType() const {
   return type.isValid();
 }
 
+bool Variant::isArray() const {
+  if (value)
+    return boost::dynamic_pointer_cast<VariantArray::Value>(value);
+  else
+    return false;
+}
+
+bool Variant::isCollection() const {
+  if (value)
+    return boost::dynamic_pointer_cast<VariantCollection::Value>(value);
+  else
+    return false;
+}
+
+bool Variant::isMessage() const {
+  if (value)
+    return boost::dynamic_pointer_cast<VariantMessage::Value>(value);
+  else
+    return false;
+}
+
 bool Variant::isEmpty() const {
   return !value;
 }
@@ -61,6 +88,28 @@ bool Variant::isEmpty() const {
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
+
+VariantArray Variant::asArray() const {
+  VariantArray array;
+  array.value = boost::dynamic_pointer_cast<VariantArray::Value>(value);
+
+  return array;
+}
+
+VariantCollection Variant::asCollection() const {
+  VariantCollection collection;
+  collection.value = boost::dynamic_pointer_cast<VariantCollection::Value>(
+    value);
+
+  return collection;
+}
+
+VariantMessage Variant::asMessage() const {
+  VariantMessage message;
+  message.value = boost::dynamic_pointer_cast<VariantMessage::Value>(value);
+
+  return message;
+}
 
 void Variant::clear() {
   type.clear();
@@ -84,6 +133,8 @@ void Variant::write(std::ostream& stream) const {
 Variant& Variant::operator=(const Variant& src) {
   type = src.type;
   value = src.value ? src.value->clone() : ValuePtr();
+  
+  return *this;
 }
 
 bool Variant::operator==(const Variant& variant) const {
