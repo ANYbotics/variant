@@ -25,6 +25,7 @@
 
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
 #include "variant_topic_tools/MessageType.h"
 

@@ -26,6 +26,10 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
+NullPointerException::NullPointerException() :
+  ros::Exception("Attempted null pointer operation") {
+}
+
 InvalidOperationException::InvalidOperationException(const std::string& what) :
   ros::Exception("Attempted execution of an invalid operation: "+what) {
 }

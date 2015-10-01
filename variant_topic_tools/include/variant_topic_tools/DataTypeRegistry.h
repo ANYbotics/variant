@@ -91,7 +91,12 @@ namespace variant_topic_tools {
     void write(std::ostream& stream) const;
     
     /** \brief Operator for retrieving a data type from the registry by
-      *   identifier
+      *   identifier (non-const version)
+      */
+    DataType operator[](const std::string& identifier);
+    
+    /** \brief Operator for retrieving a data type from the registry by
+      *   identifier (const version)
       */
     DataType operator[](const std::string& identifier) const;
     

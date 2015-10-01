@@ -23,7 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 
-#include <variant_topic_tools/MessageDataType.h>
+#include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
   /** \brief Variant message type information

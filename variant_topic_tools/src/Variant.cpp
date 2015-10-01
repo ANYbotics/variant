@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/SharedVariant.h"
 #include "variant_topic_tools/Variant.h"
 #include "variant_topic_tools/VariantArray.h"
 #include "variant_topic_tools/VariantCollection.h"
@@ -30,13 +31,9 @@ namespace variant_topic_tools {
 Variant::Variant() {
 }
 
-Variant::Variant(const DataType& type) :
-  type(type) {
-}
-
-Variant::Variant(const Variant& src) :
-  type(src.type),
-  value(src.value ? src.value->clone() : ValuePtr()) {
+Variant::Variant(const DataType& type, const ValuePtr& value) :
+  type(type),
+  value(value) {
 }
 
 Variant::~Variant() {
@@ -90,25 +87,15 @@ bool Variant::isEmpty() const {
 /*****************************************************************************/
 
 VariantArray Variant::asArray() const {
-  VariantArray array;
-  array.value = boost::dynamic_pointer_cast<VariantArray::Value>(value);
-
-  return array;
+  return SharedVariant(*this);
 }
 
 VariantCollection Variant::asCollection() const {
-  VariantCollection collection;
-  collection.value = boost::dynamic_pointer_cast<VariantCollection::Value>(
-    value);
-
-  return collection;
+  return SharedVariant(*this);
 }
 
 VariantMessage Variant::asMessage() const {
-  VariantMessage message;
-  message.value = boost::dynamic_pointer_cast<VariantMessage::Value>(value);
-
-  return message;
+  return SharedVariant(*this);
 }
 
 void Variant::clear() {
@@ -129,13 +116,6 @@ void Variant::write(std::ostream& stream) const {
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
-
-Variant& Variant::operator=(const Variant& src) {
-  type = src.type;
-  value = src.value ? src.value->clone() : ValuePtr();
-  
-  return *this;
-}
 
 bool Variant::operator==(const Variant& variant) const {
   if ((type == variant.type) && value && variant.value)

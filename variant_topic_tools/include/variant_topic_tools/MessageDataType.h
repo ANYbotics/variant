@@ -35,6 +35,7 @@ namespace variant_topic_tools {
     public DataType {
   friend class DataType;
   friend class DataTypeRegistry;
+  friend class VariantMessage;
   public:
     /** \brief Default constructor
       */ 

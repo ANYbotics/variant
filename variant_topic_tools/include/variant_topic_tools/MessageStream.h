@@ -1,0 +1,91 @@
+/******************************************************************************
+ * Copyright (C) 2014 by Ralf Kaestner                                        *
+ * ralf.kaestner@gmail.com                                                    *
+ *                                                                            *
+ * This program is free software; you can redistribute it and/or modify       *
+ * it under the terms of the Lesser GNU General Public License as published by*
+ * the Free Software Foundation; either version 3 of the License, or          *
+ * (at your option) any later version.                                        *
+ *                                                                            *
+ * This program is distributed in the hope that it will be useful,            *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of             *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the               *
+ * Lesser GNU General Public License for more details.                        *
+ *                                                                            *
+ * You should have received a copy of the Lesser GNU General Public License   *
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
+ ******************************************************************************/
+
+/** \file MessageStream.h
+  * \brief Header file providing the MessageStream class interface
+  */
+
+#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
+#define VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
+
+#include <vector>
+
+#include <variant_topic_tools/DataType.h>
+
+namespace variant_topic_tools {
+  /** \brief Message output stream
+    * 
+    * This stream implementation determines the offsets of the members
+    * of a message.
+    */
+  class MessageStream {
+  public:
+    /** \brief Constructor
+      */ 
+    MessageStream(const uint8_t* data);
+    
+    /** \brief Constructor (templated version)
+      */ 
+    template <typename T> MessageStream(const T& data);
+    
+    /** \brief Copy constructor
+      */ 
+    MessageStream(const MessageStream& src);
+    
+    /** \brief Destructor
+      */ 
+    ~MessageStream();
+
+    /** \brief Access the message stream's data
+      */
+    const uint8_t* getData() const;
+    
+    /** \brief Access the data types of the streamed message members
+      */
+    const std::vector<DataType>& getMemberTypes() const;
+    
+    /** \brief Access the offsets of the streamed  message members
+      */
+    const std::vector<size_t>& getMemberOffsets() const;
+    
+    /** \brief Advance the message stream
+      */
+    template <typename T> void next(const T& member);
+    
+    /** \brief Message stream output operator
+      */
+    template <typename T> MessageStream& operator<<(const T& member);
+    
+  protected:
+    /** \brief The message stream's data
+      */
+    const uint8_t* data;
+    
+    /** \brief The data types of the streamed message members
+      */
+    std::vector<DataType> memberTypes;
+    
+    /** \brief The offsets of the streamed message members
+      */
+    std::vector<size_t> memberOffsets;
+  };
+};
+
+#include <variant_topic_tools/MessageStream.tpp>
+
+#endif

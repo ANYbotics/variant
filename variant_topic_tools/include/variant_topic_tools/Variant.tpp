@@ -26,22 +26,30 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T> Variant::Variant(const T& value) {
-  this->template setValue<T>(value);
+template <typename T> Variant::Variant(const T& src) {
+  TypeTraits::assign(*this, src);
 }
 
 template <typename T>
-Variant::ValueT<T>::ValueT(const T& value) :
-  value(value) {
-}
-
-template <typename T>
-Variant::ValueT<T>::ValueT(const ValueT<T>& src) :
-  value(src.value) {
+Variant::ValueT<T>::ValueT() {
 }
 
 template <typename T>
 Variant::ValueT<T>::~ValueT() {
+}
+
+template <typename T>
+Variant::ValueImplT<T>::ValueImplT(const T& value) :
+  value(value) {
+}
+
+template <typename T>
+Variant::ValueImplT<T>::ValueImplT(const ValueT<T>& src) :
+  value(src.getValue()) {
+}
+
+template <typename T>
+Variant::ValueImplT<T>::~ValueImplT() {
 }
 
 /*****************************************************************************/
@@ -53,15 +61,15 @@ template <typename T> void Variant::setValue(const T& value) {
     this->type = DataType(typeid(T));
     
     if (this->type.isValid())
-      this->value.reset(new ValueT<T>(value));
+      this->value.reset(new ValueImplT<T>(value));
     else
       throw InvalidDataTypeException();
   }
   else if (typeid(T) == this->type.getTypeInfo()) {
     if (this->value)
-      boost::static_pointer_cast<ValueT<T> >(this->value)->value = value;
+      boost::dynamic_pointer_cast<ValueT<T> >(this->value)->setValue(value);
     else
-      this->value.reset(new ValueT<T>(value));
+      this->value.reset(new ValueImplT<T>(value));
   }
   else
     throw DataTypeMismatchException(type.getIdentifier(),
@@ -73,18 +81,18 @@ template <typename T> T& Variant::getValue() {
     this->type = DataType(typeid(T));
     
     if (this->type.isValid()) {
-      this->value.reset(new ValueT<T>());
+      this->value.reset(new ValueImplT<T>());
       
-      return boost::static_pointer_cast<ValueT<T> >(this->value)->value;
+      return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
     }
     else
       throw InvalidDataTypeException();
   }
   else if (typeid(T) == this->type.getTypeInfo()) {
     if (!this->value)
-      this->value.reset(new ValueT<T>());
+      this->value.reset(new ValueImplT<T>());
     
-    return boost::static_pointer_cast<ValueT<T> >(this->value)->value;
+    return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
   }
   else
     throw DataTypeMismatchException(type.getIdentifier(),
@@ -99,7 +107,8 @@ template <typename T> const T& Variant::getValue() const {
         return value;
       }
       else 
-        return boost::static_pointer_cast<ValueT<T> >(this->value)->value;
+        return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->
+          getValue();
     }
     else
       throw DataTypeMismatchException(type.getIdentifier(),
@@ -111,75 +120,126 @@ template <typename T> const T& Variant::getValue() const {
 
 template <typename T>
 bool Variant::ValueT<T>::isEqual(const Value& value) const {
-  return TypeTraits::EqualTo<T>::compare(
-    static_cast<const ValueT<T>&>(value).value, this->value);
+  return TypeTraits::isEqual(dynamic_cast<const ValueT<T>&>(value).getValue(),
+    this->getValue());
+}
+
+template <typename T>
+void Variant::ValueImplT<T>::setValue(const T& value) {
+  this->value = value;
+}
+
+template <typename T>
+T& Variant::ValueImplT<T>::getValue() {
+  return this->value;
+}
+
+template <typename T>
+const T& Variant::ValueImplT<T>::getValue() const {
+  return this->value;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T, class Enable>
-bool Variant::TypeTraits::EqualTo<T, Enable>::compare(const T& lhs, const
-    T& rhs) {
+template <typename T> void Variant::TypeTraits::assign(Variant& dst, const
+    T& src, typename boost::enable_if<boost::is_base_of<Variant, T> >::type*
+    dummy) {
+  dst.type = src.type;
+  dst.value = src.value ? src.value->clone() : ValuePtr();
+}
+
+template <typename T> void Variant::TypeTraits::assign(Variant& dst, const
+    T& src, typename boost::disable_if<boost::is_base_of<Variant, T> >::type*
+    dummy) {
+  dst.template setValue<T>(src);
+}
+
+template <typename T> bool Variant::TypeTraits::isEqual(const T& lhs, const
+    T& rhs, typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
+    dummy) {
+  return (lhs == rhs);
+}
+
+template <typename T, size_t N> bool Variant::TypeTraits::isEqual(const
+    boost::array<T, N>& lhs, const boost::array<T, N>& rhs, typename
+    boost::enable_if<boost::has_equal_to<T, T, bool> >::type* dummy) {
+  return (lhs == rhs);
+}
+
+template <typename T> bool Variant::TypeTraits::isEqual(const std::vector<T>&
+    lhs, const std::vector<T>& rhs, typename boost::enable_if<boost::
+    has_equal_to<T, T, bool> >::type* dummy) {
+  return (lhs == rhs);
+}
+
+template <typename T> bool Variant::TypeTraits::isEqual(const T& lhs, const
+    T& rhs, typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
+    dummy) {
   throw InvalidOperationException(
     "Comparing two variants of non-comparable type");
 }
 
-template <typename T>
-bool Variant::TypeTraits::EqualTo<T, typename boost::enable_if<
-    boost::has_equal_to<T, T, bool> >::type>::compare(const T& lhs, const
-    T& rhs) {
-  return (lhs == rhs);
+template <typename T, size_t N> bool Variant::TypeTraits::isEqual(const
+    boost::array<T, N>& lhs, const boost::array<T, N>& rhs, typename
+    boost::disable_if<boost::has_equal_to<T, T, bool> >::type* dummy) {
+  throw InvalidOperationException(
+    "Comparing two variants of non-comparable type");
 }
 
-template <typename T, class Enable>
-void Variant::TypeTraits::ReadFrom<T, Enable>::read(std::istream& stream,
-    T& value) {
+template <typename T> bool Variant::TypeTraits::isEqual(const std::vector<T>&
+    lhs, const std::vector<T>& rhs, typename boost::disable_if<boost::
+    has_equal_to<T, T, bool> >::type* dummy) {
+  throw InvalidOperationException(
+    "Comparing two variants of non-comparable type");
+}
+
+template <typename T> void Variant::TypeTraits::read(std::istream& stream,
+    T& value, typename boost::enable_if<boost::has_right_shift<std::istream,
+    T&> >::type* dummy) {
+  stream >> value;
+}
+
+template <typename T> void Variant::TypeTraits::read(std::istream& stream,
+    T& value, typename boost::disable_if<boost::has_right_shift<std::istream,
+    T&> >::type* dummy) {
   throw InvalidOperationException(
     "Reading a variant of non-readable type");
 }
 
-template <typename T>
-void Variant::TypeTraits::ReadFrom<T, typename boost::enable_if<
-    boost::has_right_shift<std::istream, T&> >::type>::read(std::istream&
-    stream, T& value) {
-  stream >> value;
-}
-
-template <typename T, class Enable>
-void Variant::TypeTraits::WriteTo<T, Enable>::write(std::ostream& stream,
-    const T& value) {
-}
-
-template <typename T>
-void Variant::TypeTraits::WriteTo<T, typename boost::enable_if<
-    boost::has_left_shift<std::ostream, const T&> >::type>::write(
-    std::ostream& stream, const T& value) {
+template <typename T> void Variant::TypeTraits::write(std::ostream& stream,
+    const T& value, typename boost::enable_if<boost::has_left_shift<std::
+    ostream, const T&> >::type* dummy) {
   stream << value;
 }
 
-template <typename T>
-Variant::ValuePtr Variant::ValueT<T>::clone() const {
-  return Variant::ValuePtr(new ValueT<T>(*this));
+template <typename T> void Variant::TypeTraits::write(std::ostream& stream,
+    const T& value, typename boost::disable_if<boost::has_left_shift<std::
+    ostream, const T&> >::type* dummy) {
 }
 
 template <typename T>
 void Variant::ValueT<T>::read(std::istream& stream) {
-  TypeTraits::ReadFrom<T>::read(stream, this->value);
+  TypeTraits::read(stream, this->getValue());
 }
 
 template <typename T>
 void Variant::ValueT<T>::write(std::ostream& stream) const {
-  TypeTraits::WriteTo<T>::write(stream, this->value);
+  TypeTraits::write(stream, this->getValue());
+}
+
+template <typename T>
+Variant::ValuePtr Variant::ValueImplT<T>::clone() const {
+  return Variant::ValuePtr(new ValueImplT<T>(*this));
 }
 
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
 
-template <typename T> Variant& Variant::operator=(const T& value) {
-  this->template setValue<T>(value);
+template <typename T> Variant& Variant::operator=(const T& src) {
+  TypeTraits::assign(*this, src);
   return *this;
 }
 

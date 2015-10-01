@@ -26,6 +26,16 @@
 #include <ros/ros.h>
 
 namespace variant_topic_tools {
+  /** \brief Exception thrown in case of a null pointer operation
+    */ 
+  class NullPointerException :
+    public ros::Exception {
+  public:
+    /** \brief Default constructor
+      */
+    NullPointerException();
+  };
+  
   /** \brief Exception thrown in case of an invalid operation
     */ 
   class InvalidOperationException :

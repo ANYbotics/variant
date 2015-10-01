@@ -88,8 +88,10 @@ catkin_add_gtest(variant_topic_test
   test/MessageDefinitionTest.cpp
   test/MessageDefinitionParserTest.cpp
   test/MessageFieldCollectionTest.cpp
+  test/MessageStreamTest.cpp
   test/MessageTest.cpp
   test/MessageTypeTest.cpp
+  test/PointerTest.cpp
   test/SerializerTest.cpp
   test/VariantTest.cpp
 )

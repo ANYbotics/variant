@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_VARIANT_COLLECTION_H
 #define VARIANT_TOPIC_TOOLS_VARIANT_COLLECTION_H
 
+#include <variant_topic_tools/SharedVariant.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
@@ -52,25 +53,54 @@ namespace variant_topic_tools {
       */
     size_t getNumMembers() const;
     
-    /** \brief Retrieve a member of the variant collection by index (non-const
-      *   version)
+    /** \brief Set a member of the variant collection by index
       */
-    Variant& getMember(size_t index);
+    void setMember(size_t index, const Variant& member);
     
-    /** \brief Retrieve a member of the variant collection by index (const
-      *   version)
+    /** \brief Set a member of the variant collection by name
       */
-    const Variant& getMember(size_t index) const;
+    void setMember(const std::string& name, const Variant& member);
     
-    /** \brief Retrieve a member of the variant collection by name (non-const
-      *   version)
+    /** \brief Retrieve a member of the variant collection by index
       */
-    Variant& getMember(const std::string& name);
+    SharedVariant getMember(size_t index) const;
     
-    /** \brief Retrieve a member of the variant collection by name (const
-      *   version)
+    /** \brief Retrieve a member of the variant collection by name
       */
-    const Variant& getMember(const std::string& name) const;
+    SharedVariant getMember(const std::string& name) const;
+    
+    /** \brief Set a member value of the variant collection by index
+      */    
+    template <typename T> void setValue(size_t index, const T& value);
+    
+    /** \brief Set a member value of the variant collection by name
+      */    
+    template <typename T> void setValue(const std::string& name, const
+      T& value);
+    
+    using Variant::setValue;
+    
+    /** \brief Retrieve a member value of the variant collection by index
+      *   (non-const version)
+      */
+    template <typename T> T& getValue(size_t index);
+    
+    /** \brief Retrieve a member value of the variant collection by index
+      *   (const version)
+      */
+    template <typename T> const T& getValue(size_t index) const;
+    
+    /** \brief Retrieve a member value of the variant collection by name
+      *   (non-const version)
+      */
+    template <typename T> T& getValue(const std::string& name);
+    
+    /** \brief Retrieve a member value of the variant collection by name
+      *   (const version)
+      */
+    template <typename T> const T& getValue(const std::string& name) const;
+    
+    using Variant::getValue;
     
     /** \brief True, if the variant collection contains the member with the
       *   specified name
@@ -82,30 +112,20 @@ namespace variant_topic_tools {
     bool isEmpty() const;
     
     /** \brief Operator for retrieving the members of the variant collection
-      *   by index (non-const version)
+      *   by index
       */
-    Variant& operator[](size_t index);
+    SharedVariant operator[](size_t index) const;
     
     /** \brief Operator for retrieving the members of the variant collection
-      *   by index (const version)
+      *   by name
       */
-    const Variant& operator[](size_t index) const;
-    
-    /** \brief Operator for retrieving the members of the variant collection
-      *   by name (non-const version)
-      */
-    Variant& operator[](const std::string& name);
-    
-    /** \brief Operator for retrieving the members of the variant collection
-      *   by name (const version)
-      */
-    const Variant& operator[](const std::string& name) const;
+    SharedVariant operator[](const std::string& name) const;
     
   protected:
-    /** \brief Variant collection value
+    /** \brief Variant collection value (abstract base)
       */
     class Value :
-      public Variant::Value {
+      public virtual Variant::Value {
     public:
       /** \brief Default constructor
         */ 
@@ -120,30 +140,36 @@ namespace variant_topic_tools {
         */
       virtual size_t getNumMembers() const = 0;
       
-      /** \brief Retrieve a member of the variant collection by index
-        *   (abstract declaration of the non-const version)
+      /** \brief Set a member of the variant collection by index (abstract
+        *   declaration)
         */
-      virtual Variant& getMember(size_t index) = 0;
+      virtual void setMember(size_t index, const Variant& member) = 0;
       
-      /** \brief Retrieve a member of the variant collection by index
-        *   (abstract declaration of the const version)
+      /** \brief Set a member of the variant collection by name (abstract
+        *   declaration)
         */
-      virtual const Variant& getMember(size_t index) const = 0;
+      virtual void setMember(const std::string& name, const Variant&
+        member) = 0;
+    
+      /** \brief Recursively set a member of the variant collection by name
+        */
+      void setMember(const std::string& name, const Variant& member,
+        size_t pos);
+    
+      /** \brief Retrieve a member of the variant collection by index
+        *   (abstract declaration)
+        */
+      virtual SharedVariant getMember(size_t index) const = 0;
       
       /** \brief Retrieve a member of the variant collection by name
-        *   (abstract declaration of the non-const version)
+        *   (abstract declaration)
         */
-      virtual Variant& getMember(const std::string& name) = 0;
-      
-      /** \brief Retrieve a member of the variant collection by name
-        *   (abstract declaration of the const version)
-        */
-      virtual const Variant& getMember(const std::string& name) const = 0;
+      virtual SharedVariant getMember(const std::string& name) const = 0;
       
       /** \brief Recursively retrieve a member of the variant collection
         *   by name
         */
-      Variant& getMember(const std::string& name, size_t pos);
+      SharedVariant getMember(const std::string& name, size_t pos) const;
     
       /** \brief True, if the variant collection contains the member with the
         *   specified name (abstract declaration)
@@ -179,5 +205,7 @@ namespace variant_topic_tools {
     VariantCollection(const DataType& type);
   };
 };
+
+#include <variant_topic_tools/VariantCollection.tpp>
 
 #endif

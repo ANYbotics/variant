@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/VariantMessage.h"
 
 namespace variant_topic_tools {
@@ -31,7 +32,7 @@ VariantMessage::VariantMessage(const MessageDataType& type, const
     MessageFieldCollection<Variant>& members) :
   VariantCollection(static_cast<const DataType&>(type)) {
   if (type.isValid())
-    value.reset(new Value(members));
+    value.reset(new ValueImplV(members));
 }
 
 VariantMessage::VariantMessage(const VariantMessage& src) :
@@ -47,43 +48,57 @@ VariantMessage::VariantMessage(const Variant& src) :
 VariantMessage::~VariantMessage() {
 }
 
-VariantMessage::Value::Value(const MessageFieldCollection<Variant>& members) :
-  members(members) {
-}
-
-VariantMessage::Value::Value(const Value& src) :
-  members(src.members) {
+VariantMessage::Value::Value() {
 }
 
 VariantMessage::Value::~Value() {
+}
+
+VariantMessage::ValueImplV::ValueImplV(const MessageFieldCollection<Variant>&
+    members) :
+  members(members) {
+}
+
+VariantMessage::ValueImplV::ValueImplV(const ValueImplV& src) :
+  members(src.members) {
+}
+
+VariantMessage::ValueImplV::~ValueImplV() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-size_t VariantMessage::Value::getNumMembers() const {
+size_t VariantMessage::ValueImplV::getNumMembers() const {
   return members.getNumFields();
 }
 
-Variant& VariantMessage::Value::getMember(size_t index) {
+void VariantMessage::ValueImplV::setMember(size_t index, const Variant&
+    member) {
+  members.getField(index).setValue(member);
+}
+
+void VariantMessage::ValueImplV::setMember(const std::string& name, const
+    Variant& member) {
+  members.getField(name).setValue(member);
+}
+
+SharedVariant VariantMessage::ValueImplV::getMember(size_t index) const {
   return members.getField(index).getValue();
 }
 
-const Variant& VariantMessage::Value::getMember(size_t index) const {
-  return members.getField(index).getValue();
-}
-
-Variant& VariantMessage::Value::getMember(const std::string& name) {
-  return members.getField(name).getValue();
-}
-
-const Variant& VariantMessage::Value::getMember(const std::string& name)
+SharedVariant VariantMessage::ValueImplV::getMember(const std::string& name)
     const {
   return members.getField(name).getValue();
 }
 
-bool VariantMessage::Value::hasMember(const std::string& name) const {
+const std::string& VariantMessage::ValueImplV::getMemberName(size_t index)
+    const {
+  return members.getField(index).getName();
+}
+
+bool VariantMessage::ValueImplV::hasMember(const std::string& name) const {
   return members.hasField(name);
 }
 
@@ -91,31 +106,27 @@ bool VariantMessage::Value::hasMember(const std::string& name) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-Variant::ValuePtr VariantMessage::Value::clone() const {
-  return Variant::ValuePtr(new Value(*this));
-}
-
 void VariantMessage::Value::writeMember(std::ostream& stream, size_t index)
     const {
-  stream << members[index].getName() << ": ";
+  SharedVariant member = getMember(index);
   
-  if (!members[index].getValue().getType().isBuiltin()) {
+  if (!member.getType().isBuiltin()) {
+    stream << getMemberName(index) << ":";
+  
     std::stringstream memberStream;    
-    memberStream << members[index].getValue();
-    
     std::string line;
-    size_t numLines = 0;
     
-    while (std::getline(memberStream, line)) {
-      if (!memberStream.eof() || numLines)
-        stream << "\n  ";
-      
-      stream << line;
-      ++numLines;
-    }
+    memberStream << member;
+
+    while (std::getline(memberStream, line))      
+      stream << "\n  " << line;
   }
-  else    
-    stream << members[index].getValue();
+  else
+    stream << getMemberName(index) << ": " << member;
+}
+
+Variant::ValuePtr VariantMessage::ValueImplV::clone() const {
+  return Variant::ValuePtr(new ValueImplV(*this));
 }
 
 }

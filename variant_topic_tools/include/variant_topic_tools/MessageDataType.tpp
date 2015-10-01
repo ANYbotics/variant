@@ -18,7 +18,7 @@
 
 #include <variant_topic_tools/Exceptions.h>
 #include "variant_topic_tools/MessageSerializer.h"
-#include <variant_topic_tools/Variant.h>
+#include <variant_topic_tools/VariantMessage.h>
 
 namespace variant_topic_tools {
 
@@ -106,7 +106,7 @@ Serializer MessageDataType::ImplT<T>::createSerializer() const {
 
 template <typename T>
 Variant MessageDataType::ImplT<T>::createVariant() const {
-  return Variant(T());
+  return static_cast<const Variant&>(VariantMessage::template create<T>());
 }
 
 template <typename T>

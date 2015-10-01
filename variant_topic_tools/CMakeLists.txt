@@ -65,15 +65,19 @@ add_library(variant_topic_tools
   src/MessageHeader.cpp
   src/MessageMember.cpp
   src/MessageSerializer.cpp
+  src/MessageStream.cpp
   src/MessageTraits.cpp
   src/MessageType.cpp
   src/MessageVariable.cpp
   src/Serialization.cpp
   src/Serializer.cpp
+  src/SharedVariant.cpp
   src/Variant.cpp
   src/VariantArray.cpp
+  src/VariantArrayMember.cpp
   src/VariantCollection.cpp
   src/VariantMessage.cpp
+#   src/VariantMessageMember.cpp
 )
 
 add_executable(

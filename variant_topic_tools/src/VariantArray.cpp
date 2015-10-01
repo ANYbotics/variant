@@ -32,7 +32,7 @@ VariantArray::VariantArray() {
 VariantArray::VariantArray(const ArrayDataType& type, size_t numMembers) :
   VariantCollection(static_cast<const DataType&>(type)) {
   if (type.isValid())
-    value.reset(new ValueV(type.getElementType(), numMembers));
+    value.reset(new ValueImplV(type.getElementType(), numMembers));
 }
 
 VariantArray::VariantArray(const VariantArray& src) :
@@ -54,19 +54,20 @@ VariantArray::Value::Value() {
 VariantArray::Value::~Value() {
 }
 
-VariantArray::ValueV::ValueV(const DataType& memberType, size_t numMembers) :
+VariantArray::ValueImplV::ValueImplV(const DataType& memberType, size_t
+    numMembers) :
   memberType(memberType),
   numMembers(numMembers),
   members(numMembers, memberType.createVariant()) {
 }
 
-VariantArray::ValueV::ValueV(const ValueV& src) :
+VariantArray::ValueImplV::ValueImplV(const ValueImplV& src) :
   memberType(src.memberType),
   numMembers(src.numMembers),
   members(src.members) {
 }
 
-VariantArray::ValueV::~ValueV() {
+VariantArray::ValueImplV::~ValueImplV() {
 }
 
 /*****************************************************************************/
@@ -75,12 +76,13 @@ VariantArray::ValueV::~ValueV() {
 
 bool VariantArray::isFixedSize() const {
   if (value)
-    return boost::static_pointer_cast<Value>(value)->isFixedSize();
+    return boost::dynamic_pointer_cast<Value>(value)->isFixedSize();
   else
     return true;
 }
 
-Variant& VariantArray::Value::getMember(const std::string& name) {
+void VariantArray::Value::setMember(const std::string& name, const Variant&
+    member) {
   size_t index;
   
   try {
@@ -90,11 +92,10 @@ Variant& VariantArray::Value::getMember(const std::string& name) {
     throw NoSuchMemberException(name);
   }
     
-  return getMember(index);
+  return setMember(index, member);
 }
 
-const Variant& VariantArray::Value::getMember(const std::string& name)
-    const {
+SharedVariant VariantArray::Value::getMember(const std::string& name) const {
   size_t index;
   
   try {
@@ -120,25 +121,27 @@ bool VariantArray::Value::hasMember(const std::string& name) const {
   return (index < getNumMembers());
 }
 
-size_t VariantArray::ValueV::getNumMembers() const {
+
+size_t VariantArray::ValueImplV::getNumMembers() const {
   return members.size();
 }
 
-Variant& VariantArray::ValueV::getMember(size_t index) {
+void VariantArray::ValueImplV::setMember(size_t index, const Variant&
+    member) {
+  if (index < members.size())
+    members[index] = member;
+  else
+    throw NoSuchMemberException(index);
+}
+
+SharedVariant VariantArray::ValueImplV::getMember(size_t index) const {
   if (index < members.size())
     return members[index];
   else
     throw NoSuchMemberException(index);
 }
 
-const Variant& VariantArray::ValueV::getMember(size_t index) const {
-  if (index < members.size())
-    return members[index];
-  else
-    throw NoSuchMemberException(index);
-}
-
-bool VariantArray::ValueV::isFixedSize() const {
+bool VariantArray::ValueImplV::isFixedSize() const {
   return numMembers;
 }
 
@@ -149,7 +152,7 @@ bool VariantArray::ValueV::isFixedSize() const {
 void VariantArray::addMember(const Variant& member) {
   if (value) {
     if (member.getType().isValid())
-      boost::static_pointer_cast<Value>(value)->addMember(member);
+      boost::dynamic_pointer_cast<Value>(value)->addMember(member);
     else
       throw InvalidDataTypeException();
   }
@@ -159,40 +162,35 @@ void VariantArray::addMember(const Variant& member) {
 
 void VariantArray::resize(size_t numMembers) {
   if (value)
-    boost::static_pointer_cast<Value>(value)->resize(numMembers);
+    boost::dynamic_pointer_cast<Value>(value)->resize(numMembers);
   else if (numMembers)
     throw InvalidOperationException("Resizing an invalid array");
 }
 
 void VariantArray::clear() {
   if (value)
-    boost::static_pointer_cast<Value>(value)->clear();
+    boost::dynamic_pointer_cast<Value>(value)->clear();
 }
 
 void VariantArray::Value::writeMember(std::ostream& stream, size_t index)
     const {
-  stream << boost::lexical_cast<std::string>(index) << ": ";
-  
   if (!getMember(index).getType().isBuiltin()) {
+    stream << boost::lexical_cast<std::string>(index) << ":";
+    
     std::stringstream memberStream;
-    memberStream << getMember(index);
-    
     std::string line;
-    size_t numLines = 0;
     
-    while (std::getline(memberStream, line)) {
-      if (!memberStream.eof() || numLines)
-        stream << "\n  ";
-      
-      stream << line;
-      ++numLines;
-    }
+    memberStream << getMember(index);
+        
+    while (std::getline(memberStream, line))
+      stream << "\n  " << line;
   }
   else    
-    stream << getMember(index);
+    stream << boost::lexical_cast<std::string>(index) << ": " <<
+      getMember(index);
 }
 
-void VariantArray::ValueV::addMember(const Variant& member) {
+void VariantArray::ValueImplV::addMember(const Variant& member) {
   if (!numMembers) {
     if (member.getType() == memberType)
       members.push_back(member);
@@ -204,7 +202,7 @@ void VariantArray::ValueV::addMember(const Variant& member) {
     throw InvalidOperationException("Adding a member to a fixed-size array");
 }
 
-void VariantArray::ValueV::resize(size_t numMembers) {
+void VariantArray::ValueImplV::resize(size_t numMembers) {
   if (!this->numMembers || (numMembers == this->numMembers)) {
     if (numMembers != members.size())
       members.resize(numMembers, memberType.createVariant());
@@ -213,15 +211,15 @@ void VariantArray::ValueV::resize(size_t numMembers) {
     throw InvalidOperationException("Resizing a fixed-size array");
 }
 
-void VariantArray::ValueV::clear() {
+void VariantArray::ValueImplV::clear() {
   if (!numMembers)
     members.clear();
   else
     throw InvalidOperationException("Clearing a fixed-size array");
 }
 
-Variant::ValuePtr VariantArray::ValueV::clone() const {
-  return Variant::ValuePtr(new ValueV(*this));
+Variant::ValuePtr VariantArray::ValueImplV::clone() const {
+  return Variant::ValuePtr(new ValueImplV(*this));
 }
 
 /*****************************************************************************/

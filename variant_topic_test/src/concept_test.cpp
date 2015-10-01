@@ -53,14 +53,6 @@ int main(int argc, char **argv) {
   std::cout << registry.getDataType<int8_t>() << "\n";
   std::cout << "\n";
   
-  int32_t ix = 42;
-  const int32_t& ixr = ix;
-  Variant vx(ixr);
-  std::cout << vx << "\n";
-  ix = 41;
-  std::cout << vx << "\n";
-  return 0;
-  
   Variant v1 = registry["float64"].createVariant();
   std::cout << v1 << "\n";
   v1 = 3.14159;
@@ -124,24 +116,25 @@ int main(int argc, char **argv) {
     getMessageDataType().createVariant();
   v5["header/frame_id"] = std::string("map");
   v5["builtin_string"] = std::string("Test");
-  v5["string"].getValue<std_msgs::String>().data = std::string("Test");
+  v5["string/data"] = std::string("Test");
   v5["builtin_int_array/0"] = 0;
   v5["builtin_int_array/1"] = 1;
   v5["builtin_int_array/2"] = 2;
-  v5["string_array/0"].getValue<std_msgs::String>().data = "Test0";
-  v5["string_array/1"].getValue<std_msgs::String>().data = "Test1";
-  v5["string_array/2"].getValue<std_msgs::String>().data = "Test2";
+//   v5.setMember<std::string>("string_array/0", "Test0");
+//   v5.setMember<std::string>("string_array/1", "Test1");
+//   v5.setMember<std::string>("string_array/2", "Test2");
   v5["string_vector"].asArray().resize(3);
-  v5["string_vector/0"].getValue<std_msgs::String>().data = "Test0";
-  v5["string_vector/1"].getValue<std_msgs::String>().data = "Test1";
-  v5["string_vector/2"].getValue<std_msgs::String>().data = "Test2";
+// //   v5["string_vector/0"].getValue<std_msgs::String>().data = "Test0";
+// //   v5["string_vector/1"].getValue<std_msgs::String>().data = "Test1";
+// //   v5["string_vector/2"].getValue<std_msgs::String>().data = "Test2";
   
   std::cout << v5 << "\n";
   std::cout << v5.hasMember("header/frame_id") << "\n";
   std::cout << v5.hasMember("builtin_string") << "\n";
   std::cout << v5.hasMember("string/data") << "\n";
   std::cout << v5["builtin_int_array"].getType() << "\n";
+  std::cout << v5["string_vector"].getType() << "\n";
   std::cout << "\n";
-  
+
   return 0;
 }

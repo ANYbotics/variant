@@ -28,25 +28,25 @@
 #include <ros/ros.h>
 
 #include <variant_topic_tools/DataType.h>
+#include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Variant type
     */  
   class Variant {
   friend class DataType;
+  friend class SharedVariant;
+  friend class VariantArray;
   friend class VariantCollection;
+  friend class VariantMessage;
   public:
     /** \brief Default constructor
       */ 
     Variant();
     
-    /** \brief Constructor (templated version taking a value)
-      */ 
-    template <typename T> Variant(const T& value);
-    
     /** \brief Copy constructor
       */ 
-    Variant(const Variant& src);
+    template <typename T> Variant(const T& src);
     
     /** \brief Destructor
       */ 
@@ -113,13 +113,9 @@ namespace variant_topic_tools {
       */
     void write(std::ostream& stream) const;
     
-    /** \brief Assignment operator (templated version)
+    /** \brief Assignment operator
       */
-    Variant& operator=(const Variant& src);
-    
-    /** \brief Assignment operator (templated version)
-      */
-    template <typename T> Variant& operator=(const T& value);
+    template <typename T> Variant& operator=(const T& src);
     
     /** \brief Conversion operator
       */
@@ -137,32 +133,47 @@ namespace variant_topic_tools {
     /** \brief Type traits
       */
     struct TypeTraits {
-      template <typename T, class Enable = void> struct EqualTo {
-        static bool compare(const T& lhs, const T& rhs);
-      };
+      template <typename T> static void assign(Variant& dst, const T& src,
+        typename boost::enable_if<boost::is_base_of<Variant, T> >::type*
+        dummy = 0);
+      template <typename T> static void assign(Variant& dst, const T& src,
+        typename boost::disable_if<boost::is_base_of<Variant, T> >::type*
+        dummy = 0);
+      
+      template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+        typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
+        dummy = 0);
+      template <typename T, size_t N> static bool isEqual(const
+        boost::array<T, N>& lhs, const boost::array<T, N>& rhs,
+        typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
+        dummy = 0);
+      template <typename T> static bool isEqual(const std::vector<T>& lhs,
+        const std::vector<T>& rhs, typename boost::enable_if<boost::
+        has_equal_to<T, T, bool> >::type* dummy = 0);
+      template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+        typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
+        dummy = 0);
+      template <typename T, size_t N> static bool isEqual(const
+        boost::array<T, N>& lhs, const boost::array<T, N>& rhs,
+        typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
+        dummy = 0);
+      template <typename T> static bool isEqual(const std::vector<T>& lhs,
+        const std::vector<T>& rhs, typename boost::disable_if<boost::
+        has_equal_to<T, T, bool> >::type* dummy = 0);
         
-      template <typename T> struct EqualTo<T, typename boost::enable_if<
-          boost::has_equal_to<T, T, bool> >::type> {
-        static bool compare(const T& lhs, const T& rhs);
-      };
+      template <typename T> static void read(std::istream& stream, T& value,
+        typename boost::enable_if<boost::has_right_shift<std::istream, T&> >::
+        type* dummy = 0);
+      template <typename T> static void read(std::istream& stream, T& value,
+        typename boost::disable_if<boost::has_right_shift<std::istream, T&> >::
+        type* dummy = 0);
       
-      template <typename T, class Enable = void> struct ReadFrom {
-        static void read(std::istream& stream, T& value);
-      };
-      
-      template <typename T> struct ReadFrom<T, typename boost::enable_if<
-          boost::has_right_shift<std::istream, T&> >::type> {
-        static void read(std::istream& stream, T& value);
-      };
-      
-      template <typename T, class Enable = void> struct WriteTo {
-        static void write(std::ostream& stream, const T& value);
-      };
-      
-      template <typename T> struct WriteTo<T, typename boost::enable_if<
-          boost::has_left_shift<std::ostream, const T&> >::type> {
-        static void write(std::ostream& stream, const T& value);
-      };
+      template <typename T> static void write(std::ostream& stream, const T&
+        value, typename boost::enable_if<boost::has_left_shift<std::ostream,
+        const T&> >::type* dummy = 0);
+      template <typename T> static void write(std::ostream& stream, const T&
+        value, typename boost::disable_if<boost::has_left_shift<std::ostream,
+        const T&> >::type* dummy = 0);
     };
     
     /** \brief Forward declaration of the variant value type
@@ -177,7 +188,7 @@ namespace variant_topic_tools {
       */
     typedef boost::weak_ptr<Value> ValueWPtr;
     
-    /** \brief Variant value
+    /** \brief Variant value (abstract base)
       */
     class Value {
     public:
@@ -207,31 +218,37 @@ namespace variant_topic_tools {
       virtual void write(std::ostream& stream) const = 0;    
     };
 
-    /** \brief Variant value (templated version)
+    /** \brief Variant value (templated abstract base)
       */
     template <typename T> class ValueT :
-      public Value {
+      public virtual Value {
     public:
       /** \brief Default constructor
         */ 
-      ValueT(const T& value = T());
-      
-      /** \brief Copy constructor
-        */ 
-      ValueT(const ValueT<T>& src);
+      ValueT();
       
       /** \brief Destructor
         */ 
       virtual ~ValueT();
       
+      /** \brief Set the variant's value (abstract declaration)
+        */
+      virtual void setValue(const T& value) = 0;
+      
+      /** \brief Retrieve the variant's value (abstract declaration of the
+        *   non-const version)
+        */
+      virtual T& getValue() = 0;
+      
+      /** \brief Retrieve the variant's value (abstract declaration of the
+        *   const version)
+        */
+      virtual const T& getValue() const = 0;
+      
       /** \brief True, if this variant value equals another variant value
         *   (implementation)
         */
       bool isEqual(const Value& value) const;
-      
-      /** \brief Clone this variant value (implementation)
-        */
-      ValuePtr clone() const;
       
       /** \brief Read the variant from a stream (implementation)
         */
@@ -240,6 +257,42 @@ namespace variant_topic_tools {
       /** \brief Write this variant value to a stream (implementation)
         */
       void write(std::ostream& stream) const;
+    };
+
+    /** \brief Variant value (templated implementation)
+      */
+    template <typename T> class ValueImplT :
+      public ValueT<T> {
+    public:
+      /** \brief Default constructor
+        */ 
+      ValueImplT(const T& value = T());
+      
+      /** \brief Copy constructor
+        */ 
+      ValueImplT(const ValueT<T>& src);
+      
+      /** \brief Destructor
+        */ 
+      virtual ~ValueImplT();
+      
+      /** \brief Set the variant's value (implementation)
+        */
+      void setValue(const T& value);
+      
+      /** \brief Retrieve the variant's value (implementation of the
+        *   non-const version)
+        */
+      T& getValue();
+      
+      /** \brief Retrieve the variant's value (implementation of the
+        *   const version)
+        */
+      const T& getValue() const;
+      
+      /** \brief Clone this variant value (implementation)
+        */
+      ValuePtr clone() const;
       
       /** \brief The strong-typed value
         */
@@ -256,7 +309,7 @@ namespace variant_topic_tools {
     
     /** \brief Constructor (overloaded version taking a data type)
       */ 
-    Variant(const DataType& type);
+    Variant(const DataType& type, const ValuePtr& value = ValuePtr());
   };
   
   /** \brief Operator for reading the variant from a stream

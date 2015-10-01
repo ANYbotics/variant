@@ -211,6 +211,10 @@ void DataTypeRegistry::write(std::ostream& stream) const {
 /* Operators                                                                 */
 /*****************************************************************************/
 
+DataType DataTypeRegistry::operator[](const std::string& identifier) {
+  return getDataType(identifier);
+}
+
 DataType DataTypeRegistry::operator[](const std::string& identifier) const {
   return getDataType(identifier);
 }

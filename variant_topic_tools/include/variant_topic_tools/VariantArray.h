@@ -86,7 +86,7 @@ namespace variant_topic_tools {
       */
     struct TypeTraits {
       template <typename T, size_t N> struct ToArray {
-        typedef boost::array<Variant, N> ArrayType;
+        typedef boost::array<T, N> ArrayType;
         
         static void add(ArrayType& array, const T& element);
         static void resize(ArrayType& array, size_t numElements);
@@ -94,7 +94,7 @@ namespace variant_topic_tools {
       };
       
       template <typename T> struct ToArray<T, 0> {
-        typedef std::vector<Variant> ArrayType;
+        typedef std::vector<T> ArrayType;
         
         static void add(ArrayType& array, const T& element);
         static void resize(ArrayType& array, size_t numElements);
@@ -102,7 +102,7 @@ namespace variant_topic_tools {
       };
     };
     
-    /** \brief Variant array value
+    /** \brief Variant array value (abstract base)
       */
     class Value :
       public VariantCollection::Value {
@@ -115,15 +115,17 @@ namespace variant_topic_tools {
         */ 
       virtual ~Value();
       
-      /** \brief Retrieve a member of the variant collection by name
-        *   (implementation of the non-const version)
+      /** \brief Set a member of the variant collection by name
+        *   (implementation)
         */
-      Variant& getMember(const std::string& name);
+      void setMember(const std::string& name, const Variant& member);
+      
+      using VariantCollection::Value::setMember;
       
       /** \brief Retrieve a member of the variant collection by name
-        *   (implementation of the const version)
+        *   (implementation)
         */
-      const Variant& getMember(const std::string& name) const;
+      SharedVariant getMember(const std::string& name) const;
       
       using VariantCollection::Value::getMember;
       
@@ -136,7 +138,7 @@ namespace variant_topic_tools {
         *   specified name (implementation)
         */
       bool hasMember(const std::string& name) const;
-      
+    
       /** \brief Write the variant collection member with the specified
         *   index to a stream (implementation)
         */
@@ -155,37 +157,38 @@ namespace variant_topic_tools {
       virtual void clear() = 0;
     };
     
-    /** \brief Variant array value (variant-typed version)
+    /** \brief Variant array value (variant-typed implementation)
       */
-    class ValueV :
+    class ValueImplV :
       public Value {
     public:
       /** \brief Default constructor
         */ 
-      ValueV(const DataType& memberType = DataType(), size_t numMembers = 0);
+      ValueImplV(const DataType& memberType = DataType(), size_t
+        numMembers = 0);
       
       /** \brief Copy constructor
         */ 
-      ValueV(const ValueV& src);
+      ValueImplV(const ValueImplV& src);
       
       /** \brief Destructor
         */ 
-      virtual ~ValueV();
+      virtual ~ValueImplV();
       
       /** \brief Retrieve the number of members of the variant collection
         *   (implementation)
         */
       size_t getNumMembers() const;
       
-      /** \brief Retrieve a member of the variant collection by index
-        *   (implementation of the non-const version)
+      /** \brief Set a member of the variant collection by index
+        *   (implementation)
         */
-      Variant& getMember(size_t index);
+      void setMember(size_t index, const Variant& member);
       
       /** \brief Retrieve a member of the variant collection by index
-        *   (implementation of the const version)
+        *   (implementation)
         */
-      const Variant& getMember(size_t index) const;
+      SharedVariant getMember(size_t index) const;
       
       /** \brief True, if the variant array is a fixed size array
         *   (implementation)
@@ -221,47 +224,77 @@ namespace variant_topic_tools {
       std::vector<Variant> members;
     };
     
-    /** \brief Variant array value
+    /** \brief Variant array value (templated implementation)
       */
-    template <typename T, size_t N> class ValueT :
+    template <typename T, size_t N> class ValueImplT :
+      public Variant::ValueT<typename VariantArray::TypeTraits::
+        ToArray<T, N>::ArrayType>,
       public Value {
     public:
-      /** \brief Definition of the array type
+      /** \brief Declaration of the array type
         */ 
       typedef typename VariantArray::TypeTraits::ToArray<T, N>::ArrayType
         ArrayType;
       
+      /** \brief Declaration of the array pointer type
+        */ 
+      typedef boost::shared_ptr<ArrayType> ArrayPtr;
+      
+      /** \brief Declaration of the array weak pointer type
+        */ 
+      typedef boost::weak_ptr<ArrayType> ArrayWPtr;
+        
       /** \brief Default constructor
         */ 
-      ValueT(const ArrayType & members = ArrayType());
+      ValueImplT(const DataType& memberType = DataType(), const ArrayType&
+        members = ArrayType());
       
       /** \brief Copy constructor
         */ 
-      ValueT(const ValueT<T, N>& src);
+      ValueImplT(const ValueImplT<T, N>& src);
       
       /** \brief Destructor
         */ 
-      virtual ~ValueT();
+      virtual ~ValueImplT();
+      
+      /** \brief Set the variant's value (implementation)
+        */
+      void setValue(const ArrayType& value);
+      
+      /** \brief Retrieve the variant's value (implementation of the
+        *   non-const version)
+        */
+      ArrayType& getValue();
+      
+      /** \brief Retrieve the variant's value (implementation of the
+        *   const version)
+        */
+      const ArrayType& getValue() const;
       
       /** \brief Retrieve the number of members of the variant collection
         *   (implementation)
         */
       size_t getNumMembers() const;
       
-      /** \brief Retrieve a member of the variant collection by index
-        *   (implementation of the non-const version)
+      /** \brief Set a member of the variant collection by index
+        *   (implementation)
         */
-      Variant& getMember(size_t index);
+      void setMember(size_t index, const Variant& member);
       
       /** \brief Retrieve a member of the variant collection by index
-        *   (implementation of the const version)
+        *   (implementation)
         */
-      const Variant& getMember(size_t index) const;
+      SharedVariant getMember(size_t index) const;
       
       /** \brief True, if the variant array is a fixed size array
         *   (implementation)
         */ 
       bool isFixedSize() const;
+      
+      /** \brief True, if this variant value equals another variant value
+        *   (re-implementation)
+        */
+      bool isEqual(const Variant::Value& value) const;
       
       /** \brief Add a member to the variant array (implementation)
         */ 
@@ -279,15 +312,27 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
+      /** \brief Read the variant from a stream (re-implementation)
+        */
+      void read(std::istream& stream);
+    
+      /** \brief Write this variant value to a stream (re-implementation)
+        */
+      void write(std::ostream& stream) const;
+      
+      /** \brief The array member type
+        */
+      DataType memberType;
+      
       /** \brief The array members
         */
-      ArrayType members;
+      ArrayPtr members;
     };
     
     /** \brief Constructor (overloaded version taking an array data type
       *   and a size)
       */
-    VariantArray(const ArrayDataType& type, size_t numMembers = 0);
+    VariantArray(const ArrayDataType& type, size_t numMembers);
     
     /** \brief Create a variant array
       */ 
