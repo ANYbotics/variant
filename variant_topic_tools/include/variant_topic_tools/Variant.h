@@ -33,8 +33,6 @@ namespace variant_topic_tools {
   /** \brief Variant type
     */  
   class Variant {
-  friend class CollectionVariant;
-  friend class SharedVariant;
   public:
     /** \brief Default constructor
       */ 

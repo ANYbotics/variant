@@ -86,12 +86,11 @@ void MessageVariant::ValueImplV::setMember(const std::string& name, const
   members.getField(name).setValue(member);
 }
 
-SharedVariant MessageVariant::ValueImplV::getMember(size_t index) const {
+Variant MessageVariant::ValueImplV::getMember(size_t index) const {
   return members.getField(index).getValue();
 }
 
-SharedVariant MessageVariant::ValueImplV::getMember(const std::string& name)
-    const {
+Variant MessageVariant::ValueImplV::getMember(const std::string& name) const {
   return members.getField(name).getValue();
 }
 
@@ -110,7 +109,7 @@ bool MessageVariant::ValueImplV::hasMember(const std::string& name) const {
 
 void MessageVariant::Value::writeMember(std::ostream& stream, size_t index)
     const {
-  SharedVariant member = getMember(index);
+  Variant member = getMember(index);
   
   if (!member.getType().isBuiltin()) {
     stream << getMemberName(index) << ":";

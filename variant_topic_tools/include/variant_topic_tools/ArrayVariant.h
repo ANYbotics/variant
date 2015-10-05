@@ -127,7 +127,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the variant collection by name
         *   (implementation)
         */
-      SharedVariant getMember(const std::string& name) const;
+      Variant getMember(const std::string& name) const;
       
       using CollectionVariant::Value::getMember;
       
@@ -190,7 +190,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the variant collection by index
         *   (implementation)
         */
-      SharedVariant getMember(size_t index) const;
+      Variant getMember(size_t index) const;
       
       /** \brief True, if the array is a fixed size array (implementation)
         */ 
@@ -285,7 +285,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the variant collection by index
         *   (implementation)
         */
-      SharedVariant getMember(size_t index) const;
+      Variant getMember(size_t index) const;
       
       /** \brief True, if the array is a fixed size array (implementation)
         */ 

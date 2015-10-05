@@ -119,7 +119,7 @@ template <typename T> void Variant::TypeTraits::assign(Variant& dst, const
     T& src, typename boost::enable_if<boost::is_base_of<Variant, T> >::type*
     dummy) {
   dst.type = src.type;
-  dst.value = src.value ? src.value->clone() : ValuePtr();
+  dst.value = src.value;
 }
 
 template <typename T> void Variant::TypeTraits::assign(Variant& dst, const

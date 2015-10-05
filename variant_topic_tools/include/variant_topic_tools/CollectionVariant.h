@@ -23,7 +23,6 @@
 #ifndef VARIANT_TOPIC_TOOLS_COLLECTION_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_COLLECTION_VARIANT_H
 
-#include <variant_topic_tools/SharedVariant.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
@@ -63,11 +62,11 @@ namespace variant_topic_tools {
     
     /** \brief Retrieve a member of the collection by index
       */
-    SharedVariant getMember(size_t index) const;
+    Variant getMember(size_t index) const;
     
     /** \brief Retrieve a member of the collection by name
       */
-    SharedVariant getMember(const std::string& name) const;
+    Variant getMember(const std::string& name) const;
     
     /** \brief Set a member value of the collection by index
       */    
@@ -114,12 +113,12 @@ namespace variant_topic_tools {
     /** \brief Operator for retrieving the members of the collection
       *   by index
       */
-    SharedVariant operator[](size_t index) const;
+    Variant operator[](size_t index) const;
     
     /** \brief Operator for retrieving the members of the collection
       *   by name
       */
-    SharedVariant operator[](const std::string& name) const;
+    Variant operator[](const std::string& name) const;
     
   protected:
     /** \brief Collection variant value (abstract base)
@@ -159,17 +158,17 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the collection by index
         *   (abstract declaration)
         */
-      virtual SharedVariant getMember(size_t index) const = 0;
+      virtual Variant getMember(size_t index) const = 0;
       
       /** \brief Retrieve a member of the collection by name
         *   (abstract declaration)
         */
-      virtual SharedVariant getMember(const std::string& name) const = 0;
+      virtual Variant getMember(const std::string& name) const = 0;
       
       /** \brief Recursively retrieve a member of the collection
         *   by name
         */
-      SharedVariant getMember(const std::string& name, size_t pos) const;
+      Variant getMember(const std::string& name, size_t pos) const;
     
       /** \brief True, if the collection contains the member with the
         *   specified name (abstract declaration)

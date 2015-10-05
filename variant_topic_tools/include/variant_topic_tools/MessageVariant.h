@@ -116,12 +116,12 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the variant collection by index
         *   (implementation)
         */
-      SharedVariant getMember(size_t index) const;
+      Variant getMember(size_t index) const;
       
       /** \brief Retrieve a member of the variant collection by name
         *   (implementation)
         */
-      SharedVariant getMember(const std::string& name) const;
+      Variant getMember(const std::string& name) const;
       
       /** \brief Retrieve the name of the message member with the specified
         *   index (implementation)
@@ -201,12 +201,12 @@ namespace variant_topic_tools {
       /** \brief Retrieve a member of the variant collection by index
         *   (implementation)
         */
-      SharedVariant getMember(size_t index) const;
+      Variant getMember(size_t index) const;
       
       /** \brief Retrieve a member of the variant collection by name
         *   (implementation)
         */
-      SharedVariant getMember(const std::string& name) const;
+      Variant getMember(const std::string& name) const;
       
       /** \brief Retrieve the name of the message member with the specified
         *   index (implementation)

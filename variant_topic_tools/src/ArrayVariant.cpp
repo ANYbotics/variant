@@ -58,7 +58,9 @@ ArrayVariant::ValueImplV::ValueImplV(const DataType& memberType, size_t
     numMembers) :
   memberType(memberType),
   numMembers(numMembers),
-  members(numMembers, memberType.createVariant()) {
+  members(numMembers) {
+  for (size_t i = 0; i < numMembers; ++i)
+    members[i] = memberType.createVariant();
 }
 
 ArrayVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
@@ -95,7 +97,7 @@ void ArrayVariant::Value::setMember(const std::string& name, const Variant&
   return setMember(index, member);
 }
 
-SharedVariant ArrayVariant::Value::getMember(const std::string& name) const {
+Variant ArrayVariant::Value::getMember(const std::string& name) const {
   size_t index;
   
   try {
@@ -134,7 +136,7 @@ void ArrayVariant::ValueImplV::setMember(size_t index, const Variant&
     throw NoSuchMemberException(index);
 }
 
-SharedVariant ArrayVariant::ValueImplV::getMember(size_t index) const {
+Variant ArrayVariant::ValueImplV::getMember(size_t index) const {
   if (index < members.size())
     return members[index];
   else
@@ -204,8 +206,14 @@ void ArrayVariant::ValueImplV::addMember(const Variant& member) {
 
 void ArrayVariant::ValueImplV::resize(size_t numMembers) {
   if (!this->numMembers || (numMembers == this->numMembers)) {
-    if (numMembers != members.size())
-      members.resize(numMembers, memberType.createVariant());
+    if (numMembers != members.size()) {
+      size_t i = members.size();
+      
+      members.resize(numMembers);
+      
+      for ( ; i < members.size(); ++i)
+        members[i] = memberType.createVariant();
+    }
   }
   else
     throw InvalidOperationException("Resizing a fixed-size array");

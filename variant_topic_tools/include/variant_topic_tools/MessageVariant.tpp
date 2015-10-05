@@ -80,14 +80,13 @@ void MessageVariant::ValueImplT<T>::setMember(const std::string& name,
 }
 
 template <typename T>
-SharedVariant MessageVariant::ValueImplT<T>::getMember(size_t index)
-    const {
+Variant MessageVariant::ValueImplT<T>::getMember(size_t index) const {
   return this->memberTypes[index].getValue().createVariant();
 }
 
 template <typename T>
-SharedVariant MessageVariant::ValueImplT<T>::getMember(const std::string&
-    name) const {
+Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name)
+    const {
   return this->memberTypes[name].getValue().createVariant();
 }
 

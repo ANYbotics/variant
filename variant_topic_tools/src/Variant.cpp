@@ -20,7 +20,6 @@
 #include "variant_topic_tools/BuiltinVariant.h"
 #include "variant_topic_tools/CollectionVariant.h"
 #include "variant_topic_tools/MessageVariant.h"
-#include "variant_topic_tools/SharedVariant.h"
 #include "variant_topic_tools/Variant.h"
 
 namespace variant_topic_tools {
@@ -94,19 +93,19 @@ bool Variant::isEmpty() const {
 /*****************************************************************************/
 
 ArrayVariant Variant::asArray() const {
-  return SharedVariant(*this);
+  return ArrayVariant(*this);
 }
 
 BuiltinVariant Variant::asBuiltin() const {
-  return SharedVariant(*this);
+  return BuiltinVariant(*this);
 }
 
 CollectionVariant Variant::asCollection() const {
-  return SharedVariant(*this);
+  return CollectionVariant(*this);
 }
 
 MessageVariant Variant::asMessage() const {
-  return SharedVariant(*this);
+  return MessageVariant(*this);
 }
 
 void Variant::clear() {

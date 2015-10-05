@@ -79,14 +79,14 @@ void CollectionVariant::setMember(const std::string& name, const Variant&
     throw NoSuchMemberException(name);
 }
 
-SharedVariant CollectionVariant::getMember(size_t index) const {
+Variant CollectionVariant::getMember(size_t index) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getMember(index);
   else
     throw NoSuchMemberException(index);
 }
 
-SharedVariant CollectionVariant::getMember(const std::string& name) const {
+Variant CollectionVariant::getMember(const std::string& name) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getMember(name, 0);
   else
@@ -115,11 +115,12 @@ void CollectionVariant::Value::setMember(const std::string& name, const
     size_t i = name.find_first_of('/', pos);
     
     if (i != std::string::npos) {
-      SharedVariant sharedMember = getMember(name.substr(pos, i-pos));
+      Variant currentMember = getMember(name.substr(pos, i-pos));
         
-      if (sharedMember.isCollection()) {
-        boost::dynamic_pointer_cast<Value>(sharedMember.value)->setMember(
-          name, member, i+1);
+      if (currentMember.isCollection()) {
+        CollectionVariant collectionMember = currentMember;
+        collectionMember.setMember(name.substr(i+1), member);
+        
         return;
       }
     }
@@ -132,7 +133,7 @@ void CollectionVariant::Value::setMember(const std::string& name, const
   throw NoSuchMemberException(name);
 }
 
-SharedVariant CollectionVariant::Value::getMember(const std::string& name,
+Variant CollectionVariant::Value::getMember(const std::string& name,
     size_t pos) const {
   pos = name.find_first_not_of('/', pos);
   
@@ -140,11 +141,12 @@ SharedVariant CollectionVariant::Value::getMember(const std::string& name,
     size_t i = name.find_first_of('/', pos);
     
     if (i != std::string::npos) {
-      SharedVariant sharedMember = getMember(name.substr(pos, i-pos));
+      Variant currentMember = getMember(name.substr(pos, i-pos));
         
-      if (sharedMember.isCollection())
-        return boost::dynamic_pointer_cast<Value>(sharedMember.value)->
-          getMember(name, i+1);
+      if (currentMember.isCollection()) {
+        CollectionVariant collectionMember = currentMember;
+        return collectionMember.getMember(name.substr(i+1));
+      }
     }
     else
       return getMember(name.substr(pos));
@@ -161,11 +163,12 @@ bool CollectionVariant::Value::hasMember(const std::string& name, size_t pos)
     size_t i = name.find_first_of('/', pos);
     
     if (i != std::string::npos) {
-      SharedVariant sharedMember = getMember(name.substr(pos, i-pos));
+      Variant currentMember = getMember(name.substr(pos, i-pos));
       
-      if (sharedMember.isCollection())
-        return boost::dynamic_pointer_cast<Value>(sharedMember.value)->
-          hasMember(name, i+1);
+      if (currentMember.isCollection()) {
+        CollectionVariant collectionMember = currentMember;
+        return collectionMember.hasMember(name.substr(i+1));
+      }
     }
     else
       return hasMember(name.substr(pos));
@@ -208,11 +211,11 @@ void CollectionVariant::Value::write(std::ostream& stream) const {
 /* Operators                                                                 */
 /*****************************************************************************/
 
-SharedVariant CollectionVariant::operator[](size_t index) const {
+Variant CollectionVariant::operator[](size_t index) const {
   return getMember(index);
 }
 
-SharedVariant CollectionVariant::operator[](const std::string& name) const {
+Variant CollectionVariant::operator[](const std::string& name) const {
   return getMember(name);
 }
 

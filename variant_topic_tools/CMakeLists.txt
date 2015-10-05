@@ -75,9 +75,7 @@ add_library(variant_topic_tools
   src/MessageVariant.cpp
   src/Serialization.cpp
   src/Serializer.cpp
-  src/SharedVariant.cpp
   src/Variant.cpp
-  src/VariantArrayMember.cpp
 )
 
 add_executable(

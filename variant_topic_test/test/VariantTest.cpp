@@ -63,6 +63,43 @@ TEST(Variant, Builtin) {
 TEST(Variant, Array) {
   DataTypeRegistry registry;
   
+  ArrayVariant v1 = DataType("int32[3]").createVariant();
+  ArrayVariant v2 = DataType("float64[]").createVariant();
+  
+  EXPECT_TRUE(v1.hasType());
+  EXPECT_FALSE(v1.isEmpty());
+  EXPECT_EQ(3, v1.getNumMembers());
+  EXPECT_NO_THROW(v1.resize(3));
+  EXPECT_ANY_THROW(v1.resize(4));
+  EXPECT_TRUE(v1[0].hasType());
+  EXPECT_FALSE(v1[0].isEmpty());
+  EXPECT_NO_THROW(v1[0] = 0);
+  EXPECT_NO_THROW(v1[1] = 1);
+  EXPECT_NO_THROW(v1[2] = 2);
+  EXPECT_ANY_THROW(v1[3] = 3);
+  EXPECT_EQ(0, v1[0].getValue<int>());
+  EXPECT_EQ(1, v1[1].getValue<int>());
+  EXPECT_EQ(2, v1[2].getValue<int>());
+  EXPECT_ANY_THROW(v1.clear());
+  
+  EXPECT_TRUE(v2.hasType());
+  EXPECT_TRUE(v2.isEmpty());
+  EXPECT_EQ(0, v2.getNumMembers());
+  EXPECT_NO_THROW(v2.resize(3));
+  EXPECT_FALSE(v2.isEmpty());
+  EXPECT_EQ(3, v2.getNumMembers());  
+  EXPECT_TRUE(v2[0].hasType());
+  EXPECT_FALSE(v2[0].isEmpty());
+  EXPECT_NO_THROW(v2[0] = 0.0);
+  EXPECT_NO_THROW(v2[1] = 1.0);
+  EXPECT_NO_THROW(v2[2] = 2.0);
+  EXPECT_ANY_THROW(v2[3] = 3);
+  EXPECT_EQ(0.0, v2[0].getValue<double>());
+  EXPECT_EQ(1.0, v2[1].getValue<double>());
+  EXPECT_EQ(2.0, v2[2].getValue<double>());
+  EXPECT_NO_THROW(v2.clear());
+  EXPECT_TRUE(v2.isEmpty());
+  
   registry.clear();
 }
 

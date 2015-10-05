@@ -18,7 +18,6 @@
 
 #include <variant_topic_tools/ArrayDataType.h>
 #include <variant_topic_tools/Exceptions.h>
-#include <variant_topic_tools/VariantArrayMember.h>
 
 namespace variant_topic_tools {
 
@@ -79,9 +78,10 @@ void ArrayVariant::ValueImplT<T, N>::setMember(size_t index, const Variant&
 }
 
 template <typename T, size_t N>
-SharedVariant ArrayVariant::ValueImplT<T, N>::getMember(size_t index) const {
-  return VariantArrayMember::template create<T, N>(this->memberType,
-    this->members, index);
+Variant ArrayVariant::ValueImplT<T, N>::getMember(size_t index) const {
+  return Variant();
+//   return VariantArrayMember::template create<T, N>(this->memberType,
+//     this->members, index);
 }
 
 template <typename T, size_t N>
