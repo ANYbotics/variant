@@ -34,7 +34,7 @@ BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
 BuiltinDataType::BuiltinDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(*impl));
 }
 
 BuiltinDataType::~BuiltinDataType() {
@@ -63,8 +63,7 @@ BuiltinDataType& BuiltinDataType::operator=(const DataType& src) {
   DataType::operator=(src);
   
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(
-      impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl));
     
   return *this;
 }

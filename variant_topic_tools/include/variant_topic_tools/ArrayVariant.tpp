@@ -27,20 +27,20 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T, size_t N>
-VariantArray::ValueImplT<T, N>::ValueImplT(const DataType& memberType, const
+ArrayVariant::ValueImplT<T, N>::ValueImplT(const DataType& memberType, const
     ArrayType& members) :
   memberType(memberType),
   members(new ArrayType(members)) {
 }
 
 template <typename T, size_t N>
-VariantArray::ValueImplT<T, N>::ValueImplT(const ValueImplT<T, N>& src) :
+ArrayVariant::ValueImplT<T, N>::ValueImplT(const ValueImplT<T, N>& src) :
   memberType(src.memberType),
   members(new ArrayType(*src.members)) {
 }
 
 template <typename T, size_t N>
-VariantArray::ValueImplT<T, N>::~ValueImplT() {
+ArrayVariant::ValueImplT<T, N>::~ValueImplT() {
 }
 
 /*****************************************************************************/
@@ -48,29 +48,29 @@ VariantArray::ValueImplT<T, N>::~ValueImplT() {
 /*****************************************************************************/
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::setValue(const ArrayType& value) {
+void ArrayVariant::ValueImplT<T, N>::setValue(const ArrayType& value) {
   *this->members = value;
 }
 
 template <typename T, size_t N>
-typename VariantArray::ValueImplT<T, N>::ArrayType&
-    VariantArray::ValueImplT<T, N>::getValue() {
+typename ArrayVariant::ValueImplT<T, N>::ArrayType&
+    ArrayVariant::ValueImplT<T, N>::getValue() {
   return *this->members;
 }
 
 template <typename T, size_t N>
-const typename VariantArray::ValueImplT<T, N>::ArrayType&
-    VariantArray::ValueImplT<T, N>::getValue() const {
+const typename ArrayVariant::ValueImplT<T, N>::ArrayType&
+    ArrayVariant::ValueImplT<T, N>::getValue() const {
   return *this->members;
 }
 
 template <typename T, size_t N>
-size_t VariantArray::ValueImplT<T, N>::getNumMembers() const {
+size_t ArrayVariant::ValueImplT<T, N>::getNumMembers() const {
   return this->members->size();
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::setMember(size_t index, const Variant&
+void ArrayVariant::ValueImplT<T, N>::setMember(size_t index, const Variant&
     member) {
   if (index < this->members->size())
     (*this->members)[index] = member.template getValue<T>();
@@ -79,100 +79,100 @@ void VariantArray::ValueImplT<T, N>::setMember(size_t index, const Variant&
 }
 
 template <typename T, size_t N>
-SharedVariant VariantArray::ValueImplT<T, N>::getMember(size_t index) const {
+SharedVariant ArrayVariant::ValueImplT<T, N>::getMember(size_t index) const {
   return VariantArrayMember::template create<T, N>(this->memberType,
     this->members, index);
 }
 
 template <typename T, size_t N>
-bool VariantArray::ValueImplT<T, N>::isFixedSize() const {
+bool ArrayVariant::ValueImplT<T, N>::isFixedSize() const {
   return N;
 }
 
 template <typename T, size_t N>
-bool VariantArray::ValueImplT<T, N>::isEqual(const Variant::Value& value)
+bool ArrayVariant::ValueImplT<T, N>::isEqual(const Variant::Value& value)
     const {
-  return VariantCollection::Value::isEqual(value);
+  return CollectionVariant::Value::isEqual(value);
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T, size_t N> VariantArray VariantArray::create() {
-  VariantArray variantArray;
-  ArrayDataType type = ArrayDataType::template create<T, N>(); 
+template <typename T, size_t N> ArrayVariant ArrayVariant::create(const
+    DataType& type, const DataType& memberType) {
+  ArrayVariant variant;
   
-  variantArray.type = type,
-  variantArray.value.reset(new ValueImplT<T, N>(type.getElementType()));
+  variant.type = type,
+  variant.value.reset(new ValueImplT<T, N>(memberType));
   
-  return variantArray;
+  return variant;
 }
 
 template <typename T, size_t N>
-void VariantArray::TypeTraits::ToArray<T, N>::add(ArrayType& array,
+void ArrayVariant::TypeTraits::ToArray<T, N>::add(ArrayType& array,
     const T& element) {
   throw InvalidOperationException("Adding a member to a fixed-size array");
 }
 
 template <typename T>
-void VariantArray::TypeTraits::ToArray<T, 0>::add(ArrayType& array,
+void ArrayVariant::TypeTraits::ToArray<T, 0>::add(ArrayType& array,
     const T& element) {
   array.push_back(element); 
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::addMember(const Variant& member) {
-  VariantArray::TypeTraits::ToArray<T, N>::add(*this->members, member);
+void ArrayVariant::ValueImplT<T, N>::addMember(const Variant& member) {
+  ArrayVariant::TypeTraits::ToArray<T, N>::add(*this->members, member);
 }
 
 template <typename T, size_t N>
-void VariantArray::TypeTraits::ToArray<T, N>::resize(ArrayType& array,
+void ArrayVariant::TypeTraits::ToArray<T, N>::resize(ArrayType& array,
     size_t numElements) {
   if (numElements != N)
     throw InvalidOperationException("Resizing a fixed-size array");
 }
 
 template <typename T>
-void VariantArray::TypeTraits::ToArray<T, 0>::resize(ArrayType& array,
+void ArrayVariant::TypeTraits::ToArray<T, 0>::resize(ArrayType& array,
      size_t numElements) {
   array.resize(numElements);
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::resize(size_t numMembers) {
-  VariantArray::TypeTraits::ToArray<T, N>::resize(*this->members,
+void ArrayVariant::ValueImplT<T, N>::resize(size_t numMembers) {
+  ArrayVariant::TypeTraits::ToArray<T, N>::resize(*this->members,
     numMembers);
 }
 
 template <typename T, size_t N>
-void VariantArray::TypeTraits::ToArray<T, N>::clear(ArrayType& array) {
+void ArrayVariant::TypeTraits::ToArray<T, N>::clear(ArrayType& array) {
   throw InvalidOperationException("Clearing a fixed-size array");
 }
 
 template <typename T>
-void VariantArray::TypeTraits::ToArray<T, 0>::clear(ArrayType& array) {
+void ArrayVariant::TypeTraits::ToArray<T, 0>::clear(ArrayType& array) {
   array.clear();
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::clear() {
-  VariantArray::TypeTraits::ToArray<T, N>::clear(*this->members);
+void ArrayVariant::ValueImplT<T, N>::clear() {
+  ArrayVariant::TypeTraits::ToArray<T, N>::clear(*this->members);
 }
 
 template <typename T, size_t N>
-Variant::ValuePtr VariantArray::ValueImplT<T, N>::clone() const {
+Variant::ValuePtr ArrayVariant::ValueImplT<T, N>::clone() const {
   return Variant::ValuePtr(new ValueImplT<T, N>(*this));
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::read(std::istream& stream) {
-  VariantCollection::Value::read(stream);
+void ArrayVariant::ValueImplT<T, N>::read(std::istream& stream) {
+  CollectionVariant::Value::read(stream);
 }
 
 template <typename T, size_t N>
-void VariantArray::ValueImplT<T, N>::write(std::ostream& stream) const {
-  VariantCollection::Value::write(stream);
+void ArrayVariant::ValueImplT<T, N>::write(std::ostream& stream) const {
+  CollectionVariant::Value::write(stream);
 }
 
 }

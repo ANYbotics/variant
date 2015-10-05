@@ -51,8 +51,11 @@ include_directories(
 add_library(variant_topic_tools
   src/ArrayDataType.cpp
   src/ArraySerializer.cpp
+  src/ArrayVariant.cpp
   src/BuiltinDataType.cpp
   src/BuiltinSerializer.cpp
+  src/BuiltinVariant.cpp
+  src/CollectionVariant.cpp
   src/DataType.cpp
   src/DataTypeRegistry.cpp
   src/Exceptions.cpp
@@ -69,15 +72,12 @@ add_library(variant_topic_tools
   src/MessageTraits.cpp
   src/MessageType.cpp
   src/MessageVariable.cpp
+  src/MessageVariant.cpp
   src/Serialization.cpp
   src/Serializer.cpp
   src/SharedVariant.cpp
   src/Variant.cpp
-  src/VariantArray.cpp
   src/VariantArrayMember.cpp
-  src/VariantCollection.cpp
-  src/VariantMessage.cpp
-#   src/VariantMessageMember.cpp
 )
 
 add_executable(

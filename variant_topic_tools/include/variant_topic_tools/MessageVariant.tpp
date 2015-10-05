@@ -26,20 +26,21 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-VariantMessage::ValueImplT<T>::ValueImplT(const MessageFieldCollection<
-  std::pair<DataType, size_t> > memberTypesAndOffsets, const T& members) :
-  memberTypesAndOffsets(memberTypesAndOffsets),
-  members(new T(members)) {
+MessageVariant::ValueImplT<T>::ValueImplT(const std::vector<MessageMember>&
+    members) :
+  members(new T()) {
+  for (size_t i = 0; i < members.size(); ++i)
+    this->memberTypes.appendField(members[i].getName(), members[i].getType());
 }
 
 template <typename T>
-VariantMessage::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
-  memberTypesAndOffsets(src.memberTypesAndOffsets),
+MessageVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
+  memberTypes(src.memberTypes),
   members(new T(*src.members)) {
 }
 
 template <typename T>
-VariantMessage::ValueImplT<T>::~ValueImplT() {
+MessageVariant::ValueImplT<T>::~ValueImplT() {
 }
 
 /*****************************************************************************/
@@ -47,99 +48,94 @@ VariantMessage::ValueImplT<T>::~ValueImplT() {
 /*****************************************************************************/
 
 template <typename T>
-void VariantMessage::ValueImplT<T>::setValue(const T& value) {
+void MessageVariant::ValueImplT<T>::setValue(const T& value) {
   *this->members = value;
 }
 
 template <typename T>
-T& VariantMessage::ValueImplT<T>::getValue() {
+T& MessageVariant::ValueImplT<T>::getValue() {
   return *this->members;
 }
 
 template <typename T>
-const T& VariantMessage::ValueImplT<T>::getValue() const {
+const T& MessageVariant::ValueImplT<T>::getValue() const {
   return *this->members;
 }
 
 template <typename T>
-size_t VariantMessage::ValueImplT<T>::getNumMembers() const {
-  return this->memberTypesAndOffsets.getNumFields();
+size_t MessageVariant::ValueImplT<T>::getNumMembers() const {
+  return this->memberTypes.getNumFields();
 }
 
 template <typename T>
-void VariantMessage::ValueImplT<T>::setMember(size_t index, const
+void MessageVariant::ValueImplT<T>::setMember(size_t index, const
     Variant& member) {
 //   members.getField(index).setValue(member);
 }
 
 template <typename T>
-void VariantMessage::ValueImplT<T>::setMember(const std::string& name,
+void MessageVariant::ValueImplT<T>::setMember(const std::string& name,
     const Variant& member) {
 //   members.getField(name).setValue(member);
 }
 
 template <typename T>
-SharedVariant VariantMessage::ValueImplT<T>::getMember(size_t index)
+SharedVariant MessageVariant::ValueImplT<T>::getMember(size_t index)
     const {
-  return this->memberTypesAndOffsets[index].getValue().first.createVariant();
+  return this->memberTypes[index].getValue().createVariant();
 }
 
 template <typename T>
-SharedVariant VariantMessage::ValueImplT<T>::getMember(const std::string&
+SharedVariant MessageVariant::ValueImplT<T>::getMember(const std::string&
     name) const {
-  return this->memberTypesAndOffsets[name].getValue().first.createVariant();
+  return this->memberTypes[name].getValue().createVariant();
 }
 
 template <typename T>
-const std::string& VariantMessage::ValueImplT<T>::getMemberName(size_t
+const std::string& MessageVariant::ValueImplT<T>::getMemberName(size_t
     index) const {
-  return this->memberTypesAndOffsets.getField(index).getName();
+  return this->memberTypes.getField(index).getName();
 }
 
 template <typename T>
-bool VariantMessage::ValueImplT<T>::hasMember(const std::string& name)
+bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
     const {
-  return this->memberTypesAndOffsets.hasField(name);
+  return this->memberTypes.hasField(name);
 }
 
 template <typename T>
-bool VariantMessage::ValueImplT<T>::isEqual(const Variant::Value& value)
+bool MessageVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
     const {
-  return VariantCollection::Value::isEqual(value);
+  return CollectionVariant::Value::isEqual(value);
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> VariantMessage VariantMessage::create() {
-  VariantMessage variantMessage;
-  MessageDataType type = MessageDataType::template create<T>(); 
-  MessageFieldCollection<std::pair<DataType, size_t> > memberTypesAndOffsets;
+template <typename T> MessageVariant MessageVariant::create(const DataType&
+    type, const std::vector<MessageMember>& members) {
+  MessageVariant variant;
   
-  for (size_t i = 0; i < type.getNumMembers(); ++i)
-    memberTypesAndOffsets.appendField(type.getMember(i).getName(),
-      std::make_pair(type.getMember(i).getType(), 0));
-  
-  variantMessage.type = type,
-  variantMessage.value.reset(new ValueImplT<T>(memberTypesAndOffsets));
-  
-  return variantMessage;
+  variant.type = type;
+  variant.value.reset(new ValueImplT<T>(members));
+    
+  return variant;
 }
 
 template <typename T>
-Variant::ValuePtr VariantMessage::ValueImplT<T>::clone() const {
+Variant::ValuePtr MessageVariant::ValueImplT<T>::clone() const {
   return Variant::ValuePtr(new ValueImplT<T>(*this));
 }
 
 template <typename T>
-void VariantMessage::ValueImplT<T>::read(std::istream& stream) {
-  VariantCollection::Value::read(stream);
+void MessageVariant::ValueImplT<T>::read(std::istream& stream) {
+  CollectionVariant::Value::read(stream);
 }
 
 template <typename T>
-void VariantMessage::ValueImplT<T>::write(std::ostream& stream) const {
-  VariantCollection::Value::write(stream);
+void MessageVariant::ValueImplT<T>::write(std::ostream& stream) const {
+  CollectionVariant::Value::write(stream);
 }
 
 }

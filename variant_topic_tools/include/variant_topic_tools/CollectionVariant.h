@@ -16,113 +16,113 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file VariantCollection.h
-  * \brief Header file providing the VariantCollection class interface
+/** \file CollectionVariant.h
+  * \brief Header file providing the CollectionVariant class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_VARIANT_COLLECTION_H
-#define VARIANT_TOPIC_TOOLS_VARIANT_COLLECTION_H
+#ifndef VARIANT_TOPIC_TOOLS_COLLECTION_VARIANT_H
+#define VARIANT_TOPIC_TOOLS_COLLECTION_VARIANT_H
 
 #include <variant_topic_tools/SharedVariant.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant collection type
+  /** \brief Collection variant type
     */  
-  class VariantCollection :
+  class CollectionVariant :
     public Variant {
   friend class Variant;
   public:
     /** \brief Default constructor
       */ 
-    VariantCollection();
+    CollectionVariant();
     
     /** \brief Copy constructor
       */ 
-    VariantCollection(const VariantCollection& src);
+    CollectionVariant(const CollectionVariant& src);
     
     /** \brief Copy constructor (overloaded version taking a variant)
       */ 
-    VariantCollection(const Variant& src);
+    CollectionVariant(const Variant& src);
     
     /** \brief Destructor
       */ 
-    ~VariantCollection();
+    ~CollectionVariant();
         
-    /** \brief Retrieve the number of members of the variant collection
+    /** \brief Retrieve the number of members of the collection
       */
     size_t getNumMembers() const;
     
-    /** \brief Set a member of the variant collection by index
+    /** \brief Set a member of the collection by index
       */
     void setMember(size_t index, const Variant& member);
     
-    /** \brief Set a member of the variant collection by name
+    /** \brief Set a member of the collection by name
       */
     void setMember(const std::string& name, const Variant& member);
     
-    /** \brief Retrieve a member of the variant collection by index
+    /** \brief Retrieve a member of the collection by index
       */
     SharedVariant getMember(size_t index) const;
     
-    /** \brief Retrieve a member of the variant collection by name
+    /** \brief Retrieve a member of the collection by name
       */
     SharedVariant getMember(const std::string& name) const;
     
-    /** \brief Set a member value of the variant collection by index
+    /** \brief Set a member value of the collection by index
       */    
     template <typename T> void setValue(size_t index, const T& value);
     
-    /** \brief Set a member value of the variant collection by name
+    /** \brief Set a member value of the collection by name
       */    
     template <typename T> void setValue(const std::string& name, const
       T& value);
     
     using Variant::setValue;
     
-    /** \brief Retrieve a member value of the variant collection by index
+    /** \brief Retrieve a member value of the collection by index
       *   (non-const version)
       */
     template <typename T> T& getValue(size_t index);
     
-    /** \brief Retrieve a member value of the variant collection by index
+    /** \brief Retrieve a member value of the collection by index
       *   (const version)
       */
     template <typename T> const T& getValue(size_t index) const;
     
-    /** \brief Retrieve a member value of the variant collection by name
+    /** \brief Retrieve a member value of the collection by name
       *   (non-const version)
       */
     template <typename T> T& getValue(const std::string& name);
     
-    /** \brief Retrieve a member value of the variant collection by name
+    /** \brief Retrieve a member value of the collection by name
       *   (const version)
       */
     template <typename T> const T& getValue(const std::string& name) const;
     
     using Variant::getValue;
     
-    /** \brief True, if the variant collection contains the member with the
+    /** \brief True, if the collection contains the member with the
       *   specified name
       */
     bool hasMember(const std::string& name) const;
 
-    /** \brief True, if the variant collection is empty
+    /** \brief True, if the collection is empty
       */
     bool isEmpty() const;
     
-    /** \brief Operator for retrieving the members of the variant collection
+    /** \brief Operator for retrieving the members of the collection
       *   by index
       */
     SharedVariant operator[](size_t index) const;
     
-    /** \brief Operator for retrieving the members of the variant collection
+    /** \brief Operator for retrieving the members of the collection
       *   by name
       */
     SharedVariant operator[](const std::string& name) const;
     
   protected:
-    /** \brief Variant collection value (abstract base)
+    /** \brief Collection variant value (abstract base)
       */
     class Value :
       public virtual Variant::Value {
@@ -135,49 +135,49 @@ namespace variant_topic_tools {
         */ 
       virtual ~Value();
               
-      /** \brief Retrieve the number of members of the variant collection
+      /** \brief Retrieve the number of members of the collection
         *   (abstract declaration)
         */
       virtual size_t getNumMembers() const = 0;
       
-      /** \brief Set a member of the variant collection by index (abstract
+      /** \brief Set a member of the collection by index (abstract
         *   declaration)
         */
       virtual void setMember(size_t index, const Variant& member) = 0;
       
-      /** \brief Set a member of the variant collection by name (abstract
+      /** \brief Set a member of the collection by name (abstract
         *   declaration)
         */
       virtual void setMember(const std::string& name, const Variant&
         member) = 0;
     
-      /** \brief Recursively set a member of the variant collection by name
+      /** \brief Recursively set a member of the collection by name
         */
       void setMember(const std::string& name, const Variant& member,
         size_t pos);
     
-      /** \brief Retrieve a member of the variant collection by index
+      /** \brief Retrieve a member of the collection by index
         *   (abstract declaration)
         */
       virtual SharedVariant getMember(size_t index) const = 0;
       
-      /** \brief Retrieve a member of the variant collection by name
+      /** \brief Retrieve a member of the collection by name
         *   (abstract declaration)
         */
       virtual SharedVariant getMember(const std::string& name) const = 0;
       
-      /** \brief Recursively retrieve a member of the variant collection
+      /** \brief Recursively retrieve a member of the collection
         *   by name
         */
       SharedVariant getMember(const std::string& name, size_t pos) const;
     
-      /** \brief True, if the variant collection contains the member with the
+      /** \brief True, if the collection contains the member with the
         *   specified name (abstract declaration)
         */
       virtual bool hasMember(const std::string& name) const = 0;
       
-      /** \brief True, if the variant collection or any of its members
-        *   contains the member with the specified name
+      /** \brief True, if the collection or any of its members contains
+        *   the member with the specified name
         */
       bool hasMember(const std::string& name, size_t pos) const;
     
@@ -190,8 +190,8 @@ namespace variant_topic_tools {
         */
       void read(std::istream& stream);
     
-      /** \brief Write the variant collection member with the specified
-        *   index to a stream (abstract declaration)
+      /** \brief Write the collection member with the specified index
+        *   to a stream (abstract declaration)
         */
       virtual void writeMember(std::ostream& stream, size_t index) const = 0;
       
@@ -202,10 +202,10 @@ namespace variant_topic_tools {
     
     /** \brief Constructor (overloaded version taking a data type)
       */ 
-    VariantCollection(const DataType& type);
+    CollectionVariant(const DataType& type);
   };
 };
 
-#include <variant_topic_tools/VariantCollection.tpp>
+#include <variant_topic_tools/CollectionVariant.tpp>
 
 #endif

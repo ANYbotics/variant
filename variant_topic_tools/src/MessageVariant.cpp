@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/MessageDataType.h"
-#include "variant_topic_tools/VariantMessage.h"
+#include "variant_topic_tools/MessageVariant.h"
 
 namespace variant_topic_tools {
 
@@ -25,80 +25,82 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-VariantMessage::VariantMessage() {
+MessageVariant::MessageVariant() {
 }
 
-VariantMessage::VariantMessage(const MessageDataType& type, const
-    MessageFieldCollection<Variant>& members) :
-  VariantCollection(static_cast<const DataType&>(type)) {
+MessageVariant::MessageVariant(const DataType& type, const
+    std::vector<MessageMember>& members) :
+  CollectionVariant(type) {
   if (type.isValid())
     value.reset(new ValueImplV(members));
 }
 
-VariantMessage::VariantMessage(const VariantMessage& src) :
-  VariantCollection(src) {
+MessageVariant::MessageVariant(const MessageVariant& src) :
+  CollectionVariant(src) {
 }
 
-VariantMessage::VariantMessage(const Variant& src) :
-  VariantCollection(src) {
+MessageVariant::MessageVariant(const Variant& src) :
+  CollectionVariant(src) {
   if (value)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
 }
 
-VariantMessage::~VariantMessage() {
+MessageVariant::~MessageVariant() {
 }
 
-VariantMessage::Value::Value() {
+MessageVariant::Value::Value() {
 }
 
-VariantMessage::Value::~Value() {
+MessageVariant::Value::~Value() {
 }
 
-VariantMessage::ValueImplV::ValueImplV(const MessageFieldCollection<Variant>&
-    members) :
-  members(members) {
+MessageVariant::ValueImplV::ValueImplV(const std::vector<MessageMember>&
+    members) {
+  for (size_t i = 0; i < members.size(); ++i)
+    this->members.appendField(members[i].getName(),
+      members[i].getType().createVariant());
 }
 
-VariantMessage::ValueImplV::ValueImplV(const ValueImplV& src) :
+MessageVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
   members(src.members) {
 }
 
-VariantMessage::ValueImplV::~ValueImplV() {
+MessageVariant::ValueImplV::~ValueImplV() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-size_t VariantMessage::ValueImplV::getNumMembers() const {
+size_t MessageVariant::ValueImplV::getNumMembers() const {
   return members.getNumFields();
 }
 
-void VariantMessage::ValueImplV::setMember(size_t index, const Variant&
+void MessageVariant::ValueImplV::setMember(size_t index, const Variant&
     member) {
   members.getField(index).setValue(member);
 }
 
-void VariantMessage::ValueImplV::setMember(const std::string& name, const
+void MessageVariant::ValueImplV::setMember(const std::string& name, const
     Variant& member) {
   members.getField(name).setValue(member);
 }
 
-SharedVariant VariantMessage::ValueImplV::getMember(size_t index) const {
+SharedVariant MessageVariant::ValueImplV::getMember(size_t index) const {
   return members.getField(index).getValue();
 }
 
-SharedVariant VariantMessage::ValueImplV::getMember(const std::string& name)
+SharedVariant MessageVariant::ValueImplV::getMember(const std::string& name)
     const {
   return members.getField(name).getValue();
 }
 
-const std::string& VariantMessage::ValueImplV::getMemberName(size_t index)
+const std::string& MessageVariant::ValueImplV::getMemberName(size_t index)
     const {
   return members.getField(index).getName();
 }
 
-bool VariantMessage::ValueImplV::hasMember(const std::string& name) const {
+bool MessageVariant::ValueImplV::hasMember(const std::string& name) const {
   return members.hasField(name);
 }
 
@@ -106,7 +108,7 @@ bool VariantMessage::ValueImplV::hasMember(const std::string& name) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void VariantMessage::Value::writeMember(std::ostream& stream, size_t index)
+void MessageVariant::Value::writeMember(std::ostream& stream, size_t index)
     const {
   SharedVariant member = getMember(index);
   
@@ -125,7 +127,7 @@ void VariantMessage::Value::writeMember(std::ostream& stream, size_t index)
     stream << getMemberName(index) << ": " << member;
 }
 
-Variant::ValuePtr VariantMessage::ValueImplV::clone() const {
+Variant::ValuePtr MessageVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
 }
 

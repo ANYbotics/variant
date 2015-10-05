@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArrayDataType.h"
+#include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/Exceptions.h"
-#include "variant_topic_tools/VariantArray.h"
 
 namespace variant_topic_tools {
 
@@ -26,62 +26,62 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-VariantArray::VariantArray() {
+ArrayVariant::ArrayVariant() {
 }
 
-VariantArray::VariantArray(const ArrayDataType& type, size_t numMembers) :
-  VariantCollection(static_cast<const DataType&>(type)) {
-  if (type.isValid())
-    value.reset(new ValueImplV(type.getElementType(), numMembers));
+ArrayVariant::ArrayVariant(const DataType& type, const DataType& memberType,
+    size_t numMembers) :
+  CollectionVariant(type) {
+  value.reset(new ValueImplV(memberType, numMembers));
 }
 
-VariantArray::VariantArray(const VariantArray& src) :
-  VariantCollection(src) {
+ArrayVariant::ArrayVariant(const ArrayVariant& src) :
+  CollectionVariant(src) {
 }
 
-VariantArray::VariantArray(const Variant& src) :
-  VariantCollection(src) {
+ArrayVariant::ArrayVariant(const Variant& src) :
+  CollectionVariant(src) {
   if (value)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
 }
 
-VariantArray::~VariantArray() {
+ArrayVariant::~ArrayVariant() {
 }
 
-VariantArray::Value::Value() {
+ArrayVariant::Value::Value() {
 }
 
-VariantArray::Value::~Value() {
+ArrayVariant::Value::~Value() {
 }
 
-VariantArray::ValueImplV::ValueImplV(const DataType& memberType, size_t
+ArrayVariant::ValueImplV::ValueImplV(const DataType& memberType, size_t
     numMembers) :
   memberType(memberType),
   numMembers(numMembers),
   members(numMembers, memberType.createVariant()) {
 }
 
-VariantArray::ValueImplV::ValueImplV(const ValueImplV& src) :
+ArrayVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
   memberType(src.memberType),
   numMembers(src.numMembers),
   members(src.members) {
 }
 
-VariantArray::ValueImplV::~ValueImplV() {
+ArrayVariant::ValueImplV::~ValueImplV() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-bool VariantArray::isFixedSize() const {
+bool ArrayVariant::isFixedSize() const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->isFixedSize();
   else
     return true;
 }
 
-void VariantArray::Value::setMember(const std::string& name, const Variant&
+void ArrayVariant::Value::setMember(const std::string& name, const Variant&
     member) {
   size_t index;
   
@@ -95,7 +95,7 @@ void VariantArray::Value::setMember(const std::string& name, const Variant&
   return setMember(index, member);
 }
 
-SharedVariant VariantArray::Value::getMember(const std::string& name) const {
+SharedVariant ArrayVariant::Value::getMember(const std::string& name) const {
   size_t index;
   
   try {
@@ -108,7 +108,7 @@ SharedVariant VariantArray::Value::getMember(const std::string& name) const {
   return getMember(index);
 }
 
-bool VariantArray::Value::hasMember(const std::string& name) const {
+bool ArrayVariant::Value::hasMember(const std::string& name) const {
   size_t index;
   
   try {
@@ -122,11 +122,11 @@ bool VariantArray::Value::hasMember(const std::string& name) const {
 }
 
 
-size_t VariantArray::ValueImplV::getNumMembers() const {
+size_t ArrayVariant::ValueImplV::getNumMembers() const {
   return members.size();
 }
 
-void VariantArray::ValueImplV::setMember(size_t index, const Variant&
+void ArrayVariant::ValueImplV::setMember(size_t index, const Variant&
     member) {
   if (index < members.size())
     members[index] = member;
@@ -134,14 +134,14 @@ void VariantArray::ValueImplV::setMember(size_t index, const Variant&
     throw NoSuchMemberException(index);
 }
 
-SharedVariant VariantArray::ValueImplV::getMember(size_t index) const {
+SharedVariant ArrayVariant::ValueImplV::getMember(size_t index) const {
   if (index < members.size())
     return members[index];
   else
     throw NoSuchMemberException(index);
 }
 
-bool VariantArray::ValueImplV::isFixedSize() const {
+bool ArrayVariant::ValueImplV::isFixedSize() const {
   return numMembers;
 }
 
@@ -149,7 +149,7 @@ bool VariantArray::ValueImplV::isFixedSize() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void VariantArray::addMember(const Variant& member) {
+void ArrayVariant::addMember(const Variant& member) {
   if (value) {
     if (member.getType().isValid())
       boost::dynamic_pointer_cast<Value>(value)->addMember(member);
@@ -160,19 +160,19 @@ void VariantArray::addMember(const Variant& member) {
     throw InvalidOperationException("Adding a member to an invalid array");
 }
 
-void VariantArray::resize(size_t numMembers) {
+void ArrayVariant::resize(size_t numMembers) {
   if (value)
     boost::dynamic_pointer_cast<Value>(value)->resize(numMembers);
   else if (numMembers)
     throw InvalidOperationException("Resizing an invalid array");
 }
 
-void VariantArray::clear() {
+void ArrayVariant::clear() {
   if (value)
     boost::dynamic_pointer_cast<Value>(value)->clear();
 }
 
-void VariantArray::Value::writeMember(std::ostream& stream, size_t index)
+void ArrayVariant::Value::writeMember(std::ostream& stream, size_t index)
     const {
   if (!getMember(index).getType().isBuiltin()) {
     stream << boost::lexical_cast<std::string>(index) << ":";
@@ -190,7 +190,7 @@ void VariantArray::Value::writeMember(std::ostream& stream, size_t index)
       getMember(index);
 }
 
-void VariantArray::ValueImplV::addMember(const Variant& member) {
+void ArrayVariant::ValueImplV::addMember(const Variant& member) {
   if (!numMembers) {
     if (member.getType() == memberType)
       members.push_back(member);
@@ -202,7 +202,7 @@ void VariantArray::ValueImplV::addMember(const Variant& member) {
     throw InvalidOperationException("Adding a member to a fixed-size array");
 }
 
-void VariantArray::ValueImplV::resize(size_t numMembers) {
+void ArrayVariant::ValueImplV::resize(size_t numMembers) {
   if (!this->numMembers || (numMembers == this->numMembers)) {
     if (numMembers != members.size())
       members.resize(numMembers, memberType.createVariant());
@@ -211,14 +211,14 @@ void VariantArray::ValueImplV::resize(size_t numMembers) {
     throw InvalidOperationException("Resizing a fixed-size array");
 }
 
-void VariantArray::ValueImplV::clear() {
+void ArrayVariant::ValueImplV::clear() {
   if (!numMembers)
     members.clear();
   else
     throw InvalidOperationException("Clearing a fixed-size array");
 }
 
-Variant::ValuePtr VariantArray::ValueImplV::clone() const {
+Variant::ValuePtr ArrayVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
 }
 
@@ -226,7 +226,7 @@ Variant::ValuePtr VariantArray::ValueImplV::clone() const {
 /* Operators                                                                 */
 /*****************************************************************************/
 
-VariantArray& VariantArray::operator+=(const Variant& member) {
+ArrayVariant& ArrayVariant::operator+=(const Variant& member) {
   addMember(member);
   return *this;
 }

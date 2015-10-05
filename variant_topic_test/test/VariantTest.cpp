@@ -23,15 +23,16 @@
 
 #include <variant_msgs/Test.h>
 
+#include <variant_topic_tools/ArrayVariant.h>
+#include <variant_topic_tools/BuiltinVariant.h>
 #include <variant_topic_tools/DataTypeRegistry.h>
 #include <variant_topic_tools/MessageDefinition.h>
-#include <variant_topic_tools/Variant.h>
-#include <variant_topic_tools/VariantMessage.h>
+#include <variant_topic_tools/MessageVariant.h>
 
 using namespace variant_topic_tools;
 
 TEST(Variant, Builtin) {
-  Variant v1 = DataType("float64").createVariant();
+  BuiltinVariant v1 = DataType("float64").createVariant();
   
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
@@ -59,14 +60,20 @@ TEST(Variant, Builtin) {
   EXPECT_TRUE(v1.isEmpty());
 }
 
+TEST(Variant, Array) {
+  DataTypeRegistry registry;
+  
+  registry.clear();
+}
+
 TEST(Variant, Message) {
   DataTypeRegistry registry;
   
-//   VariantMessage v1(MessageDefinition::create<std_msgs::Bool>().
+//   MessageVariant v1(MessageDefinition::create<std_msgs::Bool>().
 //     getMessageDataType());
-//   VariantMessage v2(MessageDefinition::create<std_msgs::String>().
+//   MessageVariant v2(MessageDefinition::create<std_msgs::String>().
 //     getMessageDataType());
-//   VariantMessage v3(MessageDefinition::create<variant_msgs::Test>().
+//   MessageVariant v3(MessageDefinition::create<variant_msgs::Test>().
 //     getMessageDataType());
   
 //   EXPECT_TRUE(v1.hasType());

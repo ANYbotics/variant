@@ -16,8 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/ArraySerializer.h"
-#include <variant_topic_tools/ArrayVariant.h>
+#include <variant_topic_tools/BuiltinDataType.h>
 
 namespace variant_topic_tools {
 
@@ -25,57 +24,56 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::ImplT() :
-  Impl(typeid(T)) {
+template <typename T>
+BuiltinVariant::ValueT<T>::ValueT(const T& value) :
+  value(value) {
 }
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::~ImplT() {
+template <typename T>
+BuiltinVariant::ValueT<T>::ValueT(const ValueT<T>& src) :
+  value(src.getValue()) {
+}
+
+template <typename T>
+BuiltinVariant::ValueT<T>::~ValueT() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-const std::type_info& ArrayDataType::ImplT<T, N>::getTypeInfo() const {
-  return typeid(typename ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType);
+template <typename T>
+void BuiltinVariant::ValueT<T>::setValue(const T& value) {
+  this->value = value;
 }
 
-template <typename T, size_t N>
-size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
-  return N;
+template <typename T>
+T& BuiltinVariant::ValueT<T>::getValue() {
+  return this->value;
+}
+
+template <typename T>
+const T& BuiltinVariant::ValueT<T>::getValue() const {
+  return this->value;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class A> ArrayDataType ArrayDataType::create() {
-  return ArrayDataType::template create<typename
-    TypeTraits::FromArray<A>::ElementType,
-    TypeTraits::FromArray<A>::NumElements>();
-}
-
-template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
-  ArrayDataType dataType;
-  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplT<T, N>()));
+template <typename T> BuiltinVariant BuiltinVariant::create(const
+    DataType& type) {
+  BuiltinVariant variant;
   
-  return dataType;
+  variant.type = type;
+  variant.value.reset(new ValueT<T>());
+  
+  return variant;
 }
 
-template <typename T, size_t N>
-Serializer ArrayDataType::ImplT<T, N>::createSerializer(const DataType& type)
-    const {
-  return ArraySerializer::template create<T, N>();
-}
-
-template <typename T, size_t N>
-Variant ArrayDataType::ImplT<T, N>::createVariant(const DataType& type)
-    const {
-  return ArrayVariant::template create<T, N>(type, this->elementType);
+template <typename T>
+Variant::ValuePtr BuiltinVariant::ValueT<T>::clone() const {
+  return BuiltinVariant::ValuePtr(new ValueT<T>(*this));
 }
 
 }

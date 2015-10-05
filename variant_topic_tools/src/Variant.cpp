@@ -16,11 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/ArrayVariant.h"
+#include "variant_topic_tools/BuiltinVariant.h"
+#include "variant_topic_tools/CollectionVariant.h"
+#include "variant_topic_tools/MessageVariant.h"
 #include "variant_topic_tools/SharedVariant.h"
 #include "variant_topic_tools/Variant.h"
-#include "variant_topic_tools/VariantArray.h"
-#include "variant_topic_tools/VariantCollection.h"
-#include "variant_topic_tools/VariantMessage.h"
 
 namespace variant_topic_tools {
 
@@ -31,9 +32,8 @@ namespace variant_topic_tools {
 Variant::Variant() {
 }
 
-Variant::Variant(const DataType& type, const ValuePtr& value) :
-  type(type),
-  value(value) {
+Variant::Variant(const DataType& type) :
+  type(type) {
 }
 
 Variant::~Variant() {
@@ -59,21 +59,28 @@ bool Variant::hasType() const {
 
 bool Variant::isArray() const {
   if (value)
-    return boost::dynamic_pointer_cast<VariantArray::Value>(value);
+    return boost::dynamic_pointer_cast<ArrayVariant::Value>(value);
+  else
+    return false;
+}
+
+bool Variant::isBuiltin() const {
+  if (value)
+    return boost::dynamic_pointer_cast<BuiltinVariant::Value>(value);
   else
     return false;
 }
 
 bool Variant::isCollection() const {
   if (value)
-    return boost::dynamic_pointer_cast<VariantCollection::Value>(value);
+    return boost::dynamic_pointer_cast<CollectionVariant::Value>(value);
   else
     return false;
 }
 
 bool Variant::isMessage() const {
   if (value)
-    return boost::dynamic_pointer_cast<VariantMessage::Value>(value);
+    return boost::dynamic_pointer_cast<MessageVariant::Value>(value);
   else
     return false;
 }
@@ -86,15 +93,19 @@ bool Variant::isEmpty() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-VariantArray Variant::asArray() const {
+ArrayVariant Variant::asArray() const {
   return SharedVariant(*this);
 }
 
-VariantCollection Variant::asCollection() const {
+BuiltinVariant Variant::asBuiltin() const {
   return SharedVariant(*this);
 }
 
-VariantMessage Variant::asMessage() const {
+CollectionVariant Variant::asCollection() const {
+  return SharedVariant(*this);
+}
+
+MessageVariant Variant::asMessage() const {
   return SharedVariant(*this);
 }
 

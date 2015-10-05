@@ -19,7 +19,7 @@
 #include <sstream>
 
 #include "variant_topic_tools/Exceptions.h"
-#include "variant_topic_tools/VariantCollection.h"
+#include "variant_topic_tools/CollectionVariant.h"
 
 namespace variant_topic_tools {
 
@@ -27,51 +27,51 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-VariantCollection::VariantCollection() {
+CollectionVariant::CollectionVariant() {
 }
 
-VariantCollection::VariantCollection(const DataType& type) :
+CollectionVariant::CollectionVariant(const DataType& type) :
   Variant(type) {
 }
 
-VariantCollection::VariantCollection(const VariantCollection& src) :
+CollectionVariant::CollectionVariant(const CollectionVariant& src) :
   Variant(src) {
 }
 
-VariantCollection::VariantCollection(const Variant& src) :
+CollectionVariant::CollectionVariant(const Variant& src) :
   Variant(src) {
   if (value)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
 }
 
-VariantCollection::~VariantCollection() {
+CollectionVariant::~CollectionVariant() {
 }
 
-VariantCollection::Value::Value() {
+CollectionVariant::Value::Value() {
 }
 
-VariantCollection::Value::~Value() {
+CollectionVariant::Value::~Value() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-size_t VariantCollection::getNumMembers() const {
+size_t CollectionVariant::getNumMembers() const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getNumMembers();
   else
     return 0;
 }
 
-void VariantCollection::setMember(size_t index, const Variant& member) {
+void CollectionVariant::setMember(size_t index, const Variant& member) {
   if (value)
     boost::dynamic_pointer_cast<Value>(value)->setMember(index, member);
   else
     throw NoSuchMemberException(index);
 }
 
-void VariantCollection::setMember(const std::string& name, const Variant&
+void CollectionVariant::setMember(const std::string& name, const Variant&
     member) {
   if (value)
     boost::dynamic_pointer_cast<Value>(value)->setMember(name, member, 0);
@@ -79,35 +79,35 @@ void VariantCollection::setMember(const std::string& name, const Variant&
     throw NoSuchMemberException(name);
 }
 
-SharedVariant VariantCollection::getMember(size_t index) const {
+SharedVariant CollectionVariant::getMember(size_t index) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getMember(index);
   else
     throw NoSuchMemberException(index);
 }
 
-SharedVariant VariantCollection::getMember(const std::string& name) const {
+SharedVariant CollectionVariant::getMember(const std::string& name) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getMember(name, 0);
   else
     throw NoSuchMemberException(name);
 }
 
-bool VariantCollection::hasMember(const std::string& name) const {
+bool CollectionVariant::hasMember(const std::string& name) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->hasMember(name, 0);
   else
     return false;
 }
 
-bool VariantCollection::isEmpty() const {
+bool CollectionVariant::isEmpty() const {
   if (value)
     return !boost::dynamic_pointer_cast<Value>(value)->getNumMembers();
   else
     return true;
 }
 
-void VariantCollection::Value::setMember(const std::string& name, const
+void CollectionVariant::Value::setMember(const std::string& name, const
     Variant& member, size_t pos) {
   pos = name.find_first_not_of('/', pos);
   
@@ -132,7 +132,7 @@ void VariantCollection::Value::setMember(const std::string& name, const
   throw NoSuchMemberException(name);
 }
 
-SharedVariant VariantCollection::Value::getMember(const std::string& name,
+SharedVariant CollectionVariant::Value::getMember(const std::string& name,
     size_t pos) const {
   pos = name.find_first_not_of('/', pos);
   
@@ -153,7 +153,7 @@ SharedVariant VariantCollection::Value::getMember(const std::string& name,
   throw NoSuchMemberException(name);
 }
 
-bool VariantCollection::Value::hasMember(const std::string& name, size_t pos)
+bool CollectionVariant::Value::hasMember(const std::string& name, size_t pos)
     const {
   pos = name.find_first_not_of('/', pos);
   
@@ -174,7 +174,7 @@ bool VariantCollection::Value::hasMember(const std::string& name, size_t pos)
   return false;
 }
 
-bool VariantCollection::Value::isEqual(const Variant::Value& value) const {
+bool CollectionVariant::Value::isEqual(const Variant::Value& value) const {
   const Value& collectionValue = dynamic_cast<const Value&>(value);
   
   if (getNumMembers() == collectionValue.getNumMembers()) {
@@ -192,11 +192,11 @@ bool VariantCollection::Value::isEqual(const Variant::Value& value) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void VariantCollection::Value::read(std::istream& stream) {
-  throw InvalidOperationException("Reading a variant collection");
+void CollectionVariant::Value::read(std::istream& stream) {
+  throw InvalidOperationException("Reading a collection variant");
 }
 
-void VariantCollection::Value::write(std::ostream& stream) const {
+void CollectionVariant::Value::write(std::ostream& stream) const {
   for (size_t i = 0; i < getNumMembers(); ++i) {
     if (i)
       stream << "\n";
@@ -208,11 +208,11 @@ void VariantCollection::Value::write(std::ostream& stream) const {
 /* Operators                                                                 */
 /*****************************************************************************/
 
-SharedVariant VariantCollection::operator[](size_t index) const {
+SharedVariant CollectionVariant::operator[](size_t index) const {
   return getMember(index);
 }
 
-SharedVariant VariantCollection::operator[](const std::string& name) const {
+SharedVariant CollectionVariant::operator[](const std::string& name) const {
   return getMember(name);
 }
 

@@ -108,11 +108,11 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
-      Serializer createSerializer() const;
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief Create a variant from this data type (re-implementation)
         */ 
-      Variant createVariant() const;
+      Variant createVariant(const DataType& type) const;
     };
     
     /** \brief Create a built-in data type

@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/BuiltinSerializer.h>
-#include <variant_topic_tools/Variant.h>
+#include <variant_topic_tools/BuiltinVariant.h>
 
 namespace variant_topic_tools {
 
@@ -60,20 +60,22 @@ bool BuiltinDataType::ImplT<T>::isFixedSize() const {
 
 template <typename T> BuiltinDataType BuiltinDataType::create(const
     std::string& identifier) {
-  BuiltinDataType builtinDataType;
-  builtinDataType.impl.reset(new DataType::ImplA(new ImplT<T>(identifier)));
+  BuiltinDataType dataType;
+  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(
+    new ImplT<T>(identifier)));
   
-  return builtinDataType;
+  return dataType;
 }
 
 template <typename T>
-Serializer BuiltinDataType::ImplT<T>::createSerializer() const {
+Serializer BuiltinDataType::ImplT<T>::createSerializer(const DataType& type)
+    const {
   return BuiltinSerializer::template create<T>();
 }
 
 template <typename T>
-Variant BuiltinDataType::ImplT<T>::createVariant() const {
-  return Variant(T());
+Variant BuiltinDataType::ImplT<T>::createVariant(const DataType& type) const {
+  return BuiltinVariant::template create<T>(type);
 }
 
 }

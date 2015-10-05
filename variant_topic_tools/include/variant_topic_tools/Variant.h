@@ -28,17 +28,13 @@
 #include <ros/ros.h>
 
 #include <variant_topic_tools/DataType.h>
-#include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Variant type
     */  
   class Variant {
-  friend class DataType;
+  friend class CollectionVariant;
   friend class SharedVariant;
-  friend class VariantArray;
-  friend class VariantCollection;
-  friend class VariantMessage;
   public:
     /** \brief Default constructor
       */ 
@@ -76,6 +72,10 @@ namespace variant_topic_tools {
       */ 
     bool isArray() const;
     
+    /** \brief True, if this variant represents a built-in
+      */ 
+    bool isBuiltin() const;
+    
     /** \brief True, if this variant represents a collection
       */ 
     bool isCollection() const;
@@ -89,17 +89,21 @@ namespace variant_topic_tools {
       */
     bool isEmpty() const;
 
-    /** \brief Retrieve this variant as variant array
+    /** \brief Retrieve this variant as array
       */ 
-    VariantArray asArray() const;
+    ArrayVariant asArray() const;
     
-    /** \brief Retrieve this variant as variant collection
+    /** \brief Retrieve this variant as builtin
       */ 
-    VariantCollection asCollection() const;
+    BuiltinVariant asBuiltin() const;
     
-    /** \brief Retrieve this variant as variant message
+    /** \brief Retrieve this variant as collection
       */ 
-    VariantMessage asMessage() const;
+    CollectionVariant asCollection() const;
+    
+    /** \brief Retrieve this variant as message
+      */ 
+    MessageVariant asMessage() const;
     
     /** \brief Clear the variant
       */
@@ -259,46 +263,6 @@ namespace variant_topic_tools {
       void write(std::ostream& stream) const;
     };
 
-    /** \brief Variant value (templated implementation)
-      */
-    template <typename T> class ValueImplT :
-      public ValueT<T> {
-    public:
-      /** \brief Default constructor
-        */ 
-      ValueImplT(const T& value = T());
-      
-      /** \brief Copy constructor
-        */ 
-      ValueImplT(const ValueT<T>& src);
-      
-      /** \brief Destructor
-        */ 
-      virtual ~ValueImplT();
-      
-      /** \brief Set the variant's value (implementation)
-        */
-      void setValue(const T& value);
-      
-      /** \brief Retrieve the variant's value (implementation of the
-        *   non-const version)
-        */
-      T& getValue();
-      
-      /** \brief Retrieve the variant's value (implementation of the
-        *   const version)
-        */
-      const T& getValue() const;
-      
-      /** \brief Clone this variant value (implementation)
-        */
-      ValuePtr clone() const;
-      
-      /** \brief The strong-typed value
-        */
-      T value;
-    };
-
     /** \brief The variant's data type
       */
     DataType type;
@@ -309,7 +273,7 @@ namespace variant_topic_tools {
     
     /** \brief Constructor (overloaded version taking a data type)
       */ 
-    Variant(const DataType& type, const ValuePtr& value = ValuePtr());
+    Variant(const DataType& type);
   };
   
   /** \brief Operator for reading the variant from a stream

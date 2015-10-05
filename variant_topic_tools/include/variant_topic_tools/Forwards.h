@@ -85,17 +85,21 @@ namespace variant_topic_tools {
     */
   typedef boost::weak_ptr<Variant> VariantWPtr;
   
-  /** \brief Forward declaration of the variant array
+  /** \brief Forward declaration of the array variant
     */
-  class VariantArray;
+  class ArrayVariant;
   
-  /** \brief Forward declaration of the variant collection
+  /** \brief Forward declaration of the built-in variant
     */
-  class VariantCollection;
+  class BuiltinVariant;
   
-  /** \brief Forward declaration of the variant message
+  /** \brief Forward declaration of the collection variant
     */
-  class VariantMessage;
+  class CollectionVariant;
+  
+  /** \brief Forward declaration of the message variant
+    */
+  class MessageVariant;
 };
 
 #endif

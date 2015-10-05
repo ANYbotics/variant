@@ -35,7 +35,7 @@ namespace variant_topic_tools {
     public DataType {
   friend class DataType;
   friend class DataTypeRegistry;
-  friend class VariantMessage;
+  friend class MessageVariant;
   public:
     /** \brief Default constructor
       */ 
@@ -209,11 +209,11 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
-      Serializer createSerializer() const;
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief Create a variant from this data type (re-implementation)
         */ 
-      Variant createVariant() const;
+      Variant createVariant(const DataType& type) const;
       
       /** \brief Add a member to this message data type (implementation)
         */
@@ -278,11 +278,11 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
-      Serializer createSerializer() const;
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief Create a variant from this data type (re-implementation)
         */ 
-      Variant createVariant() const;
+      Variant createVariant(const DataType& type) const;
       
       /** \brief Add a member to this message data type (implementation)
         */

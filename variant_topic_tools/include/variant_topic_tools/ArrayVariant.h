@@ -16,46 +16,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file VariantArray.h
-  * \brief Header file providing the VariantArray class interface
+/** \file ArrayVariant.h
+  * \brief Header file providing the ArrayVariant class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_VARIANT_ARRAY_H
-#define VARIANT_TOPIC_TOOLS_VARIANT_ARRAY_H
+#ifndef VARIANT_TOPIC_TOOLS_ARRAY_VARIANT_H
+#define VARIANT_TOPIC_TOOLS_ARRAY_VARIANT_H
 
 #include <vector>
 
-#include <variant_topic_tools/VariantCollection.h>
+#include <variant_topic_tools/CollectionVariant.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant array type
+  /** \brief Array variant type
     */  
-  class VariantArray :
-    public VariantCollection {
+  class ArrayVariant :
+    public CollectionVariant {
   friend class ArrayDataType;
   friend class Variant;
   public:
     /** \brief Default constructor
       */ 
-    VariantArray();
+    ArrayVariant();
     
     /** \brief Copy constructor
       */ 
-    VariantArray(const VariantArray& src);
+    ArrayVariant(const ArrayVariant& src);
     
     /** \brief Copy constructor (overloaded version taking a variant)
       */ 
-    VariantArray(const Variant& src);
+    ArrayVariant(const Variant& src);
     
     /** \brief Destructor
       */ 
-    ~VariantArray();
+    ~ArrayVariant();
         
-    /** \brief True, if this variant array is a fixed size array
+    /** \brief True, if this array is a fixed size array
       */ 
     bool isFixedSize() const;
     
-    /** \brief Add a member to the variant array
+    /** \brief Add a member to the array
       * 
       * \note An attempt to adding a member to a fixed-size array will result
       *   in an exception being thrown. Further, the data type of the variant
@@ -63,23 +63,25 @@ namespace variant_topic_tools {
       */ 
     void addMember(const Variant& member);
   
-    /** \brief Resize the variant array
+    /** \brief Resize the array
       * 
       * \note An attempt to resizing a fixed-size array will result in an
       *   exception being thrown.
       */ 
     void resize(size_t numMembers);
     
-    /** \brief Clear the variant array
+    /** \brief Clear the array
       * 
       * \note An attempt to clearing a fixed-size array will result in an
       *   exception being thrown.
       */ 
     void clear();
     
-    /** \brief Operator for adding a member to the variant array
+    /** \brief Operator for adding a member to the array
       */ 
-    VariantArray& operator+=(const Variant& member);
+    ArrayVariant& operator+=(const Variant& member);
+    
+    using Variant::operator=;
     
   protected:
     /** \brief Type traits
@@ -102,10 +104,10 @@ namespace variant_topic_tools {
       };
     };
     
-    /** \brief Variant array value (abstract base)
+    /** \brief Array variant value (abstract base)
       */
     class Value :
-      public VariantCollection::Value {
+      public CollectionVariant::Value {
     public:
       /** \brief Default constructor
         */ 
@@ -120,16 +122,16 @@ namespace variant_topic_tools {
         */
       void setMember(const std::string& name, const Variant& member);
       
-      using VariantCollection::Value::setMember;
+      using CollectionVariant::Value::setMember;
       
       /** \brief Retrieve a member of the variant collection by name
         *   (implementation)
         */
       SharedVariant getMember(const std::string& name) const;
       
-      using VariantCollection::Value::getMember;
+      using CollectionVariant::Value::getMember;
       
-      /** \brief True, if the variant array is a fixed size array (abstract
+      /** \brief True, if the array is a fixed size array (abstract
         *   declaration)
         */ 
       virtual bool isFixedSize() const = 0;
@@ -144,20 +146,20 @@ namespace variant_topic_tools {
         */
       void writeMember(std::ostream& stream, size_t index) const;
       
-      /** \brief Add a member to the variant array (abstract declaration)
+      /** \brief Add a member to the array (abstract declaration)
         */ 
       virtual void addMember(const Variant& member) = 0;
   
-      /** \brief Resize the variant array (abstract declaration)
+      /** \brief Resize the array (abstract declaration)
         */ 
       virtual void resize(size_t numMembers) = 0;
       
-      /** \brief Clear the variant array (abstract declaration)
+      /** \brief Clear the array (abstract declaration)
         */ 
       virtual void clear() = 0;
     };
     
-    /** \brief Variant array value (variant-typed implementation)
+    /** \brief Array variant value (variant-typed implementation)
       */
     class ValueImplV :
       public Value {
@@ -190,20 +192,19 @@ namespace variant_topic_tools {
         */
       SharedVariant getMember(size_t index) const;
       
-      /** \brief True, if the variant array is a fixed size array
-        *   (implementation)
+      /** \brief True, if the array is a fixed size array (implementation)
         */ 
       bool isFixedSize() const;
       
-      /** \brief Add a member to the variant array (implementation)
+      /** \brief Add a member to the array (implementation)
         */ 
       void addMember(const Variant& member);
   
-      /** \brief Resize the variant array (implementation)
+      /** \brief Resize the array (implementation)
         */ 
       void resize(size_t numMembers);
       
-      /** \brief Clear the variant array (implementation)
+      /** \brief Clear the array (implementation)
         */ 
       void clear();
       
@@ -224,16 +225,16 @@ namespace variant_topic_tools {
       std::vector<Variant> members;
     };
     
-    /** \brief Variant array value (templated implementation)
+    /** \brief Array variant value (templated implementation)
       */
     template <typename T, size_t N> class ValueImplT :
-      public Variant::ValueT<typename VariantArray::TypeTraits::
+      public Variant::ValueT<typename ArrayVariant::TypeTraits::
         ToArray<T, N>::ArrayType>,
       public Value {
     public:
       /** \brief Declaration of the array type
         */ 
-      typedef typename VariantArray::TypeTraits::ToArray<T, N>::ArrayType
+      typedef typename ArrayVariant::TypeTraits::ToArray<T, N>::ArrayType
         ArrayType;
       
       /** \brief Declaration of the array pointer type
@@ -286,8 +287,7 @@ namespace variant_topic_tools {
         */
       SharedVariant getMember(size_t index) const;
       
-      /** \brief True, if the variant array is a fixed size array
-        *   (implementation)
+      /** \brief True, if the array is a fixed size array (implementation)
         */ 
       bool isFixedSize() const;
       
@@ -296,15 +296,15 @@ namespace variant_topic_tools {
         */
       bool isEqual(const Variant::Value& value) const;
       
-      /** \brief Add a member to the variant array (implementation)
+      /** \brief Add a member to the array (implementation)
         */ 
       void addMember(const Variant& member);
   
-      /** \brief Resize the variant array (implementation)
+      /** \brief Resize the array (implementation)
         */ 
       void resize(size_t numMembers);
       
-      /** \brief Clear the variant array (implementation)
+      /** \brief Clear the array (implementation)
         */ 
       void clear();
       
@@ -332,14 +332,16 @@ namespace variant_topic_tools {
     /** \brief Constructor (overloaded version taking an array data type
       *   and a size)
       */
-    VariantArray(const ArrayDataType& type, size_t numMembers);
+    ArrayVariant(const DataType& type, const DataType& memberType,
+      size_t numMembers);
     
-    /** \brief Create a variant array
+    /** \brief Create an array variant
       */ 
-    template <typename T, size_t N> static VariantArray create();
+    template <typename T, size_t N> static ArrayVariant create(const
+      DataType& type, const DataType& memberType);
   };
 };
 
-#include <variant_topic_tools/VariantArray.tpp>
+#include <variant_topic_tools/ArrayVariant.tpp>
 
 #endif

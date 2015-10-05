@@ -16,68 +16,73 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file VariantMessageMember.h
-  * \brief Header file providing the VariantMessageMember class interface
+/** \file BuiltinVariant.h
+  * \brief Header file providing the BuiltinVariant class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_VARIANT_MESSAGE_MEMBER_H
-#define VARIANT_TOPIC_TOOLS_VARIANT_MESSAGE_MEMBER_H
+#ifndef VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
+#define VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message member type
+  /** \brief Built-in variant type
     */  
-  class VariantMessageMember :
+  class BuiltinVariant :
     public Variant {
-  friend class VariantMessage;
+  friend class BuiltinDataType;
+  friend class Variant;
   public:
     /** \brief Default constructor
       */ 
-    VariantMessageMember();
+    BuiltinVariant();
     
     /** \brief Copy constructor
       */ 
-    VariantMessageMember(const VariantMessageMember& src);
+    BuiltinVariant(const BuiltinVariant& src);
     
     /** \brief Copy constructor (overloaded version taking a variant)
       */ 
-    VariantMessageMember(const Variant& src);
+    BuiltinVariant(const Variant& src);
     
     /** \brief Destructor
       */ 
-    ~VariantMessageMember();        
+    ~BuiltinVariant();
+
+    using Variant::operator=;
     
   protected:
-    /** \brief Variant message member value
+    /** \brief Built-in variant value (abstract base)
       */
-    template <typename T> class ValueImplT :
-      public Variant::ValueT<T> {
+    class Value :
+      public virtual Variant::Value {
     public:
-      /** \brief Declaration of the array type
-        */ 
-      typedef typename VariantMessageMember::TypeTraits::ToArray<T, N>::
-        ArrayType ArrayType;
-      
-      /** \brief Declaration of the array pointer type
-        */ 
-      typedef boost::shared_ptr<ArrayType> ArrayPtr;
-      
-      /** \brief Declaration of the array weak pointer type
-        */ 
-      typedef boost::weak_ptr<ArrayType> ArrayWPtr;
-      
       /** \brief Default constructor
         */ 
-      ValueImplT(const ArrayPtr& array, size_t index);
-      
-      /** \brief Copy constructor
-        */ 
-      ValueImplT(const ValueImplT<T, N>& src);
+      Value();
       
       /** \brief Destructor
         */ 
-      virtual ~ValueImplT();
+      virtual ~Value();
+    };
+    
+    /** \brief Built-in variant value (templated implementation)
+      */
+    template <typename T> class ValueT :
+      public Variant::ValueT<T>,
+      public Value {
+    public:
+      /** \brief Default constructor
+        */ 
+      ValueT(const T& value = T());
+      
+      /** \brief Copy constructor
+        */ 
+      ValueT(const ValueT<T>& src);
+      
+      /** \brief Destructor
+        */ 
+      virtual ~ValueT();
       
       /** \brief Set the variant's value (implementation)
         */
@@ -97,23 +102,17 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
-      /** \brief The variant array holding this array member
+      /** \brief The strong-typed value
         */
-      ArrayWPtr array;
-      
-      /** \brief The index of the array member value
-        */
-      size_t index;
+      T value;
     };
     
-    /** \brief Create a variant array member
+    /** \brief Create a built-in variant
       */ 
-    template <typename T, size_t N> static VariantMessageMember create(const
-      DataType& type, const typename VariantMessageMember::ValueImplT<T, N>::
-      ArrayPtr& array, size_t index);
+    template <typename T> static BuiltinVariant create(const DataType& type);
   };
 };
 
-#include <variant_topic_tools/VariantMessageMember.tpp>
+#include <variant_topic_tools/BuiltinVariant.tpp>
 
 #endif

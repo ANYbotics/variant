@@ -18,8 +18,8 @@
 
 #include "variant_topic_tools/ArrayDataType.h"
 #include "variant_topic_tools/ArraySerializer.h"
+#include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/Exceptions.h"
-#include "variant_topic_tools/VariantArray.h"
 
 namespace variant_topic_tools {
 
@@ -31,7 +31,8 @@ ArrayDataType::ArrayDataType() {
 }
 
 ArrayDataType::ArrayDataType(const DataType& elementType, size_t numElements) {
-  impl.reset(new DataType::ImplA(new ImplV(elementType, numElements)));
+  impl.reset(new boost::shared_ptr<DataType::Impl>(
+    new ImplV(elementType, numElements)));
 }
 
 ArrayDataType::ArrayDataType(const ArrayDataType& src) :
@@ -41,7 +42,7 @@ ArrayDataType::ArrayDataType(const ArrayDataType& src) :
 ArrayDataType::ArrayDataType(const DataType& src) :
   DataType(src) {
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(*impl));
 }
 
 ArrayDataType::~ArrayDataType() {
@@ -74,12 +75,12 @@ const DataType& ArrayDataType::getElementType() const {
     return elementType;
   }
   else
-    return boost::static_pointer_cast<Impl>(impl->adaptee)->elementType;
+    return boost::static_pointer_cast<Impl>(*impl)->elementType;
 }
 
 size_t ArrayDataType::getNumElements() const {
   if (impl)
-    return boost::static_pointer_cast<Impl>(impl->adaptee)->getNumElements();
+    return boost::static_pointer_cast<Impl>(*impl)->getNumElements();
   else
     return 0;
 }
@@ -109,15 +110,12 @@ size_t ArrayDataType::ImplV::getNumElements() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-Serializer ArrayDataType::ImplV::createSerializer() const {
+Serializer ArrayDataType::ImplV::createSerializer(const DataType& type) const {
   return ArraySerializer(elementType.createSerializer(), numElements);
 }
 
-Variant ArrayDataType::ImplV::createVariant() const {
-  ArrayDataType type(getIdentifier());
-  VariantArray variant(type, numElements);
-  
-  return static_cast<const Variant&>(variant);
+Variant ArrayDataType::ImplV::createVariant(const DataType& type) const {
+  return ArrayVariant(type, elementType, numElements);
 }
 
 /*****************************************************************************/
@@ -128,8 +126,7 @@ ArrayDataType& ArrayDataType::operator=(const DataType& src) {
   DataType::operator=(src);
   
   if (impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(
-      impl->adaptee));
+    BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl));
     
   return *this;
 }

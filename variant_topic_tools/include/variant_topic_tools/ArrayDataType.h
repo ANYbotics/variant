@@ -35,9 +35,9 @@ namespace variant_topic_tools {
   class ArrayDataType :
     public DataType {
   friend class ArraySerializer;
+  friend class ArrayVariant;
   friend class DataType;
   friend class DataTypeRegistry;
-  friend class VariantArray;
   public:
     /** \brief Default constructor
       */ 
@@ -166,11 +166,11 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
-      Serializer createSerializer() const;
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief Create a variant from this data type (re-implementation)
         */ 
-      Variant createVariant() const;
+      Variant createVariant(const DataType& type) const;
       
       /** \brief The number of elements of the array data type
         */
@@ -202,11 +202,11 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
-      Serializer createSerializer() const;
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief Create a variant from this data type (re-implementation)
         */ 
-      Variant createVariant() const;
+      Variant createVariant(const DataType& type) const;
     };
     
     /** \brief Constructor (overloaded version taking an element type

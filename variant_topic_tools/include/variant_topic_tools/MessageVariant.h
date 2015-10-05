@@ -16,45 +16,50 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-/** \file VariantMessage.h
-  * \brief Header file providing the VariantMessage class interface
+/** \file MessageVariant.h
+  * \brief Header file providing the MessageVariant class interface
   */
 
-#ifndef VARIANT_TOPIC_TOOLS_VARIANT_MESSAGE_H
-#define VARIANT_TOPIC_TOOLS_VARIANT_MESSAGE_H
+#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_VARIANT_H
+#define VARIANT_TOPIC_TOOLS_MESSAGE_VARIANT_H
+
+#include <vector>
 
 #include <variant_topic_tools/MessageFieldCollection.h>
-#include <variant_topic_tools/VariantCollection.h>
+#include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/CollectionVariant.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message type
+  /** \brief Message variant type
     */  
-  class VariantMessage :
-    public VariantCollection {
+  class MessageVariant :
+    public CollectionVariant {
   friend class MessageDataType;
   friend class Variant;
   public:
     /** \brief Default constructor
       */ 
-    VariantMessage();
+    MessageVariant();
     
     /** \brief Copy constructor
       */ 
-    VariantMessage(const VariantMessage& src);
+    MessageVariant(const MessageVariant& src);
     
     /** \brief Copy constructor (overloaded version taking a variant)
       */ 
-    VariantMessage(const Variant& src);
+    MessageVariant(const Variant& src);
     
     /** \brief Destructor
       */ 
-    ~VariantMessage();
+    ~MessageVariant();
         
+    using Variant::operator=;
+    
   protected:
-    /** \brief Variant message value (abstract base)
+    /** \brief Message variant value (abstract base)
       */
     class Value :
-      public VariantCollection::Value {
+      public CollectionVariant::Value {
     public:
       /** \brief Default constructor
         */ 
@@ -64,8 +69,8 @@ namespace variant_topic_tools {
         */ 
       virtual ~Value();
       
-      /** \brief Retrieve the name of the variant message member with the
-        *   specified index (abstract declaration)
+      /** \brief Retrieve the name of the message member with the specified
+        *   index (abstract declaration)
         */
       virtual const std::string& getMemberName(size_t index) const = 0;
       
@@ -75,15 +80,15 @@ namespace variant_topic_tools {
       void writeMember(std::ostream& stream, size_t index) const;
     };
     
-    /** \brief Variant message value (variant-typed implementation)
+    /** \brief Message variant value (variant-typed implementation)
       */
     class ValueImplV :
       public Value {
     public:
       /** \brief Default constructor
         */ 
-      ValueImplV(const MessageFieldCollection<Variant>& members =
-        MessageFieldCollection<Variant>());
+      ValueImplV(const std::vector<MessageMember>& members =
+        std::vector<MessageMember>());
       
       /** \brief Copy constructor
         */ 
@@ -118,8 +123,8 @@ namespace variant_topic_tools {
         */
       SharedVariant getMember(const std::string& name) const;
       
-      /** \brief Retrieve the name of the variant message member with the
-        *   specified index (implementation)
+      /** \brief Retrieve the name of the message member with the specified
+        *   index (implementation)
         */
       const std::string& getMemberName(size_t index) const;
       
@@ -137,7 +142,7 @@ namespace variant_topic_tools {
       MessageFieldCollection<Variant> members;
     };
     
-    /** \brief Variant message value (templated implementation)
+    /** \brief Message variant value (templated implementation)
       */
     template <typename T> class ValueImplT :
       public Variant::ValueT<T>,
@@ -153,9 +158,8 @@ namespace variant_topic_tools {
       
       /** \brief Default constructor
         */ 
-      ValueImplT(const MessageFieldCollection<std::pair<DataType, size_t> >
-        memberTypesAndOffsets = MessageFieldCollection<std::pair<DataType,
-        size_t> >(), const T& members = T());
+      ValueImplT(const std::vector<MessageMember>& members =
+        std::vector<MessageMember>());
       
       /** \brief Copy constructor
         */ 
@@ -204,8 +208,8 @@ namespace variant_topic_tools {
         */
       SharedVariant getMember(const std::string& name) const;
       
-      /** \brief Retrieve the name of the variant message member with the
-        *   specified index (implementation)
+      /** \brief Retrieve the name of the message member with the specified
+        *   index (implementation)
         */
       const std::string& getMemberName(size_t index) const;
       
@@ -233,8 +237,7 @@ namespace variant_topic_tools {
       
       /** \brief The message member types
         */
-      MessageFieldCollection<std::pair<DataType, size_t> >
-        memberTypesAndOffsets;
+      MessageFieldCollection<DataType> memberTypes;
       
       /** \brief The message members
         */
@@ -244,15 +247,16 @@ namespace variant_topic_tools {
     /** \brief Constructor (overloaded version taking a message data type
       *   and a message field collection)
       */ 
-    VariantMessage(const MessageDataType& type, const
-      MessageFieldCollection<Variant>& members);
+    MessageVariant(const DataType& type, const std::vector<MessageMember>&
+      members);
     
-    /** \brief Create a variant message
+    /** \brief Create a message variant
       */ 
-    template <typename T> static VariantMessage create();
+    template <typename T> static MessageVariant create(const DataType& type,
+      const std::vector<MessageMember>& members);
   };
 };
 
-#include <variant_topic_tools/VariantMessage.tpp>
+#include <variant_topic_tools/MessageVariant.tpp>
 
 #endif

@@ -21,9 +21,9 @@
 
 #include <variant_msgs/Test.h>
 
+#include <variant_topic_tools/ArrayVariant.h>
 #include <variant_topic_tools/DataTypeRegistry.h>
-#include <variant_topic_tools/VariantArray.h>
-#include <variant_topic_tools/VariantMessage.h>
+#include <variant_topic_tools/MessageVariant.h>
 
 using namespace variant_topic_tools;
 
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
   std::cout << m4[1] << "\n";
   std::cout << "\n";
 
-  VariantMessage v5 = MessageDefinition::create<variant_msgs::Test>().
+  MessageVariant v5 = MessageDefinition::create<variant_msgs::Test>().
     getMessageDataType().createVariant();
   v5["header/frame_id"] = std::string("map");
   v5["builtin_string"] = std::string("Test");

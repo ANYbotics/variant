@@ -38,20 +38,6 @@ template <typename T>
 Variant::ValueT<T>::~ValueT() {
 }
 
-template <typename T>
-Variant::ValueImplT<T>::ValueImplT(const T& value) :
-  value(value) {
-}
-
-template <typename T>
-Variant::ValueImplT<T>::ValueImplT(const ValueT<T>& src) :
-  value(src.getValue()) {
-}
-
-template <typename T>
-Variant::ValueImplT<T>::~ValueImplT() {
-}
-
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
@@ -60,16 +46,18 @@ template <typename T> void Variant::setValue(const T& value) {
   if (!this->type.isValid()) {
     this->type = DataType(typeid(T));
     
-    if (this->type.isValid())
-      this->value.reset(new ValueImplT<T>(value));
+    if (this->type.isValid()) {
+      this->value = this->type.createVariant().value;
+      boost::dynamic_pointer_cast<ValueT<T> >(this->value)->setValue(value);      
+    }
     else
       throw InvalidDataTypeException();
   }
   else if (typeid(T) == this->type.getTypeInfo()) {
-    if (this->value)
-      boost::dynamic_pointer_cast<ValueT<T> >(this->value)->setValue(value);
-    else
-      this->value.reset(new ValueImplT<T>(value));
+    if (!this->value)
+      this->value = this->type.createVariant().value;
+    
+    boost::dynamic_pointer_cast<ValueT<T> >(this->value)->setValue(value);      
   }
   else
     throw DataTypeMismatchException(type.getIdentifier(),
@@ -81,8 +69,7 @@ template <typename T> T& Variant::getValue() {
     this->type = DataType(typeid(T));
     
     if (this->type.isValid()) {
-      this->value.reset(new ValueImplT<T>());
-      
+      this->value = this->type.createVariant().value;
       return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
     }
     else
@@ -90,7 +77,7 @@ template <typename T> T& Variant::getValue() {
   }
   else if (typeid(T) == this->type.getTypeInfo()) {
     if (!this->value)
-      this->value.reset(new ValueImplT<T>());
+      this->value = this->type.createVariant().value;
     
     return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
   }
@@ -122,21 +109,6 @@ template <typename T>
 bool Variant::ValueT<T>::isEqual(const Value& value) const {
   return TypeTraits::isEqual(dynamic_cast<const ValueT<T>&>(value).getValue(),
     this->getValue());
-}
-
-template <typename T>
-void Variant::ValueImplT<T>::setValue(const T& value) {
-  this->value = value;
-}
-
-template <typename T>
-T& Variant::ValueImplT<T>::getValue() {
-  return this->value;
-}
-
-template <typename T>
-const T& Variant::ValueImplT<T>::getValue() const {
-  return this->value;
 }
 
 /*****************************************************************************/
@@ -227,11 +199,6 @@ void Variant::ValueT<T>::read(std::istream& stream) {
 template <typename T>
 void Variant::ValueT<T>::write(std::ostream& stream) const {
   TypeTraits::write(stream, this->getValue());
-}
-
-template <typename T>
-Variant::ValuePtr Variant::ValueImplT<T>::clone() const {
-  return Variant::ValuePtr(new ValueImplT<T>(*this));
 }
 
 /*****************************************************************************/

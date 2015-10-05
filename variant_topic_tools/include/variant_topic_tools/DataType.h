@@ -166,36 +166,6 @@ namespace variant_topic_tools {
     };
     
   protected:
-    /** \brief Forward declaration of the data type implementation
-      */
-    class Impl;
-    
-    /** \brief Declaration of the data type implementation pointer type
-      */
-    typedef boost::shared_ptr<Impl> ImplPtr;
-    
-    /** \brief Declaration of the data type implementation weak pointer
-      *   type
-      */
-    typedef boost::weak_ptr<Impl> ImplWPtr;
-    
-    /** \brief Data type implementation adapter
-      */
-    class ImplA {
-    public:
-      /** \brief Constructor
-        */
-      ImplA(Impl* adaptee);
-      
-      /** \brief Destructor
-        */
-      ~ImplA();
-    
-      /** \brief The data type implementation adaptee
-        */
-      ImplPtr adaptee;
-    };
-      
     /** \brief Data type implementation
       */
     class Impl {
@@ -229,26 +199,29 @@ namespace variant_topic_tools {
       
       /** \brief Create a serializer for this data type (abstract declaration)
         */ 
-      virtual Serializer createSerializer() const;
+      virtual Serializer createSerializer(const DataType& type) const = 0;
       
       /** \brief Create a variant from this data type (abstract declaration)
         */ 
-      virtual Variant createVariant() const;
+      virtual Variant createVariant(const DataType& type) const = 0;
     };
     
-    /** \brief Declaration of the data type implementation adapter
-      *   pointer type
+    /** \brief Declaration of the data type implementation pointer type
+      *
+      * \note This pointer uses two layers of indirection to allow for
+      *   updating the underlying implementation for all instances of
+      *   data type pointing to the same implementation.
       */
-    typedef boost::shared_ptr<ImplA> ImplAPtr;
+    typedef boost::shared_ptr<boost::shared_ptr<Impl> > ImplPtr;
     
-    /** \brief Declaration of the data type implementation adapter
-      *   weak pointer type
+    /** \brief Declaration of the data type implementation weak pointer
+      *   type
       */
-    typedef boost::weak_ptr<ImplA> ImplAWPtr;
+    typedef boost::shared_ptr<boost::weak_ptr<Impl> > ImplWPtr;
     
     /** \brief The data type's implementation adapter
       */
-    ImplAPtr impl;
+    ImplPtr impl;
   };
     
   /** \brief Operator for writing the data type to a stream

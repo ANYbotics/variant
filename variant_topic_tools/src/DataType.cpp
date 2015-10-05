@@ -61,14 +61,6 @@ DataType::DataType(const DataType& src) :
 DataType::~DataType() {
 }
 
-DataType::ImplA::ImplA(Impl* adaptee) :
-  adaptee(adaptee) {
-  BOOST_ASSERT(adaptee);
-}
-
-DataType::ImplA::~ImplA() {
-}
-
 DataType::Impl::Impl() {
 }
 
@@ -85,47 +77,47 @@ const std::string& DataType::getIdentifier() const {
     return identifier;
   }
   else
-    return impl->adaptee->getIdentifier();
+    return (*impl)->getIdentifier();
 }
 
 const std::type_info& DataType::getTypeInfo() const {
   if (impl)
-    return impl->adaptee->getTypeInfo();
+    return (*impl)->getTypeInfo();
   else
     return typeid(void);
 }
 
 size_t DataType::getSize() const {
   if (impl)
-    return impl->adaptee->getSize();
+    return (*impl)->getSize();
   else
     return 0;
 }
 
 bool DataType::isArray() const {
   if (impl)
-    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(impl->adaptee);
+    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl);
   else
     return false;
 }
 
 bool DataType::isBuiltin() const {
   if (impl)
-    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(impl->adaptee);
+    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl);
   else
     return false;
 }
 
 bool DataType::isMessage() const {
   if (impl)
-    return boost::dynamic_pointer_cast<MessageDataType::Impl>(impl->adaptee);
+    return boost::dynamic_pointer_cast<MessageDataType::Impl>(*impl);
   else
     return false;
 }
 
 bool DataType::isFixedSize() const {
   if (impl)
-    return impl->adaptee->isFixedSize();
+    return (*impl)->isFixedSize();
   else
     return true;
 }
@@ -136,7 +128,7 @@ bool DataType::isValid() const {
 
 bool DataType::hasTypeInfo() const {
   if (impl)
-    return (impl->adaptee->getTypeInfo() != typeid(void));
+    return ((*impl)->getTypeInfo() != typeid(void));
   else
     return false;
 }
@@ -155,30 +147,21 @@ void DataType::clear() {
 
 void DataType::write(std::ostream& stream) const {
   if (impl)
-    stream << impl->adaptee->getIdentifier();
+    stream << (*impl)->getIdentifier();
 }
 
 Serializer DataType::createSerializer() const {
   if (impl)
-    return impl->adaptee->createSerializer();
+    return (*impl)->createSerializer(*this);
   else
     return Serializer();
 }
 
 Variant DataType::createVariant() const {
   if (impl)
-    return impl->adaptee->createVariant();
+    return (*impl)->createVariant(*this);
   else
     return Variant();
-}
-
-Serializer DataType::Impl::createSerializer() const {
-  return Serializer(getIdentifier());
-}
-
-Variant DataType::Impl::createVariant() const {
-  DataType dataType(getIdentifier());
-  return Variant(dataType);
 }
 
 /*****************************************************************************/
@@ -186,8 +169,8 @@ Variant DataType::Impl::createVariant() const {
 /*****************************************************************************/
 
 DataType& DataType::operator=(const DataType& src) {
-  if (impl)
-    impl->adaptee = src.impl->adaptee;
+  if (impl && src.impl)
+    *impl = *src.impl;
   else
     impl = src.impl;
   

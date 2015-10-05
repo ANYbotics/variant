@@ -18,7 +18,7 @@
 
 #include <variant_topic_tools/Exceptions.h>
 #include "variant_topic_tools/MessageSerializer.h"
-#include <variant_topic_tools/VariantMessage.h>
+#include <variant_topic_tools/MessageVariant.h>
 
 namespace variant_topic_tools {
 
@@ -83,10 +83,10 @@ bool MessageDataType::ImplT<T>::isFixedSize() const {
 /*****************************************************************************/
 
 template <typename T> MessageDataType MessageDataType::create() {
-  MessageDataType messageDataType;
-  messageDataType.impl.reset(new DataType::ImplA(new ImplT<T>()));
+  MessageDataType dataType;
+  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>()));
   
-  return messageDataType;
+  return dataType;
 }
 
 template <typename T> MessageConstant MessageDataType::addConstant(const
@@ -100,13 +100,15 @@ template <typename T> MessageVariable MessageDataType::addVariable(const
 }
 
 template <typename T>
-Serializer MessageDataType::ImplT<T>::createSerializer() const {
+Serializer MessageDataType::ImplT<T>::createSerializer(const DataType& type)
+    const {
   return MessageSerializer::template create<T>();
 }
 
 template <typename T>
-Variant MessageDataType::ImplT<T>::createVariant() const {
-  return static_cast<const Variant&>(VariantMessage::template create<T>());
+Variant MessageDataType::ImplT<T>::createVariant(const DataType& type) const {
+  return static_cast<const Variant&>(MessageVariant::template create<T>(type,
+    this->members));
 }
 
 template <typename T>

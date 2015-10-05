@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/VariantArrayMember.h"
+#include "variant_topic_tools/BuiltinVariant.h"
 
 namespace variant_topic_tools {
 
@@ -24,20 +24,26 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-VariantArrayMember::VariantArrayMember() {
+BuiltinVariant::BuiltinVariant() {
 }
 
-VariantArrayMember::VariantArrayMember(const VariantArrayMember& src) :
+BuiltinVariant::BuiltinVariant(const BuiltinVariant& src) :
   Variant(src) {
 }
 
-VariantArrayMember::VariantArrayMember(const Variant& src) :
+BuiltinVariant::BuiltinVariant(const Variant& src) :
   Variant(src) {
   if (value)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
 }
 
-VariantArrayMember::~VariantArrayMember() {
+BuiltinVariant::~BuiltinVariant() {
+}
+
+BuiltinVariant::Value::Value() {
+}
+
+BuiltinVariant::Value::~Value() {
 }
 
 }

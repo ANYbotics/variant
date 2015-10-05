@@ -30,7 +30,7 @@ namespace variant_topic_tools {
     */  
   class VariantArrayMember :
     public Variant {
-  friend class VariantArray;
+  friend class ArrayVariant;
   public:
     /** \brief Default constructor
       */ 
