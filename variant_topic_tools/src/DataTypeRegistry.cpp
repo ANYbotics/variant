@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/BuiltinDataType.h"
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
@@ -159,7 +158,7 @@ void DataTypeRegistry::addDataType(const DataType& dataType) {
         std::make_pair(&dataType.getTypeInfo(), dataType));
     }
     else
-      throw AmbiguousDataTypeIdentifierException(it->first);    
+      throw AmbiguousDataTypeIdentifierException(it->first);
   }
   else
     throw InvalidDataTypeException();

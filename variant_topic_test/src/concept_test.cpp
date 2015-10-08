@@ -120,13 +120,13 @@ int main(int argc, char **argv) {
   v5["builtin_int_array/0"] = 0;
   v5["builtin_int_array/1"] = 1;
   v5["builtin_int_array/2"] = 2;
-//   v5.setMember<std::string>("string_array/0", "Test0");
-//   v5.setMember<std::string>("string_array/1", "Test1");
-//   v5.setMember<std::string>("string_array/2", "Test2");
+  v5["string_array/0/data"] = std::string("Test0");
+  v5["string_array/1/data"] = std::string("Test1");
+  v5["string_array/2/data"] = std::string("Test2");
   v5["string_vector"].asArray().resize(3);
-// //   v5["string_vector/0"].getValue<std_msgs::String>().data = "Test0";
-// //   v5["string_vector/1"].getValue<std_msgs::String>().data = "Test1";
-// //   v5["string_vector/2"].getValue<std_msgs::String>().data = "Test2";
+  v5["string_vector/0/data"] = std::string("Test0");
+  v5["string_vector/1/data"] = std::string("Test1");
+  v5["string_vector/2/data"] = std::string("Test2");
   
   std::cout << v5 << "\n";
   std::cout << v5.hasMember("header/frame_id") << "\n";

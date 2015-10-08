@@ -16,24 +16,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Exceptions.h>
+/** \file BuiltinTypeTraits.h
+  * \brief Header file providing the BuiltinTypeTraits class interface
+  */
+
+#ifndef VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
+#define VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
+
+#include <ros/ros.h>
 
 namespace variant_topic_tools {
+  /** \brief Array type traits
+    */
+  struct BuiltinTypeTraits {
+    template <typename T, size_t D = 0> struct ToBuiltin {
+      typedef T BuiltinType;
+    };
+    
+    template <size_t D> struct ToBuiltin<bool, D> {
+      typedef uint8_t BuiltinType;
+    };
+  };
+};
 
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <class M> void MessageDefinition::setMessageType() {
-  this->setMessageType(MessageType::template create<M>());
-}
-
-/*****************************************************************************/
-/* Methods                                                                   */
-/*****************************************************************************/
-
-template <class M> MessageDefinition MessageDefinition::create() {
-  return MessageDefinition(MessageType::template create<M>());
-}
-
-}
+#endif

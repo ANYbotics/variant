@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 
+#include <variant_topic_tools/Pointer.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
@@ -68,21 +69,25 @@ namespace variant_topic_tools {
     
     /** \brief Built-in variant value (templated implementation)
       */
-    template <typename T> class ValueT :
+    template <typename T> class ValueImplT :
       public Variant::ValueT<T>,
       public Value {
     public:
       /** \brief Default constructor
         */ 
-      ValueT(const T& value = T());
+      ValueImplT(const Pointer<T>& value = Pointer<T>());
       
       /** \brief Copy constructor
         */ 
-      ValueT(const ValueT<T>& src);
+      ValueImplT(const ValueImplT<T>& src);
       
       /** \brief Destructor
         */ 
-      virtual ~ValueT();
+      virtual ~ValueImplT();
+      
+      /** \brief Set the variant's value pointer (implementation)
+        */
+      void set(const Pointer<T>& value);
       
       /** \brief Set the variant's value (implementation)
         */
@@ -104,12 +109,13 @@ namespace variant_topic_tools {
       
       /** \brief The strong-typed value
         */
-      T value;
+      Pointer<T> value;
     };
     
     /** \brief Create a built-in variant
       */ 
-    template <typename T> static BuiltinVariant create(const DataType& type);
+    template <typename T> static BuiltinVariant create(const DataType& type,
+      const Pointer<T>& value = Pointer<T>());
   };
 };
 

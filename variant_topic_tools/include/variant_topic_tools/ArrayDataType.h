@@ -68,42 +68,6 @@ namespace variant_topic_tools {
     ArrayDataType& operator=(const DataType& src);
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <class A> struct IsArray :
-        public boost::false_type {
-      };
-      
-      template <typename T> struct IsArray<std::vector<T> > :
-        public boost::true_type {
-      };
-      
-      template <typename T, size_t N> struct IsArray<boost::array<T, N> > :
-        public boost::true_type {
-      };
-      
-      template <class A> struct FromArray;
-      
-      template <typename T> struct FromArray<std::vector<T> > {
-        typedef T ElementType;
-        static const size_t NumElements = 0;
-      };
-      
-      template <typename T, size_t N> struct FromArray<boost::array<T, N> > {
-        typedef T ElementType;
-        static const size_t NumElements = N;
-      };
-      
-      template <typename T, size_t N> struct ToArray {
-        typedef boost::array<T, N> ArrayType;
-      };
-      
-      template <typename T> struct ToArray<T, 0> {
-        typedef std::vector<T> ArrayType;
-      };
-    };
-    
     /** \brief Array data type implementation
       */
     class Impl :

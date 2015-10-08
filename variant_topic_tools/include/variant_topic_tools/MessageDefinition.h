@@ -29,8 +29,8 @@
 
 #include <ros/ros.h>
 
+#include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/Forwards.h>
-#include <variant_topic_tools/MessageDataType.h>
 #include <variant_topic_tools/MessageField.h>
 #include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageType.h>
@@ -80,7 +80,7 @@ namespace variant_topic_tools {
     /** \brief Retrieve the message data type represented by this message
       *   definition
       */ 
-    const MessageDataType& getMessageDataType() const;
+    MessageDataType getMessageDataType() const;
     
     /** \brief True, if this message definition is valid
       */ 
@@ -106,7 +106,7 @@ namespace variant_topic_tools {
   protected:
     /** \brief The message data type represented by this message definition
       */ 
-    MessageDataType messageDataType;
+    DataType messageDataType;
     
     /** \brief Recursively fill the fields of the message definition
       */

@@ -38,17 +38,6 @@ namespace variant_topic_tools {
   friend class DataTypeRegistry;
   friend class Serializer;
   public:
-    /** \brief Data type hash
-      */
-    class Hash {
-    public:
-      /** \brief Data type hash operator
-        */
-      inline size_t operator()(const DataType& dataType) const {
-        return reinterpret_cast<size_t>(dataType.impl.get());
-      };
-    };
-
     /** \brief Default constructor
       */ 
     DataType();
@@ -156,13 +145,15 @@ namespace variant_topic_tools {
     /** \brief Equality comparison operator
       */
     inline bool operator==(const DataType& dataType) const {
-      return (impl == dataType.impl);
+      return (impl && dataType.impl) ? (*impl == *dataType.impl) :
+        (impl == dataType.impl);
     };
     
     /** \brief Inequality comparison operator
       */
     inline bool operator!=(const DataType& dataType) const {
-      return (impl != dataType.impl);
+      return (impl && dataType.impl) ? (*impl != *dataType.impl) :
+        (impl != dataType.impl);
     };
     
   protected:

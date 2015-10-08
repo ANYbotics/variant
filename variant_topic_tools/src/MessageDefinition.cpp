@@ -21,6 +21,7 @@
 
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinition.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
 
@@ -83,7 +84,7 @@ void MessageDefinition::setMessageDataType(const MessageDataType&
   setMessageType(messageDataType);
 }
 
-const MessageDataType& MessageDefinition::getMessageDataType() const {
+MessageDataType MessageDefinition::getMessageDataType() const {
   return messageDataType;
 }
 
@@ -121,7 +122,7 @@ void MessageDefinition::fill(const MessageDataType& currentDataType,
 }
 
 void MessageDefinition::write(std::ostream& stream) const {
-  stream << messageDataType.getDefinition();
+  stream << MessageDataType(messageDataType).getDefinition();
 }
 
 /*****************************************************************************/

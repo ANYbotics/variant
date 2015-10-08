@@ -206,4 +206,10 @@ bool MessageDefinitionParser::matchArray(const std::string& expression,
     return false;
 }
 
+bool MessageDefinitionParser::matchSeparator(const std::string& expression) {
+  boost::smatch match;
+  
+  return boost::regex_match(expression, match, separatorExpression);
+}
+
 }

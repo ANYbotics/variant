@@ -26,10 +26,12 @@
 #include <typeinfo>
 
 #include <boost/unordered_map.hpp>
+#include <boost/type_traits.hpp>
 
-#include <variant_topic_tools/ArrayDataType.h>
-#include <variant_topic_tools/BuiltinDataType.h>
-#include <variant_topic_tools/MessageDataType.h>
+#include <variant_topic_tools/ArrayTypeTraits.h>
+#include <variant_topic_tools/DataType.h>
+#include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/TypeInfoHash.h>
 
 namespace variant_topic_tools {
@@ -159,24 +161,6 @@ namespace variant_topic_tools {
     void clear();
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename T, class Enable = void> struct DataTypeConstructor {
-        static DataType create();
-      };
-        
-      template <typename T> struct DataTypeConstructor<T, typename
-          boost::enable_if<ArrayDataType::TypeTraits::IsArray<T> >::type> {
-        static ArrayDataType create();
-      };
-      
-      template <typename T> struct DataTypeConstructor<T, typename
-          boost::enable_if<MessageDataType::TypeTraits::IsMessage<T> >::type> {
-        static MessageDataType create();
-      };      
-    };
-    
     /** \brief Data type implementation
       */
     class Impl {
@@ -212,8 +196,29 @@ namespace variant_topic_tools {
     /** \brief The data type registry's implementation
       */
     static ImplPtr impl;
+    
+    /** \brief Create a data type (overloaded version creating an array
+      *   data type)
+      */
+    template <typename T> static ArrayDataType create(typename boost::
+      enable_if<ArrayTypeTraits::IsArray<T> >::type* = 0);
+    
+    /** \brief Create a data type (overloaded version creating a message
+      *   data type)
+      */
+    template <typename T> static MessageDataType create(typename boost::
+      enable_if<MessageTypeTraits::IsMessage<T> >::type* = 0);
+      
+    /** \brief Create a data type (overloaded version creating an invalid
+      *   data type)
+      */
+    template <typename T> static DataType create(typename boost::
+      disable_if<boost::type_traits::ice_or<ArrayTypeTraits::IsArray<T>::
+      value, MessageTypeTraits::IsMessage<T>::value> >::type* = 0);
   };
     
+  /** \brief Operator for writing the data type registry to a stream
+    */
   std::ostream& operator<<(std::ostream& stream, const DataTypeRegistry&
     dataTypeRegistry);
 };

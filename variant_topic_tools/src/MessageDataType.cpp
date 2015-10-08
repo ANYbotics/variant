@@ -81,7 +81,7 @@ MessageDataType::Impl::Impl(const std::string& definition) {
         memberType = "std_msgs/Header";
       
       if (registry.getDataType(memberType).isValid()) {
-        MessageVariable member(memberName, memberType);
+        MessageVariable member(memberName, memberType, 0);
         members.push_back(member);
       }
       else
@@ -96,6 +96,8 @@ MessageDataType::Impl::Impl(const std::string& definition) {
       else
         throw NoSuchDataTypeException(memberType);
     }
+    else if (MessageDefinitionParser::matchSeparator(line))
+      break;
   }
 }
 
@@ -219,7 +221,7 @@ MessageConstant MessageDataType::addConstant(const std::string& name, const
 
 MessageVariable MessageDataType::addVariable(const std::string& name, const
     DataType& type) {
-  MessageVariable variable(name, type);
+  MessageVariable variable(name, type, 0);
   addMember(variable);
   
   return variable;

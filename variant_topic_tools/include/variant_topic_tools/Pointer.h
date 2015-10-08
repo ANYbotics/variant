@@ -48,6 +48,10 @@ namespace variant_topic_tools {
       */
     T* get() const;
       
+    /** \brief Reset this pointer
+      */
+    void reset();
+      
     /** \brief Reference operator
       */
     T& operator*() const;

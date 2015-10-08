@@ -108,14 +108,6 @@ namespace variant_topic_tools {
     const MessageMember& operator[](size_t index) const;
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename T> struct IsMessage :
-        public ros::message_traits::IsMessage<T> {
-      };
-    };
-    
     /** \brief Message data type implementation
       */
     class Impl :

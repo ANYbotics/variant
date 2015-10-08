@@ -16,24 +16,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Exceptions.h>
+/** \file MessageFieldTypeTraits.h
+  * \brief Header file providing the MessageFieldTypeTraits class interface
+  */
+
+#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_TYPE_TRAITS_H
+#define VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_TYPE_TRAITS_H
 
 namespace variant_topic_tools {
+  /** \brief Message field type traits
+    */
+  struct MessageFieldTypeTraits {
+    template <typename U> struct HasIsValid {
+      template <typename V, bool (V::*)() const> struct Test {};
+      
+      template <typename V> static char test(Test<V, &V::isValid>*);
+      template <typename V> static int test(...);
+      
+      static const bool value = sizeof(test<U>(0)) == sizeof(char);
+    };
+  };
+};
 
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <class M> void MessageDefinition::setMessageType() {
-  this->setMessageType(MessageType::template create<M>());
-}
-
-/*****************************************************************************/
-/* Methods                                                                   */
-/*****************************************************************************/
-
-template <class M> MessageDefinition MessageDefinition::create() {
-  return MessageDefinition(MessageType::template create<M>());
-}
-
-}
+#endif

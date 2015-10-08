@@ -78,17 +78,6 @@ namespace variant_topic_tools {
     };
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename T> static void advance(ros::serialization::IStream&
-        stream, typename boost::enable_if<ros::message_traits::IsFixedSize<
-        T> >::type* = 0);
-      template <typename T> static void advance(ros::serialization::IStream&
-        stream, typename boost::disable_if<ros::message_traits::IsFixedSize<
-        T> >::type* = 0);
-    };
-    
     /** \brief Serializer implementation
       */
     class Impl {
@@ -128,6 +117,20 @@ namespace variant_topic_tools {
     /** \brief The serializer's implementation
       */
     ImplPtr impl;
+    
+    /** \brief Advance an input stream by the length of a serialized
+      *   value (overloaded version taking a fixed-size message)
+      */ 
+    template <typename T> static void advance(ros::serialization::IStream&
+      stream, typename boost::enable_if<ros::message_traits::IsFixedSize<
+      T> >::type* = 0);
+    
+    /** \brief Advance an input stream by the length of a serialized
+      *   value (overloaded version taking a non-fixed-size message)
+      */ 
+    template <typename T> static void advance(ros::serialization::IStream&
+      stream, typename boost::disable_if<ros::message_traits::IsFixedSize<
+      T> >::type* = 0);
   };
 };
 

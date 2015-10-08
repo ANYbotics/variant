@@ -20,6 +20,7 @@
 
 #include <variant_msgs/Test.h>
 
+#include <variant_topic_tools/DataTypeRegistry.h>
 #include <variant_topic_tools/MessageStream.h>
 
 using namespace variant_topic_tools;
@@ -41,9 +42,9 @@ TEST(MessageStream, Output) {
   EXPECT_EQ(registry.getDataType<int32_t>(),
     s1.getMemberTypes()[1]);
   EXPECT_EQ(offsetof(variant_msgs::Test, builtin_string),
-    s1.getMemberOffsets()[2]);
+    s1.getMemberOffsets()[4]);
   EXPECT_EQ(registry.getDataType<std::string>(),
-    s1.getMemberTypes()[2]);
+    s1.getMemberTypes()[4]);
   
   registry.clear();
 }

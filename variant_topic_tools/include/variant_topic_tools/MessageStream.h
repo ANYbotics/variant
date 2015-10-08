@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
 
+#include <typeinfo>
 #include <vector>
 
 #include <variant_topic_tools/DataType.h>

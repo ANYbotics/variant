@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/DataTypeRegistry.h>
 #include "variant_topic_tools/MessageStream.h"
 
 namespace variant_topic_tools {

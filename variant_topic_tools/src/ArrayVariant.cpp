@@ -32,7 +32,8 @@ ArrayVariant::ArrayVariant() {
 ArrayVariant::ArrayVariant(const DataType& type, const DataType& memberType,
     size_t numMembers) :
   CollectionVariant(type) {
-  value.reset(new ValueImplV(memberType, numMembers));
+  if (type.isValid())
+    value.reset(new ValueImplV(memberType, numMembers));
 }
 
 ArrayVariant::ArrayVariant(const ArrayVariant& src) :

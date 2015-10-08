@@ -73,6 +73,13 @@ size_t MessageMember::getSize() const {
     return 0;
 }
 
+size_t MessageMember::getOffset() const {
+  if (impl)
+    return impl->getOffset();
+  else
+    return 0;
+}
+
 bool MessageMember::isVariable() const {
   if (impl)
     return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl);

@@ -59,7 +59,7 @@ void MessageSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
 template <typename T>
 void MessageSerializer::ImplT<T>::advance(ros::serialization::IStream&
     stream) {
-  Serializer::TypeTraits::template advance<T>(stream);
+  Serializer::template advance<T>(stream);
 }
 
 }

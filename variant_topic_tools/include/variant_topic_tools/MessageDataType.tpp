@@ -17,7 +17,9 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/Exceptions.h>
-#include "variant_topic_tools/MessageSerializer.h"
+#include <variant_topic_tools/MessageDefinition.h>
+#include <variant_topic_tools/MessageSerializer.h>
+#include <variant_topic_tools/MessageStream.h>
 #include <variant_topic_tools/MessageVariant.h>
 
 namespace variant_topic_tools {
@@ -30,6 +32,26 @@ template <typename T>
 MessageDataType::ImplT<T>::ImplT() :
   Impl(ros::message_traits::template definition<T>()) {
   BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
+  
+  T message;
+  MessageStream stream(message);
+  
+  ros::serialization::serialize(stream, message);
+  
+  const std::vector<size_t>& memberOffsets = stream.getMemberOffsets();
+  const std::vector<DataType>& memberTypes = stream.getMemberTypes();
+
+  BOOST_ASSERT(memberTypes.size() <= this->members.size());
+  for (size_t i = 0, j = 0; i < memberOffsets.size(); ++i, ++j) {
+    while (this->members[j].isConstant())
+      ++j;
+      
+    if (memberTypes[i] != this->members[j].getType())
+      ROS_INFO_STREAM("MISMATCH " << memberTypes[i] << " " << this->members[j].getType());
+//     BOOST_ASSERT(memberTypes[i] == this->members[j].getType());
+//     boost::static_pointer_cast<MessageVariable::Impl>(
+//       this->members[j].impl)->offset = memberOffsets[i];
+  }
 }
 
 template <typename T>
@@ -83,7 +105,9 @@ bool MessageDataType::ImplT<T>::isFixedSize() const {
 /*****************************************************************************/
 
 template <typename T> MessageDataType MessageDataType::create() {
+  MessageDefinition::template create<T>();
   MessageDataType dataType;
+  
   dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>()));
   
   return dataType;

@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include <boost/type_traits.hpp>
+
 #include <variant_topic_tools/CollectionVariant.h>
 
 namespace variant_topic_tools {
@@ -84,26 +86,6 @@ namespace variant_topic_tools {
     using Variant::operator=;
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename T, size_t N> struct ToArray {
-        typedef boost::array<T, N> ArrayType;
-        
-        static void add(ArrayType& array, const T& element);
-        static void resize(ArrayType& array, size_t numElements);
-        static void clear(ArrayType& array);
-      };
-      
-      template <typename T> struct ToArray<T, 0> {
-        typedef std::vector<T> ArrayType;
-        
-        static void add(ArrayType& array, const T& element);
-        static void resize(ArrayType& array, size_t numElements);
-        static void clear(ArrayType& array);
-      };
-    };
-    
     /** \brief Array variant value (abstract base)
       */
     class Value :
@@ -228,27 +210,18 @@ namespace variant_topic_tools {
     /** \brief Array variant value (templated implementation)
       */
     template <typename T, size_t N> class ValueImplT :
-      public Variant::ValueT<typename ArrayVariant::TypeTraits::
-        ToArray<T, N>::ArrayType>,
+      public Variant::ValueT<typename ArrayTypeTraits::ToArray<T, N>::
+        ArrayType>,
       public Value {
     public:
       /** \brief Declaration of the array type
         */ 
-      typedef typename ArrayVariant::TypeTraits::ToArray<T, N>::ArrayType
-        ArrayType;
+      typedef typename ArrayTypeTraits::ToArray<T, N>::ArrayType ArrayType;
       
-      /** \brief Declaration of the array pointer type
-        */ 
-      typedef boost::shared_ptr<ArrayType> ArrayPtr;
-      
-      /** \brief Declaration of the array weak pointer type
-        */ 
-      typedef boost::weak_ptr<ArrayType> ArrayWPtr;
-        
       /** \brief Default constructor
         */ 
-      ValueImplT(const DataType& memberType = DataType(), const ArrayType&
-        members = ArrayType());
+      ValueImplT(const DataType& memberType = DataType(), const
+        Pointer<ArrayType>& array = Pointer<ArrayType>());
       
       /** \brief Copy constructor
         */ 
@@ -257,6 +230,10 @@ namespace variant_topic_tools {
       /** \brief Destructor
         */ 
       virtual ~ValueImplT();
+      
+      /** \brief Set the variant's value pointer (implementation)
+        */
+      void set(const Pointer<ArrayType>& value);
       
       /** \brief Set the variant's value (implementation)
         */
@@ -324,9 +301,9 @@ namespace variant_topic_tools {
         */
       DataType memberType;
       
-      /** \brief The array members
+      /** \brief The strong-typed array
         */
-      ArrayPtr members;
+      mutable Pointer<ArrayType> array;
     };
     
     /** \brief Constructor (overloaded version taking an array data type
@@ -339,6 +316,66 @@ namespace variant_topic_tools {
       */ 
     template <typename T, size_t N> static ArrayVariant create(const
       DataType& type, const DataType& memberType);
+
+    /** \brief Initialize an array (overloaded version taking a
+      *   fixed-size array)
+      */ 
+    template <typename T, size_t N> static void initialize(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
+      disable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
+    
+    /** \brief Initialize an array (overloaded version taking a
+      *   non-fixed-size array)
+      */ 
+    template <typename T, size_t N> static void initialize(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
+      enable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
+    
+    /** \brief Add a member to an array (overloaded version taking a
+      *   fixed-size array)
+      */ 
+    template <typename T, size_t N> static void add(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, const T& element,
+      typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::
+      type* = 0);
+    
+    /** \brief Add a member to an array (overloaded version taking a
+      *   non-fixed-size array)
+      */ 
+    template <typename T, size_t N> static void add(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, const T& element,
+      typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::
+      type* = 0);
+    
+    /** \brief Resize an array (overloaded version taking a
+      *   fixed-size array)
+      */ 
+    template <typename T, size_t N> static void resize(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, size_t numElements,
+      typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::
+      type* = 0);
+    
+    /** \brief Resize an array (overloaded version taking a
+      *   non-fixed-size array)
+      */ 
+    template <typename T, size_t N> static void resize(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, size_t numElements,
+      typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::
+      type* = 0);
+    
+    /** \brief Clear an array (overloaded version taking a
+      *   fixed-size array)
+      */ 
+    template <typename T, size_t N> static void clear(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
+      disable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
+    
+    /** \brief Clear an array (overloaded version taking a
+      *   non-fixed-size array)
+      */ 
+    template <typename T, size_t N> static void clear(typename
+      ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
+      enable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
   };
 };
 

@@ -52,8 +52,18 @@ namespace variant_topic_tools {
     const DataType& getType() const;
     
     /** \brief Retrieve the size of this message member
+      * 
+      * \note For invalid and constant message members, the returned size
+      *   will be zero.
       */
     size_t getSize() const;
+    
+    /** \brief Retrieve the offset of this message member
+      * 
+      * \note For invalid and constant message members, the returned offset
+      *   will be zero.
+      */
+    size_t getOffset() const;
     
     /** \brief True, if this message member is a variable member
       */
@@ -104,6 +114,11 @@ namespace variant_topic_tools {
         *   declaration)
         */
       virtual size_t getSize() const = 0;
+      
+      /** \brief Retrieve the offset of this message member (abstract
+        *   declaration)
+        */
+      virtual size_t getOffset() const = 0;
       
       /** \brief True, if this message member represents a fixed-size
         *   message member, as opposed to a variable-size message member

@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/BuiltinDataType.h>
+#include <variant_topic_tools/BuiltinPointer.h>
 
 namespace variant_topic_tools {
 
@@ -25,17 +26,17 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-BuiltinVariant::ValueT<T>::ValueT(const T& value) :
+BuiltinVariant::ValueImplT<T>::ValueImplT(const Pointer<T>& value) :
   value(value) {
 }
 
 template <typename T>
-BuiltinVariant::ValueT<T>::ValueT(const ValueT<T>& src) :
-  value(src.getValue()) {
+BuiltinVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
+  value(src.value) {
 }
 
 template <typename T>
-BuiltinVariant::ValueT<T>::~ValueT() {
+BuiltinVariant::ValueImplT<T>::~ValueImplT() {
 }
 
 /*****************************************************************************/
@@ -43,18 +44,34 @@ BuiltinVariant::ValueT<T>::~ValueT() {
 /*****************************************************************************/
 
 template <typename T>
-void BuiltinVariant::ValueT<T>::setValue(const T& value) {
+void BuiltinVariant::ValueImplT<T>::set(const Pointer<T>& value) {
   this->value = value;
 }
 
 template <typename T>
-T& BuiltinVariant::ValueT<T>::getValue() {
-  return this->value;
+void BuiltinVariant::ValueImplT<T>::setValue(const T& value) {
+  if (!this->value)
+    this->value = BuiltinPointer<T>(new T());
+  
+  *this->value = value;
 }
 
 template <typename T>
-const T& BuiltinVariant::ValueT<T>::getValue() const {
-  return this->value;
+T& BuiltinVariant::ValueImplT<T>::getValue() {
+  if (!this->value)
+    this->value = BuiltinPointer<T>(new T());
+  
+  return *this->value;
+}
+
+template <typename T>
+const T& BuiltinVariant::ValueImplT<T>::getValue() const {
+  if (!this->value) {
+    static T value = T();
+    return value;
+  }
+  else
+    return *this->value;
 }
 
 /*****************************************************************************/
@@ -62,18 +79,18 @@ const T& BuiltinVariant::ValueT<T>::getValue() const {
 /*****************************************************************************/
 
 template <typename T> BuiltinVariant BuiltinVariant::create(const
-    DataType& type) {
-  BuiltinVariant variant;
+    DataType& type, const Pointer<T>& value) {
+  BuiltinVariant variant;  
   
   variant.type = type;
-  variant.value.reset(new ValueT<T>());
+  variant.value.reset(new ValueImplT<T>());
   
   return variant;
 }
 
 template <typename T>
-Variant::ValuePtr BuiltinVariant::ValueT<T>::clone() const {
-  return BuiltinVariant::ValuePtr(new ValueT<T>(*this));
+Variant::ValuePtr BuiltinVariant::ValueImplT<T>::clone() const {
+  return BuiltinVariant::ValuePtr(new ValueImplT<T>(*this));
 }
 
 }

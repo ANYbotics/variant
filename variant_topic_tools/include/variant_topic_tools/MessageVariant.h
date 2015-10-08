@@ -148,18 +148,11 @@ namespace variant_topic_tools {
       public Variant::ValueT<T>,
       public Value {
     public:
-      /** \brief Declaration of the message pointer type
-        */ 
-      typedef boost::shared_ptr<T> MessagePtr;
-      
-      /** \brief Declaration of the message weak pointer type
-        */ 
-      typedef boost::weak_ptr<T> MessageWPtr;
-      
       /** \brief Default constructor
         */ 
-      ValueImplT(const std::vector<MessageMember>& members =
-        std::vector<MessageMember>());
+      ValueImplT(const std::vector<MessageMember>&
+        members = std::vector<MessageMember>(), const Pointer<T>&
+        message = Pointer<T>());
       
       /** \brief Copy constructor
         */ 
@@ -168,6 +161,10 @@ namespace variant_topic_tools {
       /** \brief Destructor
         */ 
       virtual ~ValueImplT();
+      
+      /** \brief Set the variant's value pointer (implementation)
+        */
+      void set(const Pointer<T>& value);
       
       /** \brief Set the variant's value (implementation)
         */
@@ -235,13 +232,13 @@ namespace variant_topic_tools {
         */
       void write(std::ostream& stream) const;
       
-      /** \brief The message member types
-        */
-      MessageFieldCollection<DataType> memberTypes;
-      
       /** \brief The message members
         */
-      MessagePtr members;
+      MessageFieldCollection<MessageMember> members;
+      
+      /** \brief The strong-typed message
+        */
+      mutable Pointer<T> message;
     };
     
     /** \brief Constructor (overloaded version taking a message data type

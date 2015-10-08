@@ -27,7 +27,9 @@
 
 #include <ros/ros.h>
 
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/DataType.h>
+#include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Variant type
@@ -132,52 +134,6 @@ namespace variant_topic_tools {
     bool operator!=(const Variant& variant) const;
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename T> static void assign(Variant& dst, const T& src,
-        typename boost::enable_if<boost::is_base_of<Variant, T> >::type*
-        dummy = 0);
-      template <typename T> static void assign(Variant& dst, const T& src,
-        typename boost::disable_if<boost::is_base_of<Variant, T> >::type*
-        dummy = 0);
-      
-      template <typename T> static bool isEqual(const T& lhs, const T& rhs,
-        typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
-        dummy = 0);
-      template <typename T, size_t N> static bool isEqual(const
-        boost::array<T, N>& lhs, const boost::array<T, N>& rhs,
-        typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
-        dummy = 0);
-      template <typename T> static bool isEqual(const std::vector<T>& lhs,
-        const std::vector<T>& rhs, typename boost::enable_if<boost::
-        has_equal_to<T, T, bool> >::type* dummy = 0);
-      template <typename T> static bool isEqual(const T& lhs, const T& rhs,
-        typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
-        dummy = 0);
-      template <typename T, size_t N> static bool isEqual(const
-        boost::array<T, N>& lhs, const boost::array<T, N>& rhs,
-        typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
-        dummy = 0);
-      template <typename T> static bool isEqual(const std::vector<T>& lhs,
-        const std::vector<T>& rhs, typename boost::disable_if<boost::
-        has_equal_to<T, T, bool> >::type* dummy = 0);
-        
-      template <typename T> static void read(std::istream& stream, T& value,
-        typename boost::enable_if<boost::has_right_shift<std::istream, T&> >::
-        type* dummy = 0);
-      template <typename T> static void read(std::istream& stream, T& value,
-        typename boost::disable_if<boost::has_right_shift<std::istream, T&> >::
-        type* dummy = 0);
-      
-      template <typename T> static void write(std::ostream& stream, const T&
-        value, typename boost::enable_if<boost::has_left_shift<std::ostream,
-        const T&> >::type* dummy = 0);
-      template <typename T> static void write(std::ostream& stream, const T&
-        value, typename boost::disable_if<boost::has_left_shift<std::ostream,
-        const T&> >::type* dummy = 0);
-    };
-    
     /** \brief Forward declaration of the variant value type
       */
     class Value;
@@ -233,6 +189,10 @@ namespace variant_topic_tools {
         */ 
       virtual ~ValueT();
       
+      /** \brief Set the variant's value pointer (abstract declaration)
+        */
+      virtual void set(const Pointer<T>& value) = 0;
+      
       /** \brief Set the variant's value (abstract declaration)
         */
       virtual void setValue(const T& value) = 0;
@@ -272,6 +232,79 @@ namespace variant_topic_tools {
     /** \brief Constructor (overloaded version taking a data type)
       */ 
     Variant(const DataType& type);
+    
+    /** \brief Set a variant's value pointer
+      */
+    template <typename T> static void set(Variant& variant, const
+      Pointer<T>& value);
+    
+    /** \brief Assign a variant (overloaded version taking a variant)
+      */
+    template <typename T> static void assign(Variant& dst, const T& src,
+      typename boost::enable_if<boost::is_base_of<Variant, T> >::type* = 0);
+    
+    /** \brief Assign a variant (overloaded version taking a non-variant)
+      */
+    template <typename T> static void assign(Variant& dst, const T& src,
+      typename boost::disable_if<boost::is_base_of<Variant, T> >::type* = 0);
+    
+    /** \brief Compare the values of two variants (overloaded version
+      *   taking two comparable values)
+      */
+    template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+      typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type* = 0,
+      typename boost::disable_if<ArrayTypeTraits::IsArray<T> >::type* = 0);
+    
+    /** \brief Compare the values of two variants (overloaded version
+      *   taking two arrays with comparable elements)
+      */
+    template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+      typename boost::enable_if<boost::has_equal_to<typename ArrayTypeTraits::
+      FromArray<T>::ElementType, typename ArrayTypeTraits::FromArray<T>::
+      ElementType, bool> >::type* = 0);
+    
+    /** \brief Compare the values of two variants (overloaded version
+      *   taking two non-comparable values)
+      */
+    template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+      typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type* = 0,
+      typename boost::disable_if<ArrayTypeTraits::IsArray<T> >::type* = 0);
+    
+    /** \brief Compare the values of two variants (overloaded version
+      *   taking two arrays with non-comparable elements)
+      */
+    template <typename T> static bool isEqual(const T& lhs, const T& rhs,
+      typename boost::disable_if<boost::has_equal_to<typename ArrayTypeTraits::
+      FromArray<T>::ElementType, typename ArrayTypeTraits::FromArray<T>::
+      ElementType, bool> >::type* = 0);
+      
+    /** \brief Read a variant from a stream (overloaded version taking
+      *   a stream-readable value)
+      */
+    template <typename T> static void read(std::istream& stream, T& value,
+      typename boost::enable_if<boost::has_right_shift<std::istream, T&> >::
+      type* = 0);
+    
+    /** \brief Read a variant from a stream (overloaded version taking
+      *   a non-stream-readable value)
+      */
+    template <typename T> static void read(std::istream& stream, T& value,
+      typename boost::disable_if<boost::has_right_shift<std::istream, T&> >::
+      type* = 0);
+    
+    /** \brief Write a variant to a stream (overloaded version taking
+      *   a stream-writable value)
+      */
+    template <typename T> static void write(std::ostream& stream, const T&
+      value, typename boost::enable_if<boost::has_left_shift<std::ostream,
+      const T&> >::type* = 0);
+    
+    /** \brief Write a variant to a stream (overloaded version taking
+      *   a non-stream-writable value)
+      */
+    template <typename T> static void write(std::ostream& stream, const T&
+      value, typename boost::disable_if<boost::has_left_shift<std::ostream,
+      const T&> >::type* = 0);
   };
   
   /** \brief Operator for reading the variant from a stream

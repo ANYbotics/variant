@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArraySerializer.h"
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/ArrayVariant.h>
 
 namespace variant_topic_tools {
@@ -40,7 +41,7 @@ ArrayDataType::ImplT<T, N>::~ImplT() {
 
 template <typename T, size_t N>
 const std::type_info& ArrayDataType::ImplT<T, N>::getTypeInfo() const {
-  return typeid(typename ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType);
+  return typeid(typename ArrayTypeTraits::ToArray<T, N>::ArrayType);
 }
 
 template <typename T, size_t N>
@@ -54,12 +55,13 @@ size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
 
 template <class A> ArrayDataType ArrayDataType::create() {
   return ArrayDataType::template create<typename
-    TypeTraits::FromArray<A>::ElementType,
-    TypeTraits::FromArray<A>::NumElements>();
+    ArrayTypeTraits::FromArray<A>::ElementType,
+    ArrayTypeTraits::FromArray<A>::NumElements>();
 }
 
 template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
   ArrayDataType dataType;
+  
   dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(
     new ImplT<T, N>()));
   

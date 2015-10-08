@@ -16,7 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/MessageDefinition.h>
+#include <variant_topic_tools/ArrayDataType.h>
+#include <variant_topic_tools/BuiltinDataType.h>
+#include <variant_topic_tools/MessageDataType.h>
 
 namespace variant_topic_tools {
 
@@ -28,7 +30,7 @@ template <typename T> DataType DataTypeRegistry::getDataType() {
   DataType dataType(this->getDataType(typeid(T)));
   
   if (!dataType.isValid()) {
-    dataType = TypeTraits::DataTypeConstructor<T>::create();
+    dataType = DataTypeRegistry::template create<T>();
     
     if (dataType.isValid())
       this->addDataType(dataType);
@@ -76,25 +78,20 @@ template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
   return messageDataType;
 }
 
-template <typename T, class Enable>
-DataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, Enable>::
-    create() {
-  return DataType();
-}
-
-template <typename T>
-ArrayDataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, typename
-    boost::enable_if<ArrayDataType::TypeTraits::IsArray<T> >::type>::
-    create() {
+template <typename T> ArrayDataType DataTypeRegistry::create(typename
+    boost::enable_if<ArrayTypeTraits::IsArray<T> >::type*) {
   return ArrayDataType::template create<T>();
 }
 
-template <typename T>
-MessageDataType DataTypeRegistry::TypeTraits::DataTypeConstructor<T, typename
-    boost::enable_if<MessageDataType::TypeTraits::IsMessage<T> >::type>::
-    create() {
-  MessageDefinition::template create<T>();
+template <typename T> MessageDataType DataTypeRegistry::create(typename
+    boost::enable_if<MessageTypeTraits::IsMessage<T> >::type*) {
   return MessageDataType::template create<T>();
+}
+
+template <typename T> DataType DataTypeRegistry::create(typename boost::
+    disable_if<boost::type_traits::ice_or<ArrayTypeTraits::IsArray<T>::value,
+    MessageTypeTraits::IsMessage<T>::value> >::type*) {
+  return DataType();
 }
 
 }

@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/ArrayDataType.h>
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
@@ -48,21 +48,21 @@ template <typename T, size_t N>
 void ArraySerializer::ImplT<T, N>::serialize(ros::serialization::OStream&
     stream, const Variant& value) {
   ros::serialization::serialize(stream, value.template getValue<typename
-    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>());
+    ArrayTypeTraits::ToArray<T, N>::ArrayType>());
 }
 
 template <typename T, size_t N>
 void ArraySerializer::ImplT<T, N>::deserialize(ros::serialization::IStream&
     stream, Variant& value) {
   ros::serialization::deserialize(stream, value.template getValue<typename
-    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>());
+    ArrayTypeTraits::ToArray<T, N>::ArrayType>());
 }
 
 template <typename T, size_t N>
 void ArraySerializer::ImplT<T, N>::advance(ros::serialization::IStream&
     stream) {
-  Serializer::TypeTraits::template advance<typename
-    ArrayDataType::TypeTraits::ToArray<T, N>::ArrayType>(stream);
+  Serializer::template advance<typename ArrayTypeTraits::ToArray<T, N>::
+    ArrayType>(stream);
 }
 
 }

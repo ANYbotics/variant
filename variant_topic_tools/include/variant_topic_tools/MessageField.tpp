@@ -72,24 +72,12 @@ const T& MessageField<T>::getValue() const {
 
 template <typename T>
 bool MessageField<T>::isValid() const {
-  return TypeTraits::template isValid<T>(value);
+  return MessageField<T>::template isValid<T>(value);
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
-
-template <typename T>
-template <typename U> bool MessageField<T>::TypeTraits::isValid(const U&
-    value, typename boost::enable_if_c<HasIsValid<U>::value>::type*) {
-  return value.isValid();
-}
-
-template <typename T>
-template <typename U> bool MessageField<T>::TypeTraits::isValid(const U&
-    value, typename boost::disable_if_c<HasIsValid<U>::value>::type*) {
-  return true;
-}
 
 template <typename T>
 void MessageField<T>::clear() {
@@ -121,6 +109,18 @@ void MessageField<T>::write(std::ostream& stream, const std::string& indent)
     stream << "\n";
     MessageFieldCollection<T>::write(stream, indent+"  ");
   }
+}
+
+template <typename T>
+template <typename U> bool MessageField<T>::isValid(const U& value, typename
+    boost::enable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type*) {
+  return value.isValid();
+}
+
+template <typename T>
+template <typename U> bool MessageField<T>::isValid(const U& value, typename
+    boost::disable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type*) {
+  return true;
 }
 
 /*****************************************************************************/

@@ -69,6 +69,9 @@ TEST(Variant, Array) {
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_EQ(3, v1.getNumMembers());
+  EXPECT_NO_THROW(v1[0] = 0);
+  EXPECT_NO_THROW(v1[1] = 0);
+  EXPECT_NO_THROW(v1[2] = 0);
   EXPECT_NO_THROW(v1.resize(3));
   EXPECT_ANY_THROW(v1.resize(4));
   EXPECT_TRUE(v1[0].hasType());

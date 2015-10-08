@@ -58,7 +58,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      Impl(const std::string& name, const DataType& type);
+      Impl(const std::string& name, const DataType& type, size_t offset);
       
       /** \brief Destructor
         */
@@ -71,6 +71,10 @@ namespace variant_topic_tools {
       /** \brief Retrieve the size of this message member (implementation)
         */
       size_t getSize() const;
+      
+      /** \brief Retrieve the offset of this message member (implementation)
+        */
+      size_t getOffset() const;
       
       /** \brief True, if this message member represents a fixed-size
         *   message member, as opposed to a variable-size message member
@@ -85,16 +89,21 @@ namespace variant_topic_tools {
       /** \brief The data type of this message variable
         */
       DataType type;
+      
+      /** \brief The offset of this message variable
+        */
+      size_t offset;
     };
     
     /** \brief Constructor (overloaded version taking a name and a data type)
       */ 
-    MessageVariable(const std::string& name, const DataType& type);
+    MessageVariable(const std::string& name, const DataType& type, size_t
+      offset);
     
     /** \brief Create a message variable
       */ 
     template <typename T> static MessageVariable create(const std::string&
-      name);
+      name, size_t offset);
   };
 };
 

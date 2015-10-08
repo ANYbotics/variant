@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/BuiltinPointer.h>
+
 namespace variant_topic_tools {
 
 /*****************************************************************************/
@@ -24,7 +26,7 @@ namespace variant_topic_tools {
 
 template <class A, typename T>
 ArrayMemberPointer<A, T>::ArrayMemberPointer(A* array, size_t index) {
-  this->impl.reset(new Impl(ArrayPtr(array), index));
+  this->impl.reset(new Impl(BuiltinPointer<A>(array), index));
 }
 
 template <class A, typename T>

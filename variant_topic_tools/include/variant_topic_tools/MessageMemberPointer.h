@@ -33,7 +33,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Definition of the message pointer type
       */
-    typedef boost::shared_ptr<M> MessagePtr;
+    typedef Pointer<M> MessagePtr;
       
     /** \brief Default constructor
       */ 

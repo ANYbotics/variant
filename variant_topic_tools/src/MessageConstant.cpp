@@ -95,6 +95,10 @@ size_t MessageConstant::Impl::getSize() const {
   return 0;
 }
 
+size_t MessageConstant::Impl::getOffset() const {
+  return 0;
+}
+
 bool MessageConstant::Impl::isFixedSize() const {
   return true;
 }
@@ -104,7 +108,7 @@ bool MessageConstant::Impl::isFixedSize() const {
 /*****************************************************************************/
 
 void MessageConstant::Impl::write(std::ostream& stream) const {
-  stream << value.getType() << " " << name << "=" << value;
+  stream << "const " << value.getType() << " " << name << "=" << value;
 }
 
 }

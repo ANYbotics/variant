@@ -26,6 +26,7 @@
 #include <ros/ros.h>
 
 #include <variant_topic_tools/MessageFieldCollection.h>
+#include <variant_topic_tools/MessageFieldTypeTraits.h>
 #include <variant_topic_tools/MessageType.h>
 
 namespace variant_topic_tools {
@@ -90,24 +91,6 @@ namespace variant_topic_tools {
     bool operator!=(const MessageField<T>& field) const;
     
   protected:
-    /** \brief Type traits
-      */
-    struct TypeTraits {
-      template <typename U> struct HasIsValid {
-        template <typename V, bool (V::*)() const> struct Test {};
-        
-        template <typename V> static char test(Test<V, &V::isValid>*);
-        template <typename V> static int test(...);
-        
-        static const bool value = sizeof(test<U>(0)) == sizeof(char);
-      };
-
-      template <typename U> static bool isValid(const U& value,
-        typename boost::enable_if_c<HasIsValid<U>::value>::type* = 0);
-      template <typename U> static bool isValid(const U& value,
-        typename boost::disable_if_c<HasIsValid<U>::value>::type* = 0);
-    };
-
     /** \brief The name of this message field
       */ 
     std::string name;
@@ -115,6 +98,18 @@ namespace variant_topic_tools {
     /** \brief The value of this message field
       */ 
     T value;
+    
+    /** \brief True, if the message field is valid (overloaded version
+      *   taking a field value which can be validated)
+      */ 
+    template <typename U> static bool isValid(const U& value, typename boost::
+      enable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type* = 0);
+    
+    /** \brief True, if the message field is valid (overloaded version
+      *   taking a field value which cannot be validated)
+      */ 
+    template <typename U> static bool isValid(const U& value, typename boost::
+      disable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type* = 0);
   };
   
   /** \brief Operator for writing the message field to a stream

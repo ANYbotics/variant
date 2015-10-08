@@ -27,7 +27,7 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T> Variant::Variant(const T& src) {
-  TypeTraits::assign(*this, src);
+  Variant::template assign<T>(*this, src);
 }
 
 template <typename T>
@@ -60,7 +60,7 @@ template <typename T> void Variant::setValue(const T& value) {
     boost::dynamic_pointer_cast<ValueT<T> >(this->value)->setValue(value);      
   }
   else
-    throw DataTypeMismatchException(type.getIdentifier(),
+    throw DataTypeMismatchException(this->type.getIdentifier(),
       DataType(typeid(T)).getIdentifier());
 }
 
@@ -82,7 +82,7 @@ template <typename T> T& Variant::getValue() {
     return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
   }
   else
-    throw DataTypeMismatchException(type.getIdentifier(),
+    throw DataTypeMismatchException(this->type.getIdentifier(),
       DataType(typeid(T)).getIdentifier());
 }
 
@@ -107,98 +107,108 @@ template <typename T> const T& Variant::getValue() const {
 
 template <typename T>
 bool Variant::ValueT<T>::isEqual(const Value& value) const {
-  return TypeTraits::isEqual(dynamic_cast<const ValueT<T>&>(value).getValue(),
-    this->getValue());
+  return Variant::template isEqual<T>(dynamic_cast<const ValueT<T>&>(
+    value).getValue(), this->getValue());
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> void Variant::TypeTraits::assign(Variant& dst, const
-    T& src, typename boost::enable_if<boost::is_base_of<Variant, T> >::type*
-    dummy) {
-  dst.type = src.type;
-  dst.value = src.value;
-}
-
-template <typename T> void Variant::TypeTraits::assign(Variant& dst, const
-    T& src, typename boost::disable_if<boost::is_base_of<Variant, T> >::type*
-    dummy) {
-  dst.template setValue<T>(src);
-}
-
-template <typename T> bool Variant::TypeTraits::isEqual(const T& lhs, const
-    T& rhs, typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*
-    dummy) {
-  return (lhs == rhs);
-}
-
-template <typename T, size_t N> bool Variant::TypeTraits::isEqual(const
-    boost::array<T, N>& lhs, const boost::array<T, N>& rhs, typename
-    boost::enable_if<boost::has_equal_to<T, T, bool> >::type* dummy) {
-  return (lhs == rhs);
-}
-
-template <typename T> bool Variant::TypeTraits::isEqual(const std::vector<T>&
-    lhs, const std::vector<T>& rhs, typename boost::enable_if<boost::
-    has_equal_to<T, T, bool> >::type* dummy) {
-  return (lhs == rhs);
-}
-
-template <typename T> bool Variant::TypeTraits::isEqual(const T& lhs, const
-    T& rhs, typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*
-    dummy) {
-  throw InvalidOperationException(
-    "Comparing two variants of non-comparable type");
-}
-
-template <typename T, size_t N> bool Variant::TypeTraits::isEqual(const
-    boost::array<T, N>& lhs, const boost::array<T, N>& rhs, typename
-    boost::disable_if<boost::has_equal_to<T, T, bool> >::type* dummy) {
-  throw InvalidOperationException(
-    "Comparing two variants of non-comparable type");
-}
-
-template <typename T> bool Variant::TypeTraits::isEqual(const std::vector<T>&
-    lhs, const std::vector<T>& rhs, typename boost::disable_if<boost::
-    has_equal_to<T, T, bool> >::type* dummy) {
-  throw InvalidOperationException(
-    "Comparing two variants of non-comparable type");
-}
-
-template <typename T> void Variant::TypeTraits::read(std::istream& stream,
-    T& value, typename boost::enable_if<boost::has_right_shift<std::istream,
-    T&> >::type* dummy) {
-  stream >> value;
-}
-
-template <typename T> void Variant::TypeTraits::read(std::istream& stream,
-    T& value, typename boost::disable_if<boost::has_right_shift<std::istream,
-    T&> >::type* dummy) {
-  throw InvalidOperationException(
-    "Reading a variant of non-readable type");
-}
-
-template <typename T> void Variant::TypeTraits::write(std::ostream& stream,
-    const T& value, typename boost::enable_if<boost::has_left_shift<std::
-    ostream, const T&> >::type* dummy) {
-  stream << value;
-}
-
-template <typename T> void Variant::TypeTraits::write(std::ostream& stream,
-    const T& value, typename boost::disable_if<boost::has_left_shift<std::
-    ostream, const T&> >::type* dummy) {
-}
-
 template <typename T>
 void Variant::ValueT<T>::read(std::istream& stream) {
-  TypeTraits::read(stream, this->getValue());
+  Variant::template read<T>(stream, this->getValue());
 }
 
 template <typename T>
 void Variant::ValueT<T>::write(std::ostream& stream) const {
-  TypeTraits::write(stream, this->getValue());
+  Variant::template write<T>(stream, this->getValue());
+}
+
+template <typename T> void Variant::set(Variant& variant, const Pointer<T>&
+    value) {
+  if (!variant.type.isValid()) {
+    variant.type = DataType(typeid(T));
+    
+    if (variant.type.isValid()) {
+      variant.value = variant.type.createVariant().value;
+      boost::dynamic_pointer_cast<ValueT<T> >(variant.value)->set(value);      
+    }
+    else
+      throw InvalidDataTypeException();
+  }
+  else if (typeid(T) == variant.type.getTypeInfo()) {
+    if (!variant.value)
+      variant.value = variant.type.createVariant().value;
+    
+    boost::dynamic_pointer_cast<ValueT<T> >(variant.value)->set(value);      
+  }
+  else
+    throw DataTypeMismatchException(variant.type.getIdentifier(),
+      DataType(typeid(T)).getIdentifier());
+}
+
+template <typename T> void Variant::assign(Variant& dst, const T& src,
+    typename boost::enable_if<boost::is_base_of<Variant, T> >::type*) {
+  dst.type = src.type;
+  dst.value = src.value;
+}
+
+template <typename T> void Variant::assign(Variant& dst, const T& src,
+    typename boost::disable_if<boost::is_base_of<Variant, T> >::type*) {
+  dst.template setValue<T>(src);
+}
+
+template <typename T> bool Variant::isEqual(const T& lhs, const T& rhs,
+    typename boost::enable_if<boost::has_equal_to<T, T, bool> >::type*,
+    typename boost::disable_if<ArrayTypeTraits::IsArray<T> >::type*) {
+  return (lhs == rhs);
+}
+
+template <typename T> bool Variant::isEqual(const T& lhs, const T& rhs,
+    typename boost::enable_if<boost::has_equal_to<typename ArrayTypeTraits::
+    FromArray<T>::ElementType, typename ArrayTypeTraits::FromArray<T>::
+    ElementType, bool> >::type*) {
+  return (lhs == rhs);
+}
+
+template <typename T> bool Variant::isEqual(const T& lhs, const T& rhs,
+    typename boost::disable_if<boost::has_equal_to<T, T, bool> >::type*,
+    typename boost::disable_if<ArrayTypeTraits::IsArray<T> >::type*) {
+  throw InvalidOperationException(
+    "Comparing two variants of non-comparable type");
+}
+
+template <typename T> bool Variant::isEqual(const T& lhs, const T& rhs,
+    typename boost::disable_if<boost::has_equal_to<typename ArrayTypeTraits::
+    FromArray<T>::ElementType, typename ArrayTypeTraits::FromArray<T>::
+    ElementType, bool> >::type*) {
+  throw InvalidOperationException(
+    "Comparing two variants of non-comparable type");
+}
+
+template <typename T> void Variant::read(std::istream& stream, T& value,
+    typename boost::enable_if<boost::has_right_shift<std::istream, T&> >::
+    type*) {
+  stream >> value;
+}
+
+template <typename T> void Variant::read(std::istream& stream, T& value,
+    typename boost::disable_if<boost::has_right_shift<std::istream, T&> >::
+    type*) {
+  throw InvalidOperationException(
+    "Reading a variant of non-readable type");
+}
+
+template <typename T> void Variant::write(std::ostream& stream, const T&
+    value, typename boost::enable_if<boost::has_left_shift<std::ostream,
+    const T&> >::type*) {
+  stream << value;
+}
+
+template <typename T> void Variant::write(std::ostream& stream, const T&
+    value, typename boost::disable_if<boost::has_left_shift<std::ostream,
+    const T&> >::type*) {
 }
 
 /*****************************************************************************/
@@ -206,7 +216,7 @@ void Variant::ValueT<T>::write(std::ostream& stream) const {
 /*****************************************************************************/
 
 template <typename T> Variant& Variant::operator=(const T& src) {
-  TypeTraits::assign(*this, src);
+  Variant::template assign<T>(*this, src);
   return *this;
 }
 

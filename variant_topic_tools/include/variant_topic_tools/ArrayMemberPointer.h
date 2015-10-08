@@ -33,7 +33,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Definition of the array pointer type
       */
-    typedef boost::shared_ptr<A> ArrayPtr;
+    typedef Pointer<A> ArrayPtr;
       
     /** \brief Default constructor
       */ 

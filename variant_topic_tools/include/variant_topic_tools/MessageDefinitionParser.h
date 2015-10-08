@@ -70,6 +70,10 @@ namespace variant_topic_tools {
     static bool matchArray(const std::string& expression, std::string& name,
       std::string& elementType, size_t& size);
   
+    /** \brief Match a separator expression
+      */
+    static bool matchSeparator(const std::string& expression);
+    
   private:
     /** \brief Regular expression for matching a comment
       */

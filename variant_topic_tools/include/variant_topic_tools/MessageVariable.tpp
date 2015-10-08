@@ -23,9 +23,9 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T> MessageVariable MessageVariable::create(const
-    std::string& name) {
+    std::string& name, size_t offset) {
   MessageVariable messageVariable;
-  messageVariable.impl.reset(new Impl(name, typeid(T)));
+  messageVariable.impl.reset(new Impl(name, typeid(T), offset));
   
   return messageVariable;
 }

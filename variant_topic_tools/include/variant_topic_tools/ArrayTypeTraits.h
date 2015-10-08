@@ -16,24 +16,53 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/Exceptions.h>
+/** \file ArrayTypeTraits.h
+  * \brief Header file providing the ArrayTypeTraits class interface
+  */
+
+#ifndef VARIANT_TOPIC_TOOLS_ARRAY_TYPE_TRAITS_H
+#define VARIANT_TOPIC_TOOLS_ARRAY_TYPE_TRAITS_H
+
+#include <vector>
+
+#include <boost/array.hpp>
 
 namespace variant_topic_tools {
+  /** \brief Array type traits
+    */
+  struct ArrayTypeTraits {
+    template <class A> struct IsArray :
+      public boost::false_type {
+    };
+    
+    template <typename T> struct IsArray<std::vector<T> > :
+      public boost::true_type {
+    };
+    
+    template <typename T, size_t N> struct IsArray<boost::array<T, N> > :
+      public boost::true_type {
+    };
+    
+    template <class A> struct FromArray;
+    
+    template <typename T> struct FromArray<std::vector<T> > {
+      typedef T ElementType;
+      static const size_t NumElements = 0;
+    };
+    
+    template <typename T, size_t N> struct FromArray<boost::array<T, N> > {
+      typedef T ElementType;
+      static const size_t NumElements = N;
+    };
+    
+    template <typename T, size_t N> struct ToArray {
+      typedef boost::array<T, N> ArrayType;
+    };
+    
+    template <typename T> struct ToArray<T, 0> {
+      typedef std::vector<T> ArrayType;
+    };
+  };
+};
 
-/*****************************************************************************/
-/* Accessors                                                                 */
-/*****************************************************************************/
-
-template <class M> void MessageDefinition::setMessageType() {
-  this->setMessageType(MessageType::template create<M>());
-}
-
-/*****************************************************************************/
-/* Methods                                                                   */
-/*****************************************************************************/
-
-template <class M> MessageDefinition MessageDefinition::create() {
-  return MessageDefinition(MessageType::template create<M>());
-}
-
-}
+#endif

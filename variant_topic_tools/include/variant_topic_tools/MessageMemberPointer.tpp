@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/BuiltinPointer.h>
+
 namespace variant_topic_tools {
 
 /*****************************************************************************/
@@ -24,7 +26,7 @@ namespace variant_topic_tools {
 
 template <class M, typename T>
 MessageMemberPointer<M, T>::MessageMemberPointer(M* message, size_t offset) {
-  this->impl.reset(new Impl(MessagePtr(message), offset));
+  this->impl.reset(new Impl(BuiltinPointer<M>(message), offset));
 }
 
 template <class M, typename T>
