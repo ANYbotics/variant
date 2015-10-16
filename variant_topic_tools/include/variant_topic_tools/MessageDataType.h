@@ -26,6 +26,7 @@
 #include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/MessageConstant.h>
 #include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/MessageVariable.h>
 
 namespace variant_topic_tools {
@@ -226,6 +227,8 @@ namespace variant_topic_tools {
     template <typename T> class ImplT :
       public Impl {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+  
       /** \brief Default constructor
         */
       ImplT();

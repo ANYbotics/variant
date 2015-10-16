@@ -23,15 +23,15 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T> void Serializer::advance(ros::serialization::IStream&
-    stream, typename boost::enable_if<ros::message_traits::IsFixedSize<T> >::
-    type*) {
-  stream.advance(sizeof(T));
+    stream, typename boost::enable_if<ros::message_traits::IsFixedSize<
+    typename type_traits::DataType<T>::ValueType> >::type*) {
+  stream.advance(sizeof(typename type_traits::DataType<T>::ValueType));
 }
 
 template <typename T> void Serializer::advance(ros::serialization::IStream&
-    stream, typename boost::disable_if<ros::message_traits::IsFixedSize<T> >::
-    type*) {
-  T value;
+    stream, typename boost::disable_if<ros::message_traits::IsFixedSize<
+    typename type_traits::DataType<T>::ValueType> >::type*) {
+  typename type_traits::DataType<T>::ValueType value;
   ros::serialization::deserialize(stream, value);
 }
 

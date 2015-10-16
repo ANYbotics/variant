@@ -44,6 +44,9 @@ TEST(DataType, Array) {
   EXPECT_TRUE(a2.isArray());
   EXPECT_FALSE(a2.isFixedSize());
   
+  EXPECT_TRUE(registry.getDataType<int32_t[3]>().isArray());
+  EXPECT_TRUE(registry.getDataType<int32_t[]>().isArray());
+  
   registry.clear();
 }
 

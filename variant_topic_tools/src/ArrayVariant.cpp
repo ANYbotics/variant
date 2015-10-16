@@ -84,6 +84,15 @@ bool ArrayVariant::isFixedSize() const {
     return true;
 }
 
+void ArrayVariant::Value::setValue(const Variant::Value& value) {
+  const Value& arrayValue = dynamic_cast<const Value&>(value);
+  
+  resize(arrayValue.getNumMembers());
+  
+  for (size_t i = 0; i < getNumMembers(); ++i)
+    setMember(i, arrayValue.getMember(i));
+}
+
 void ArrayVariant::Value::setMember(const std::string& name, const Variant&
     member) {
   size_t index;

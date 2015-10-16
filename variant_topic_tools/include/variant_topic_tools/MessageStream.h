@@ -55,14 +55,20 @@ namespace variant_topic_tools {
     /** \brief Access the message stream's data
       */
     const uint8_t* getData() const;
-    
-    /** \brief Access the data types of the streamed message members
+
+    /** \brief Access the number of streamed message members
       */
-    const std::vector<DataType>& getMemberTypes() const;
+    size_t getNumMembers() const;
     
-    /** \brief Access the offsets of the streamed  message members
+    /** \brief Access the data type of the streamed message member
+      *   with the specified index
       */
-    const std::vector<size_t>& getMemberOffsets() const;
+    const DataType& getMemberType(size_t index) const;
+    
+    /** \brief Access the offset of the streamed message member with the
+      *   specified index
+      */
+    size_t getMemberOffset(size_t index) const;
     
     /** \brief Advance the message stream
       */

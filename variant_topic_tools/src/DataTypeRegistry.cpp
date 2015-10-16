@@ -75,13 +75,13 @@ DataType DataTypeRegistry::getDataType(const std::string& identifier) {
   if (it != impl->dataTypesByIdentifier.end())
     return it->second;
   
-  std::string name, elementType;
+  std::string name, memberType;
   size_t size;
   
-  if (MessageDefinitionParser::matchArrayType(identifier, elementType,
+  if (MessageDefinitionParser::matchArrayType(identifier, memberType,
       size)) {
     boost::unordered_map<std::string, DataType>::const_iterator jt =
-      impl->dataTypesByIdentifier.find(elementType);
+      impl->dataTypesByIdentifier.find(memberType);
     
     if (jt != impl->dataTypesByIdentifier.end())
       return addArrayDataType(jt->second, size);
@@ -114,9 +114,9 @@ DataType DataTypeRegistry::getDataType(const std::type_info& typeInfo) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-ArrayDataType DataTypeRegistry::addArrayDataType(const DataType& elementType,
-    size_t numElements) {
-  ArrayDataType arrayDataType(elementType, numElements);
+ArrayDataType DataTypeRegistry::addArrayDataType(const DataType& memberType,
+    size_t numMembers) {
+  ArrayDataType arrayDataType(memberType, numMembers);
   addDataType(arrayDataType);
   
   return arrayDataType;

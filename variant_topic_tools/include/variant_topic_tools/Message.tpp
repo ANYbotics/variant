@@ -26,12 +26,12 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <class M> Message::Message(const M& message, const MessageHeader&
+template <typename T> Message::Message(const T& message, const MessageHeader&
     header) :
   header(header),
-  type(MessageType::template create<M>()),
+  type(MessageType::template create<T>()),
   data(ros::serialization::serializationLength(message)) {
-  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<M>::value);
+  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
 
   ros::serialization::OStream stream(const_cast<uint8_t*>(data.data()),
     data.size());
@@ -42,21 +42,21 @@ template <class M> Message::Message(const M& message, const MessageHeader&
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class M> void Message::morph() {
-  this->setType(MessageType::template create<M>());
+template <typename T> void Message::morph() {
+  this->setType(MessageType::template create<T>());
 }
 
-template <class M> boost::shared_ptr<M> Message::toInvariant() const {
-  if (ros::message_traits::template datatype<M>() != type.getDataType())
+template <typename T> boost::shared_ptr<T> Message::toInvariant() const {
+  if (ros::message_traits::template datatype<T>() != type.getDataType())
     throw DataTypeMismatchException(ros::message_traits::template
-      datatype<M>(), type.getDataType());
+      datatype<T>(), type.getDataType());
   
   if ((type.getMD5Sum() != "*") &&
-      (ros::message_traits::template md5sum<M>() != type.getMD5Sum()))
+      (ros::message_traits::template md5sum<T>() != type.getMD5Sum()))
     throw MD5SumMismatchException(ros::message_traits::template 
-      md5sum<M>(), type.getMD5Sum());
+      md5sum<T>(), type.getMD5Sum());
   
-  boost::shared_ptr<M> invariant(new M());
+  boost::shared_ptr<T> invariant(new T());
 
   ros::serialization::IStream stream(const_cast<uint8_t*>(data.data()),
     data.size());

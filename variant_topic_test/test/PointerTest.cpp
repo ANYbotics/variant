@@ -42,14 +42,14 @@ TEST(Pointer, Array) {
   (*a1)[0] = 0;
   (*a1)[1] = 1;
   (*a1)[2] = 2;  
-  ArrayMemberPointer<boost::array<int, 3>, int> p1(a1, 1);
+  ArrayMemberPointer<boost::array<int, 3> > p1(a1, 1);
   
   std::vector<int>* a2 = new std::vector<int>(3);
   (*a2)[0] = 0;
   (*a2)[1] = 1;
   (*a2)[2] = 2;  
-  ArrayMemberPointer<std::vector<int>, int> p2(a2, 1);
-  ArrayMemberPointer<std::vector<int>, int> p3(p2.getArray(), 2);
+  ArrayMemberPointer<std::vector<int> > p2(a2, 1);
+  ArrayMemberPointer<std::vector<int> > p3(p2.getArray(), 2);
   
   EXPECT_EQ(a1, p1.getArray().get());
   EXPECT_EQ(1, p1.getIndex());

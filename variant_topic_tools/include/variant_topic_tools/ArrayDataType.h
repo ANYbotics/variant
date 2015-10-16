@@ -23,10 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_DATA_TYPE_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_DATA_TYPE_H
 
-#include <vector>
-
-#include <boost/array.hpp>
-
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/DataType.h>
 
 namespace variant_topic_tools {
@@ -55,13 +52,13 @@ namespace variant_topic_tools {
       */ 
     virtual ~ArrayDataType();
   
-    /** \brief Retrieve the element type of this array data type
+    /** \brief Retrieve the member type of this array data type
       */
-    const DataType& getElementType() const;
+    const DataType& getMemberType() const;
     
-    /** \brief Retrieve the number of elements of this array data type
+    /** \brief Retrieve the number of members of this array data type
       */
-    size_t getNumElements() const;
+    size_t getNumMembers() const;
     
     /** \brief Assignment operator
       */
@@ -75,7 +72,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      Impl(const DataType& elementType);
+      Impl(const DataType& memberType);
       
       /** \brief Destructor
         */
@@ -86,10 +83,10 @@ namespace variant_topic_tools {
         */ 
       const std::string& getIdentifier() const;
     
-      /** \brief Retrieve the number of elements of this array data type
+      /** \brief Retrieve the number of members of this array data type
         *   (abstract declaration)
         */
-      virtual size_t getNumElements() const = 0;
+      virtual size_t getNumMembers() const = 0;
       
       /** \brief Retrieve the size of the instances of this data type
         *   (implementation)
@@ -105,9 +102,9 @@ namespace variant_topic_tools {
         */
       mutable std::string identifier;
       
-      /** \brief The element type of the array data type
+      /** \brief The member type of the array data type
         */
-      DataType elementType;
+      DataType memberType;
     };
     
     /** \brief Array data type implementation (variant-typed version)
@@ -117,16 +114,16 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      ImplV(const DataType& elementType, size_t numElements);
+      ImplV(const DataType& memberType, size_t numMembers);
       
       /** \brief Destructor
         */
       virtual ~ImplV();
       
-      /** \brief Retrieve the number of elements of this array data type
+      /** \brief Retrieve the number of members of this array data type
         *   (implementation)
         */
-      size_t getNumElements() const;
+      size_t getNumMembers() const;
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
@@ -136,16 +133,18 @@ namespace variant_topic_tools {
         */ 
       Variant createVariant(const DataType& type) const;
       
-      /** \brief The number of elements of the array data type
+      /** \brief The number of members of the array data type
         */
-      size_t numElements;
+      size_t numMembers;
     };
     
     /** \brief Array data type implementation (templated strong-typed version)
       */
-    template <typename T, size_t N> class ImplT :
+    template <typename T> class ImplT :
       public Impl {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+      
       /** \brief Default constructor
         */
       ImplT();
@@ -159,10 +158,10 @@ namespace variant_topic_tools {
         */ 
       const std::type_info& getTypeInfo() const;
       
-      /** \brief Retrieve the number of elements of this array data type
+      /** \brief Retrieve the number of members of this array data type
         *   (implementation)
         */
-      size_t getNumElements() const;
+      size_t getNumMembers() const;
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
@@ -173,20 +172,27 @@ namespace variant_topic_tools {
       Variant createVariant(const DataType& type) const;
     };
     
-    /** \brief Constructor (overloaded version taking an element type
-      *   and a number of elements)
+    /** \brief Constructor (overloaded version taking an member type
+      *   and a number of members)
       */ 
-    ArrayDataType(const DataType& elementType, size_t numElements);
+    ArrayDataType(const DataType& memberType, size_t numMembers);
     
     /** \brief Create an array data type (version templated on the
       *   array type)
       */ 
-    template <class A> static ArrayDataType create();
+    template <typename T> static ArrayDataType create();
     
-    /** \brief Create an array data type (version templated on the
-      *   element type and the number of elements)
+    /** \brief Create an array data type (overloaded version for creating
+      *   a non-fixed-size array data type)
       */ 
-    template <typename T, size_t N> static ArrayDataType create();
+    template <typename T, size_t N> static ArrayDataType create(typename
+      boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
+    
+    /** \brief Create an array data type (overloaded version for creating
+      *   a fixed-size array data type)
+      */ 
+    template <typename T, size_t N> static ArrayDataType create(typename
+      boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
   };
 };
 

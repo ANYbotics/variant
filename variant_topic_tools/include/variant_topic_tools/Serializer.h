@@ -25,6 +25,7 @@
 
 #include <ros/ros.h>
 
+#include <variant_topic_tools/DataTypeTraits.h>
 #include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
@@ -123,14 +124,14 @@ namespace variant_topic_tools {
       */ 
     template <typename T> static void advance(ros::serialization::IStream&
       stream, typename boost::enable_if<ros::message_traits::IsFixedSize<
-      T> >::type* = 0);
+      typename type_traits::DataType<T>::ValueType> >::type* = 0);
     
     /** \brief Advance an input stream by the length of a serialized
       *   value (overloaded version taking a non-fixed-size message)
       */ 
     template <typename T> static void advance(ros::serialization::IStream&
       stream, typename boost::disable_if<ros::message_traits::IsFixedSize<
-      T> >::type* = 0);
+      typename type_traits::DataType<T>::ValueType> >::type* = 0);
   };
 };
 

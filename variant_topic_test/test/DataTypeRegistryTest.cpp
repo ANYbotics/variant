@@ -32,24 +32,26 @@ TEST(DataTypeRegistry, Array) {
   ArrayDataType a2 = registry.addArrayDataType<int, 0>();
   ArrayDataType a3 = registry.addArrayDataType<boost::array<double, 3> >();
   ArrayDataType a4 = registry.addArrayDataType<std::vector<double> >();
-  ArrayDataType a5 = registry.addArrayDataType("int8", 3);
-  ArrayDataType a6 = registry.addArrayDataType(typeid(int8_t));
+//   ArrayDataType a5 = registry.addArrayDataType<bool[3]>();
+//   ArrayDataType a6 = registry.addArrayDataType<bool[]>();
+  ArrayDataType a7 = registry.addArrayDataType("int8", 3);
+  ArrayDataType a8 = registry.addArrayDataType(typeid(int8_t));
   
-  typedef boost::array<int, 3> boost_array_int_3;
-  typedef boost::array<double, 3> boost_array_double_3;
-  typedef boost::array<int8_t, 3> boost_array_int8_t_3;
-  
-  EXPECT_TRUE(registry.getDataType<boost_array_int_3>().isArray());
+  EXPECT_TRUE(registry.getDataType<int[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("int32[3]").isArray());
-  EXPECT_TRUE(registry.getDataType<std::vector<int> >().isArray());
+  EXPECT_TRUE(registry.getDataType<int[]>().isArray());
   EXPECT_TRUE(registry.getDataType("int32[]").isArray());
-  EXPECT_TRUE(registry.getDataType<boost_array_double_3>().isArray());
+  EXPECT_TRUE(registry.getDataType<double[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("float64[3]").isArray());
-  EXPECT_TRUE(registry.getDataType<std::vector<double> >().isArray());
+  EXPECT_TRUE(registry.getDataType<double[]>().isArray());
   EXPECT_TRUE(registry.getDataType("float64[]").isArray());
-  EXPECT_TRUE(registry.getDataType<boost_array_int8_t_3>().isArray());
+//   EXPECT_TRUE(registry.getDataType<bool[3]>().isArray());
+//   EXPECT_TRUE(registry.getDataType("bool[3]").isArray());
+//   EXPECT_TRUE(registry.getDataType<bool[]>().isArray());
+//   EXPECT_TRUE(registry.getDataType("bool[]").isArray());  
+  EXPECT_TRUE(registry.getDataType<int8_t[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("int8[3]").isArray());
-  EXPECT_TRUE(registry.getDataType<std::vector<int8_t> >().isArray());
+  EXPECT_TRUE(registry.getDataType<int8_t[]>().isArray());
   EXPECT_TRUE(registry.getDataType("int8[]").isArray());
   EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).
     getDataType("uint8[3]").isArray());

@@ -48,7 +48,7 @@ namespace variant_topic_tools {
     /** \brief Match an array type expression
       */
     static bool matchArrayType(const std::string& expression, std::string&
-      elementType, size_t& size);
+      memberType, size_t& size);
     
     /** \brief Match any message member expression
       */
@@ -68,7 +68,7 @@ namespace variant_topic_tools {
     /** \brief Match an array message member expression
       */
     static bool matchArray(const std::string& expression, std::string& name,
-      std::string& elementType, size_t& size);
+      std::string& memberType, size_t& size);
   
     /** \brief Match a separator expression
       */

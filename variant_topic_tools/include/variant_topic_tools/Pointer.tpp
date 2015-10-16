@@ -25,7 +25,9 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-Pointer<T>::Pointer() {
+Pointer<T>::Pointer(T* pointer) {
+  if (pointer)
+    this->impl.reset(new Impl(boost::shared_ptr<T>(pointer)));
 }
 
 template <typename T>
@@ -38,7 +40,16 @@ Pointer<T>::~Pointer() {
 }
 
 template <typename T>
-Pointer<T>::Impl::Impl() {
+Pointer<T>::ImplA::ImplA() {
+}
+
+template <typename T>
+Pointer<T>::ImplA::~ImplA() {
+}
+
+template <typename T>
+Pointer<T>::Impl::Impl(const boost::shared_ptr<T>& pointer) :
+  pointer(pointer) {
 }
 
 template <typename T>
@@ -55,6 +66,11 @@ T* Pointer<T>::get() const {
     return this->impl->get();
   else
     return 0;
+}
+
+template <typename T>
+T* Pointer<T>::Impl::get() const {
+  return this->pointer.get();
 }
 
 /*****************************************************************************/

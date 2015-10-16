@@ -23,34 +23,33 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_POINTER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_POINTER_H
 
+#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Shared pointer
     */
-  template <class M, typename T> class MessageMemberPointer :
-    public Pointer<T> {
+  template <typename T, typename M> class MessageMemberPointer :
+    public Pointer<M> {
   public:
-    /** \brief Definition of the message pointer type
-      */
-    typedef Pointer<M> MessagePtr;
-      
+    BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+    
     /** \brief Default constructor
       */ 
-    MessageMemberPointer(M* message = 0, size_t offset = 0);
+    MessageMemberPointer(T* message = 0, size_t offset = 0);
     
     /** \brief Constructor (overloaded version taking a message pointer
       *   and an offset)
       */ 
-    MessageMemberPointer(const MessagePtr& message, size_t offset);
+    MessageMemberPointer(const Pointer<T>& message, size_t offset);
     
     /** \brief Copy constructor
       */ 
-    MessageMemberPointer(const MessageMemberPointer<M, T>& src);
+    MessageMemberPointer(const MessageMemberPointer<T, M>& src);
     
     /** \brief Copy constructor (overloaded version taking a pointer)
       */ 
-    MessageMemberPointer(const Pointer<T>& src);
+    MessageMemberPointer(const Pointer<M>& src);
     
     /** \brief Destructor
       */ 
@@ -58,11 +57,11 @@ namespace variant_topic_tools {
     
     /** \brief Set the message
       */
-    void setMessage(const MessagePtr& message);
+    void setMessage(const Pointer<T>& message);
     
     /** \brief Retrieve the message
       */
-    const MessagePtr& getMessage() const;
+    const Pointer<T>& getMessage() const;
     
     /** \brief Set the message member offset
       */
@@ -76,12 +75,11 @@ namespace variant_topic_tools {
     /** \brief Message member pointer implementation
       */
     class Impl :
-      public Pointer<T>::Impl {
+      public Pointer<M>::ImplA {
     public:
       /** \brief Constructor
         */
-      Impl(const MessagePtr& message = MessagePtr(), size_t
-        offset = 0);
+      Impl(const Pointer<T>& message = Pointer<T>(), size_t offset = 0);
       
       /** \brief Destructor
         */
@@ -89,11 +87,11 @@ namespace variant_topic_tools {
       
       /** \brief Retrieve the stored pointer (implementation)
         */
-      T* get() const;
+      M* get() const;
       
       /** \brief The shared message
         */ 
-      MessagePtr message;
+      Pointer<T> message;
       
       /** \brief The member offset
         */ 

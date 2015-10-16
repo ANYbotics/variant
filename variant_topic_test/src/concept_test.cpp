@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
 
   registry.addArrayDataType<int, 3>();
   registry.addArrayDataType<int, 0>();
-  registry.addArrayDataType<boost::array<double, 3> >();
-  registry.addArrayDataType<std::vector<double> >();
+  registry.addArrayDataType<double[3]>();
+  registry.addArrayDataType<double[]>();
   registry.addArrayDataType("int8", 3);
   registry.addArrayDataType(typeid(int8_t));
   
@@ -61,16 +61,16 @@ int main(int argc, char **argv) {
   
   Variant v2 = registry["float64[3]"].createVariant();
   std::cout << v2.getType().getIdentifier() << "\n";
-  std::cout << v2.getValue<boost::array<double, 3> >()[0] << "\n";
-  v2.getValue<boost::array<double, 3> >()[1] = 1.0;
-  std::cout << v2.getValue<boost::array<double, 3> >()[1] << "\n";
+  std::cout << v2.getValue<double[3]>()[0] << "\n";
+  v2.getValue<double[3]>()[1] = 1.0;
+  std::cout << v2.getValue<double[3]>()[1] << "\n";
   std::cout << "\n";
 
   Variant v3 = registry["float64[]"].createVariant();
   std::cout << v3.getType().getIdentifier() << "\n";
-  std::cout << v3.getValue<std::vector<double> >().size() << "\n";
-  v3.getValue<std::vector<double> >().push_back(0.0);
-  std::cout << v3.getValue<std::vector<double> >().size() << "\n";
+  std::cout << v3.getValue<double[]>().size() << "\n";
+  v3.getValue<double[]>().push_back(0.0);
+  std::cout << v3.getValue<double[]>().size() << "\n";
   std::cout << "\n";
   
   Variant v4 = registry["int8[3]"].createVariant();
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
   std::cout << "\n";
   
   ArrayDataType a1 = registry["uint8[3]"];
-  std::cout << a1.getNumElements() << "\n";
+  std::cout << a1.getNumMembers() << "\n";
   std::cout << "\n";
   
   MessageDataType m1 = registry["std_msgs/String"];

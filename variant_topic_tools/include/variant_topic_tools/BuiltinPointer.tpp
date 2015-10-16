@@ -23,23 +23,24 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-BuiltinPointer<T>::BuiltinPointer(T* builtin) {
-  this->impl.reset(new Impl(BuiltinPtr(builtin)));
+BuiltinPointer<T>::BuiltinPointer(ValueType* builtin) {
+  this->impl.reset(new Impl(boost::shared_ptr<ValueType>(builtin)));
 }
 
 template <typename T>
-BuiltinPointer<T>::BuiltinPointer(const BuiltinPtr& builtin) {
+BuiltinPointer<T>::BuiltinPointer(const boost::shared_ptr<ValueType>&
+    builtin) {
   this->impl.reset(new Impl(builtin));
 }
 
 template <typename T>
 BuiltinPointer<T>::BuiltinPointer(const BuiltinPointer<T>& src) :
-  Pointer<T>(src) {
+  Pointer<ValueType>(src) {
 }
 
 template <typename T>
-BuiltinPointer<T>::BuiltinPointer(const Pointer<T>& src) :
-  Pointer<T>(src) {
+BuiltinPointer<T>::BuiltinPointer(const Pointer<ValueType>& src) :
+  Pointer<ValueType>(src) {
   if (this->impl)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(this->impl));
 }
@@ -49,7 +50,7 @@ BuiltinPointer<T>::~BuiltinPointer() {
 }
 
 template <typename T>
-BuiltinPointer<T>::Impl::Impl(const BuiltinPtr& builtin) :
+BuiltinPointer<T>::Impl::Impl(const boost::shared_ptr<ValueType>& builtin) :
   builtin(builtin) {
 }
 
@@ -62,7 +63,7 @@ BuiltinPointer<T>::Impl::~Impl() {
 /*****************************************************************************/
 
 template <typename T>
-T* BuiltinPointer<T>::Impl::get() const {
+typename BuiltinPointer<T>::ValueType* BuiltinPointer<T>::Impl::get() const {
   return this->builtin.get();
 }
 

@@ -17,7 +17,6 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArraySerializer.h"
-#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/ArrayVariant.h>
 
 namespace variant_topic_tools {
@@ -26,58 +25,61 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::ImplT() :
-  Impl(typeid(T)) {
+template <typename T>
+ArrayDataType::ImplT<T>::ImplT() :
+  Impl(typeid(typename type_traits::ArrayType<T>::MemberType)) {
 }
 
-template <typename T, size_t N>
-ArrayDataType::ImplT<T, N>::~ImplT() {
+template <typename T>
+ArrayDataType::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-const std::type_info& ArrayDataType::ImplT<T, N>::getTypeInfo() const {
-  return typeid(typename ArrayTypeTraits::ToArray<T, N>::ArrayType);
+template <typename T>
+const std::type_info& ArrayDataType::ImplT<T>::getTypeInfo() const {
+  return typeid(T);
 }
 
-template <typename T, size_t N>
-size_t ArrayDataType::ImplT<T, N>::getNumElements() const {
-  return N;
+template <typename T>
+size_t ArrayDataType::ImplT<T>::getNumMembers() const {
+  return type_traits::ArrayType<T>::NumMembers;
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class A> ArrayDataType ArrayDataType::create() {
-  return ArrayDataType::template create<typename
-    ArrayTypeTraits::FromArray<A>::ElementType,
-    ArrayTypeTraits::FromArray<A>::NumElements>();
-}
-
-template <typename T, size_t N> ArrayDataType ArrayDataType::create() {
+template <typename T> ArrayDataType ArrayDataType::create() {
   ArrayDataType dataType;
   
-  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplT<T, N>()));
+  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>()));
   
   return dataType;
 }
 
-template <typename T, size_t N>
-Serializer ArrayDataType::ImplT<T, N>::createSerializer(const DataType& type)
-    const {
-  return ArraySerializer::template create<T, N>();
+template <typename T, size_t N> ArrayDataType ArrayDataType::create(
+    typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+  return ArrayDataType::template create<T[]>();
 }
 
-template <typename T, size_t N>
-Variant ArrayDataType::ImplT<T, N>::createVariant(const DataType& type)
+template <typename T, size_t N> ArrayDataType ArrayDataType::create(
+    typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+  return ArrayDataType::template create<T[N]>();
+}
+
+template <typename T>
+Serializer ArrayDataType::ImplT<T>::createSerializer(const DataType& type)
     const {
-  return ArrayVariant::template create<T, N>(type, this->elementType);
+  return ArraySerializer::template create<T>();
+}
+
+template <typename T>
+Variant ArrayDataType::ImplT<T>::createVariant(const DataType& type)
+    const {
+  return ArrayVariant::template create<T>(type, this->memberType);
 }
 
 }

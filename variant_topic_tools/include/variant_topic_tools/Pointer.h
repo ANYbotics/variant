@@ -34,7 +34,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Default constructor
       */ 
-    Pointer();
+    Pointer(T* pointer = 0);
     
     /** \brief Copy constructor
       */ 
@@ -75,29 +75,51 @@ namespace variant_topic_tools {
   protected:
     /** \brief Pointer implementation (abstract base)
       */
-    class Impl {
+    class ImplA {
     public:
       /** \brief Constructor
         */
-      Impl();
+      ImplA();
       
       /** \brief Destructor
         */
-      virtual ~Impl();
+      virtual ~ImplA();
       
       /** \brief Retrieve the stored pointer (abstract declaration)
         */
       virtual T* get() const = 0;
     };
     
+    /** \brief Pointer implementation
+      */
+    class Impl :
+      public ImplA {
+    public:
+      /** \brief Constructor
+        */
+      Impl(const boost::shared_ptr<T>& pointer = boost::shared_ptr<T>());
+      
+      /** \brief Destructor
+        */
+      virtual ~Impl();
+      
+      /** \brief Retrieve the stored pointer (implementation)
+        */
+      T* get() const;
+      
+      /** \brief The stored pointer
+        */
+      boost::shared_ptr<T> pointer;
+    };
+    
     /** \brief Declaration of the pointer implementation pointer type
       */
-    typedef boost::shared_ptr<Impl> ImplPtr;
+    typedef boost::shared_ptr<ImplA> ImplPtr;
     
     /** \brief Declaration of the pointer implementation weak pointer
       *   type
       */
-    typedef boost::weak_ptr<Impl> ImplWPtr;
+    typedef boost::weak_ptr<ImplA> ImplWPtr;
     
     /** \brief The pointer's implementation
       */

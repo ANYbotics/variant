@@ -16,82 +16,79 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/BuiltinPointer.h>
-
 namespace variant_topic_tools {
 
 /*****************************************************************************/
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::MessageMemberPointer(M* message, size_t offset) {
-  this->impl.reset(new Impl(BuiltinPointer<M>(message), offset));
+template <typename T, typename M>
+MessageMemberPointer<T, M>::MessageMemberPointer(T* message, size_t offset) {
+  this->impl.reset(new Impl(Pointer<T>(message), offset));
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::MessageMemberPointer(const MessagePtr&
-    message, size_t offset) {
+template <typename T, typename M>
+MessageMemberPointer<T, M>::MessageMemberPointer(const Pointer<T>& message,
+    size_t offset) {
   this->impl.reset(new Impl(message, offset));
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::MessageMemberPointer(const
-    MessageMemberPointer<M, T>& src) :
-  Pointer<T>(src) {
+template <typename T, typename M>
+MessageMemberPointer<T, M>::MessageMemberPointer(const
+    MessageMemberPointer<T, M>& src) :
+  Pointer<M>(src) {
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::MessageMemberPointer(const Pointer<T>& src) :
-  Pointer<T>(src) {
+template <typename T, typename M>
+MessageMemberPointer<T, M>::MessageMemberPointer(const Pointer<M>& src) :
+  Pointer<M>(src) {
   if (this->impl)
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(this->impl));
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::~MessageMemberPointer() {
+template <typename T, typename M>
+MessageMemberPointer<T, M>::~MessageMemberPointer() {
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::Impl::Impl(const MessagePtr& message,
-    size_t offset) :
+template <typename T, typename M>
+MessageMemberPointer<T, M>::Impl::Impl(const Pointer<T>& message, size_t
+    offset) :
   message(message),
   offset(offset) {
 }
 
-template <class M, typename T>
-MessageMemberPointer<M, T>::Impl::~Impl() {
+template <typename T, typename M>
+MessageMemberPointer<T, M>::Impl::~Impl() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <class M, typename T>
-void MessageMemberPointer<M, T>::setMessage(const MessagePtr& message) {
+template <typename T, typename M>
+void MessageMemberPointer<T, M>::setMessage(const Pointer<T>& message) {
   boost::static_pointer_cast<Impl>(this->impl)->message = message;
 }
 
-template <class M, typename T>
-const typename MessageMemberPointer<M, T>::MessagePtr&
-    MessageMemberPointer<M, T>::getMessage() const {
+template <typename T, typename M>
+const Pointer<T>& MessageMemberPointer<T, M>::getMessage() const {
   return boost::static_pointer_cast<Impl>(this->impl)->message;
 }
 
-template <class M, typename T>
-void MessageMemberPointer<M, T>::setOffset(size_t offset) {
+template <typename T, typename M>
+void MessageMemberPointer<T, M>::setOffset(size_t offset) {
   boost::static_pointer_cast<Impl>(this->impl)->offset = offset;
 }
 
-template <class M, typename T>
-size_t MessageMemberPointer<M, T>::getOffset() const {
+template <typename T, typename M>
+size_t MessageMemberPointer<T, M>::getOffset() const {
   return boost::static_pointer_cast<Impl>(this->impl)->offset;
 }
 
-template <class M, typename T>
-T* MessageMemberPointer<M, T>::Impl::get() const {
+template <typename T, typename M>
+M* MessageMemberPointer<T, M>::Impl::get() const {
   if (this->message)
-    return reinterpret_cast<T*>(
+    return reinterpret_cast<M*>(
       (reinterpret_cast<size_t>(this->message.get())+this->offset));
   else
     return 0;

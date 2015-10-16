@@ -122,11 +122,11 @@ bool MessageDefinitionParser::matchType(const std::string& expression) {
 }
 
 bool MessageDefinitionParser::matchArrayType(const std::string& expression,
-    std::string& elementType, size_t& size) {
+    std::string& memberType, size_t& size) {
   boost::smatch match;
   
   if (boost::regex_match(expression, match, memberArrayTypeExpression)) {
-    elementType = std::string(match[1].first, match[1].second);
+    memberType = std::string(match[1].first, match[1].second);
     
     if (match[2].first != match[2].second)
       size = boost::lexical_cast<size_t>(
@@ -187,12 +187,12 @@ bool MessageDefinitionParser::matchVariable(const std::string& expression,
 }
 
 bool MessageDefinitionParser::matchArray(const std::string& expression,
-    std::string& name, std::string& elementType, size_t& size) {
+    std::string& name, std::string& memberType, size_t& size) {
   boost::smatch match;
   
   if (boost::regex_match(expression, match, arrayMemberExpression)) {
     name = std::string(match[3].first, match[3].second);
-    elementType = std::string(match[1].first, match[1].second);
+    memberType = std::string(match[1].first, match[1].second);
     
     if (match[2].first != match[2].second)
       size = boost::lexical_cast<size_t>(

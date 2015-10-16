@@ -30,7 +30,7 @@ template <typename T> DataType DataTypeRegistry::getDataType() {
   DataType dataType(this->getDataType(typeid(T)));
   
   if (!dataType.isValid()) {
-    dataType = DataTypeRegistry::template create<T>();
+    dataType = DataTypeRegistry::template createDataType<T>();
     
     if (dataType.isValid())
       this->addDataType(dataType);
@@ -47,15 +47,15 @@ template <typename T> DataType DataTypeRegistry::getDataType() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class A> ArrayDataType DataTypeRegistry::addArrayDataType() {
-  ArrayDataType arrayDataType = ArrayDataType::template create<A>();
+template <typename T> ArrayDataType DataTypeRegistry::addArrayDataType() {
+  ArrayDataType arrayDataType = ArrayDataType::template create<T>();
   this->addDataType(arrayDataType);
   
   return arrayDataType;
 }
 
-template <typename T, size_t N> ArrayDataType
-  DataTypeRegistry::addArrayDataType() {
+template <typename T, size_t N> ArrayDataType DataTypeRegistry::
+    addArrayDataType() {
   ArrayDataType arrayDataType = ArrayDataType::template create<T, N>();
   this->addDataType(arrayDataType);
   
@@ -64,8 +64,8 @@ template <typename T, size_t N> ArrayDataType
 
 template <typename T> BuiltinDataType DataTypeRegistry::addBuiltinDataType(
     const std::string& identifier) {
-  BuiltinDataType builtinDataType = BuiltinDataType::template
-    create<T>(identifier);
+  BuiltinDataType builtinDataType = BuiltinDataType::template create<T>(
+    identifier);
   this->addDataType(builtinDataType);
   
   return builtinDataType;
@@ -78,20 +78,19 @@ template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
   return messageDataType;
 }
 
-template <typename T> ArrayDataType DataTypeRegistry::create(typename
-    boost::enable_if<ArrayTypeTraits::IsArray<T> >::type*) {
+template <typename T> BuiltinDataType DataTypeRegistry::createDataType(
+    typename boost::enable_if<type_traits::IsBuiltin<T> >::type*) {
+  return BuiltinDataType();
+}
+
+template <typename T> ArrayDataType DataTypeRegistry::createDataType(
+    typename boost::enable_if<type_traits::IsArray<T> >::type*) {
   return ArrayDataType::template create<T>();
 }
 
-template <typename T> MessageDataType DataTypeRegistry::create(typename
-    boost::enable_if<MessageTypeTraits::IsMessage<T> >::type*) {
+template <typename T> MessageDataType DataTypeRegistry::createDataType(
+    typename boost::enable_if<type_traits::IsMessage<T> >::type*) {
   return MessageDataType::template create<T>();
-}
-
-template <typename T> DataType DataTypeRegistry::create(typename boost::
-    disable_if<boost::type_traits::ice_or<ArrayTypeTraits::IsArray<T>::value,
-    MessageTypeTraits::IsMessage<T>::value> >::type*) {
-  return DataType();
 }
 
 }

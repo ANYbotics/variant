@@ -27,6 +27,7 @@
 
 #include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/CollectionVariant.h>
 
 namespace variant_topic_tools {
@@ -68,6 +69,10 @@ namespace variant_topic_tools {
       /** \brief Destructor
         */ 
       virtual ~Value();
+      
+      /** \brief Set the variant's value (implementation)
+        */
+      void setValue(const Variant::Value& value);
       
       /** \brief Retrieve the name of the message member with the specified
         *   index (abstract declaration)
@@ -148,11 +153,17 @@ namespace variant_topic_tools {
       public Variant::ValueT<T>,
       public Value {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+      
+      /** \brief Definition of the value type
+        */
+      typedef typename type_traits::MessageType<T>::ValueType ValueType;
+      
       /** \brief Default constructor
         */ 
-      ValueImplT(const std::vector<MessageMember>&
-        members = std::vector<MessageMember>(), const Pointer<T>&
-        message = Pointer<T>());
+      ValueImplT(const std::vector<MessageMember>& members =
+        std::vector<MessageMember>(), const Pointer<ValueType>&
+        message = Pointer<ValueType>());
       
       /** \brief Copy constructor
         */ 
@@ -164,21 +175,17 @@ namespace variant_topic_tools {
       
       /** \brief Set the variant's value pointer (implementation)
         */
-      void set(const Pointer<T>& value);
-      
-      /** \brief Set the variant's value (implementation)
-        */
-      void setValue(const T& value);
+      void set(const Pointer<ValueType>& value);
       
       /** \brief Retrieve the variant's value (implementation of the
         *   non-const version)
         */
-      T& getValue();
+      ValueType& getValue();
       
       /** \brief Retrieve the variant's value (implementation of the
         *   const version)
         */
-      const T& getValue() const;
+      const ValueType& getValue() const;
       
       /** \brief Retrieve the number of members of the variant collection
         *   (implementation)
@@ -238,7 +245,7 @@ namespace variant_topic_tools {
       
       /** \brief The strong-typed message
         */
-      mutable Pointer<T> message;
+      mutable Pointer<ValueType> message;
     };
     
     /** \brief Constructor (overloaded version taking a message data type

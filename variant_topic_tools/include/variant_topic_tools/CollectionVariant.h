@@ -68,17 +68,6 @@ namespace variant_topic_tools {
       */
     Variant getMember(const std::string& name) const;
     
-    /** \brief Set a member value of the collection by index
-      */    
-    template <typename T> void setValue(size_t index, const T& value);
-    
-    /** \brief Set a member value of the collection by name
-      */    
-    template <typename T> void setValue(const std::string& name, const
-      T& value);
-    
-    using Variant::setValue;
-    
     /** \brief Retrieve a member value of the collection by index
       *   (non-const version)
       */

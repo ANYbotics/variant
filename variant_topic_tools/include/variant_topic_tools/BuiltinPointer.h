@@ -23,25 +23,28 @@
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_POINTER_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_POINTER_H
 
+#include <variant_topic_tools/BuiltinTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Shared pointer to a built-in variable
     */
   template <typename T> class BuiltinPointer :
-    public Pointer<T> {
+    public Pointer<typename type_traits::BuiltinType<T>::ValueType> {
   public:
-    /** \brief Definition of the built-in pointer type
+    BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
+    
+    /** \brief Definition of the built-in value type
       */
-    typedef boost::shared_ptr<T> BuiltinPtr;
-      
+    typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
+    
     /** \brief Default constructor
       */ 
-    BuiltinPointer(T* builtin = 0);
+    BuiltinPointer(ValueType* builtin = 0);
     
     /** \brief Constructor (overloaded version taking a built-in pointer
       */ 
-    BuiltinPointer(const BuiltinPtr& builtin);
+    BuiltinPointer(const boost::shared_ptr<ValueType>& builtin);
     
     /** \brief Copy constructor
       */ 
@@ -49,7 +52,7 @@ namespace variant_topic_tools {
     
     /** \brief Copy constructor (overloaded version taking a pointer)
       */ 
-    BuiltinPointer(const Pointer<T>& src);
+    BuiltinPointer(const Pointer<ValueType>& src);
     
     /** \brief Destructor
       */ 
@@ -59,11 +62,12 @@ namespace variant_topic_tools {
     /** \brief Built-in pointer implementation
       */
     class Impl :
-      public Pointer<T>::Impl {
+      public Pointer<ValueType>::ImplA {
     public:
       /** \brief Constructor
         */
-      Impl(const BuiltinPtr& builtin = BuiltinPtr());
+      Impl(const boost::shared_ptr<ValueType>& builtin = boost::
+        shared_ptr<ValueType>());
       
       /** \brief Destructor
         */
@@ -71,9 +75,9 @@ namespace variant_topic_tools {
 
       /** \brief Retrieve the stored pointer (implementation)
         */
-      T* get() const;
+      ValueType* get() const;
       
-      BuiltinPtr builtin;
+      boost::shared_ptr<ValueType> builtin;
     };
   };
 };

@@ -78,7 +78,7 @@ namespace variant_topic_tools {
 
     /** \brief Create a message type
       */ 
-    template <class M> static MessageType create();
+    template <typename T> static MessageType create();
     
     /** \brief Attempt to load the message type corresponding to the specified
       *   message data type

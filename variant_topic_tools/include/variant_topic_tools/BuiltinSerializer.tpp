@@ -26,7 +26,6 @@ namespace variant_topic_tools {
 
 template <typename T>
 BuiltinSerializer::ImplT<T>::ImplT() {
-  BOOST_STATIC_ASSERT(!ros::message_traits::IsMessage<T>::value);
 }
 
 template <typename T>

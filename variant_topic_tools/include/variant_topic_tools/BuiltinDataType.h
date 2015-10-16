@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_DATA_TYPE_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_DATA_TYPE_H
 
+#include <variant_topic_tools/BuiltinTypeTraits.h>
 #include <variant_topic_tools/DataType.h>
 
 namespace variant_topic_tools {
@@ -83,6 +84,8 @@ namespace variant_topic_tools {
     template <typename T> class ImplT :
       public Impl {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
+      
       /** \brief Constructor
         */
       ImplT(const std::string& identifier);

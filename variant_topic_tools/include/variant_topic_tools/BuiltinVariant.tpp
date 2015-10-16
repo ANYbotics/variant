@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/BuiltinDataType.h>
 #include <variant_topic_tools/BuiltinPointer.h>
 
 namespace variant_topic_tools {
@@ -26,7 +25,7 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-BuiltinVariant::ValueImplT<T>::ValueImplT(const Pointer<T>& value) :
+BuiltinVariant::ValueImplT<T>::ValueImplT(const Pointer<ValueType>& value) :
   value(value) {
 }
 
@@ -44,30 +43,32 @@ BuiltinVariant::ValueImplT<T>::~ValueImplT() {
 /*****************************************************************************/
 
 template <typename T>
-void BuiltinVariant::ValueImplT<T>::set(const Pointer<T>& value) {
+void BuiltinVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
   this->value = value;
 }
 
 template <typename T>
-void BuiltinVariant::ValueImplT<T>::setValue(const T& value) {
+void BuiltinVariant::ValueImplT<T>::setValue(const Variant::Value& value) {
   if (!this->value)
-    this->value = BuiltinPointer<T>(new T());
+    this->value = BuiltinPointer<T>(new ValueType());
   
-  *this->value = value;
+  *this->value = dynamic_cast<const ValueImplT<T>&>(value).getValue();
 }
 
 template <typename T>
-T& BuiltinVariant::ValueImplT<T>::getValue() {
+typename BuiltinVariant::ValueImplT<T>::ValueType& BuiltinVariant::
+    ValueImplT<T>::getValue() {
   if (!this->value)
-    this->value = BuiltinPointer<T>(new T());
+    this->value = BuiltinPointer<T>(new ValueType());
   
   return *this->value;
 }
 
 template <typename T>
-const T& BuiltinVariant::ValueImplT<T>::getValue() const {
+const typename BuiltinVariant::ValueImplT<T>::ValueType& BuiltinVariant::
+    ValueImplT<T>::getValue() const {
   if (!this->value) {
-    static T value = T();
+    static ValueType value = ValueType();
     return value;
   }
   else
@@ -78,8 +79,8 @@ const T& BuiltinVariant::ValueImplT<T>::getValue() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> BuiltinVariant BuiltinVariant::create(const
-    DataType& type, const Pointer<T>& value) {
+template <typename T> BuiltinVariant BuiltinVariant::create(const DataType&
+    type) {
   BuiltinVariant variant;  
   
   variant.type = type;
@@ -91,6 +92,53 @@ template <typename T> BuiltinVariant BuiltinVariant::create(const
 template <typename T>
 Variant::ValuePtr BuiltinVariant::ValueImplT<T>::clone() const {
   return BuiltinVariant::ValuePtr(new ValueImplT<T>(*this));
+}
+
+template <typename T>
+void BuiltinVariant::ValueImplT<T>::read(std::istream& stream) {
+  if (!this->value)
+    this->value = BuiltinPointer<T>(new ValueType());
+  
+  BuiltinVariant::template read<T>(stream, *this->value);
+}
+
+template <typename T>
+void BuiltinVariant::ValueImplT<T>::write(std::ostream& stream) const {
+  if (!this->value) {
+    static ValueType value = ValueType();
+    BuiltinVariant::template write<T>(stream, value);
+  }
+  else
+    BuiltinVariant::template write<T>(stream, *this->value);
+}
+
+template <typename T> void BuiltinVariant::read(std::istream& stream, typename
+    type_traits::BuiltinType<T>::ValueType& value, typename boost::enable_if<
+    boost::is_same<T, bool> >::type*) {
+  typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
+  
+  std::string stringValue;
+  stream >> stringValue;
+  
+  value = (stringValue == "true") ? ValueType(1) : ValueType(0);
+}
+
+template <typename T> void BuiltinVariant::read(std::istream& stream, typename
+    type_traits::BuiltinType<T>::ValueType& value, typename boost::disable_if<
+    boost::is_same<T, bool> >::type*) {
+  Variant::template read<T>(stream, value);
+}
+
+template <typename T> void BuiltinVariant::write(std::ostream& stream, const
+    typename type_traits::BuiltinType<T>::ValueType& value, typename boost::
+    enable_if<boost::is_same<T, bool> >::type*) {
+  stream << (value ? "true" : "false");
+}
+
+template <typename T> void BuiltinVariant::write(std::ostream& stream, const
+    typename type_traits::BuiltinType<T>::ValueType& value, typename boost::
+    disable_if<boost::is_same<T, bool> >::type*) {
+  Variant::template write<T>(stream, value);
 }
 
 }

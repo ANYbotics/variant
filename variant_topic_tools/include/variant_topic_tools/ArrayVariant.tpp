@@ -16,9 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/ArrayDataType.h>
 #include <variant_topic_tools/ArrayMemberPointer.h>
-#include <variant_topic_tools/BuiltinPointer.h>
 #include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
@@ -27,62 +25,52 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-ArrayVariant::ValueImplT<T, N>::ValueImplT(const DataType& memberType, const
-    Pointer<ArrayType>& array) :
+template <typename T>
+ArrayVariant::ValueImplT<T>::ValueImplT(const DataType& memberType, const
+    Pointer<ValueType>& array) :
   memberType(memberType),
   array(array) {
 }
 
-template <typename T, size_t N>
-ArrayVariant::ValueImplT<T, N>::ValueImplT(const ValueImplT<T, N>& src) :
+template <typename T>
+ArrayVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
   memberType(src.memberType),
   array(src.array) {
 }
 
-template <typename T, size_t N>
-ArrayVariant::ValueImplT<T, N>::~ValueImplT() {
+template <typename T>
+ArrayVariant::ValueImplT<T>::~ValueImplT() {
 }
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::set(const Pointer<ArrayType>& value) {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
   this->array = value;
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::setValue(const ArrayType& value) {
+template <typename T>
+typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
+    ValueImplT<T>::getValue() {
   if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
-  }
-    
-  *this->array = value;
-}
-
-template <typename T, size_t N>
-typename ArrayVariant::ValueImplT<T, N>::ArrayType&
-    ArrayVariant::ValueImplT<T, N>::getValue() {
-  if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
+    this->array = Pointer<ValueType>(new ValueType());
+    ArrayVariant::template initialize<T>(*this->array);
   }
   
   return *this->array;
 }
 
-template <typename T, size_t N>
-const typename ArrayVariant::ValueImplT<T, N>::ArrayType&
-    ArrayVariant::ValueImplT<T, N>::getValue() const {
+template <typename T>
+const typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
+    ValueImplT<T>::getValue() const {
   if (!this->array) {
-    static ArrayType array = ArrayType();
+    static ValueType array = ValueType();
     static bool initialized = false;
     
     if (!initialized) {
-      ArrayVariant::template initialize<T, N>(array);
+      ArrayVariant::template initialize<T>(array);
       initialized = true;
     }
     
@@ -92,40 +80,40 @@ const typename ArrayVariant::ValueImplT<T, N>::ArrayType&
     return *this->array;
 }
 
-template <typename T, size_t N>
-size_t ArrayVariant::ValueImplT<T, N>::getNumMembers() const {
+template <typename T>
+size_t ArrayVariant::ValueImplT<T>::getNumMembers() const {
   if (this->array)
     return this->array->size();
   else
     return 0;
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::setMember(size_t index, const Variant&
+template <typename T>
+void ArrayVariant::ValueImplT<T>::setMember(size_t index, const Variant&
     member) {
   if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
+    this->array = Pointer<ValueType>(new ValueType());
+    ArrayVariant::template initialize<T>(*this->array);
   }
   
   if (index < this->array->size())
-    (*this->array)[index] = member.template getValue<T>();
+    (*this->array)[index] = member.template getValue<MemberType>();
   else
     throw NoSuchMemberException(index);
 }
 
-template <typename T, size_t N>
-Variant ArrayVariant::ValueImplT<T, N>::getMember(size_t index) const {
+template <typename T>
+Variant ArrayVariant::ValueImplT<T>::getMember(size_t index) const {
   if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
+    this->array = Pointer<ValueType>(new ValueType());
+    ArrayVariant::template initialize<T>(*this->array);
   }
   
   if (index < this->array->size()) {
     Variant member = this->memberType.createVariant();
 
-    Variant::template set<T>(member,
-      ArrayMemberPointer<ArrayType, T>(this->array, index));
+    Variant::template set<MemberType>(member, ArrayMemberPointer<T>(
+      this->array, index));
     
     return member;
   }
@@ -133,13 +121,13 @@ Variant ArrayVariant::ValueImplT<T, N>::getMember(size_t index) const {
     throw NoSuchMemberException(index);  
 }
 
-template <typename T, size_t N>
-bool ArrayVariant::ValueImplT<T, N>::isFixedSize() const {
-  return N;
+template <typename T>
+bool ArrayVariant::ValueImplT<T>::isFixedSize() const {
+  return NumMembers;
 }
 
-template <typename T, size_t N>
-bool ArrayVariant::ValueImplT<T, N>::isEqual(const Variant::Value& value)
+template <typename T>
+bool ArrayVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
     const {
   return CollectionVariant::Value::isEqual(value);
 }
@@ -148,102 +136,104 @@ bool ArrayVariant::ValueImplT<T, N>::isEqual(const Variant::Value& value)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T, size_t N> ArrayVariant ArrayVariant::create(const
+template <typename T> ArrayVariant ArrayVariant::create(const
     DataType& type, const DataType& memberType) {
   ArrayVariant variant;
   
   variant.type = type;
-  variant.value.reset(new ValueImplT<T, N>(memberType));
+  variant.value.reset(new ValueImplT<T>(memberType));
   
   return variant;
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::addMember(const Variant& member) {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::addMember(const Variant& member) {
   if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
+    this->array = Pointer<ValueType>(new ValueType());
+    ArrayVariant::template initialize<T>(*this->array);
   }
   
-  ArrayVariant::template add<T, N>(*this->array, member);
+  ArrayVariant::template add<T>(*this->array, member);
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::resize(size_t numMembers) {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::resize(size_t numMembers) {
   if (!this->array) {
-    this->array = BuiltinPointer<ArrayType>(new ArrayType());
-    ArrayVariant::template initialize<T, N>(*this->array);
+    this->array = Pointer<ValueType>(new ValueType());
+    ArrayVariant::template initialize<T>(*this->array);
   }
   
-  ArrayVariant::template resize<T, N>(*this->array, numMembers);
+  ArrayVariant::template resize<T>(*this->array, numMembers);
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::clear() {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::clear() {
   if (this->array)
-    ArrayVariant::template clear<T, N>(*this->array);
+    ArrayVariant::template clear<T>(*this->array);
 }
 
-template <typename T, size_t N>
-Variant::ValuePtr ArrayVariant::ValueImplT<T, N>::clone() const {
-  return Variant::ValuePtr(new ValueImplT<T, N>(*this));
+template <typename T>
+Variant::ValuePtr ArrayVariant::ValueImplT<T>::clone() const {
+  return Variant::ValuePtr(new ValueImplT<T>(*this));
 }
 
-template <typename T, size_t N> void ArrayVariant::initialize(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
-    disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
-  array.assign(T());
+template <typename T> void ArrayVariant::initialize(typename type_traits::
+    ArrayType<T>::ValueType& array, typename boost::enable_if<typename
+    type_traits::ArrayType<T>::IsFixedSize>::type*) {
+  array.assign(typename type_traits::ArrayType<T>::MemberValueType());
 }
 
-template <typename T, size_t N> void ArrayVariant::initialize(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
-    enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T> void ArrayVariant::initialize(typename type_traits::
+    ArrayType<T>::ValueType& array, typename boost::disable_if<typename
+    type_traits::ArrayType<T>::IsFixedSize>::type*) {
 }
 
-template <typename T, size_t N> void ArrayVariant::add(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, const T& element,
-    typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T> void ArrayVariant::add(typename type_traits::
+    ArrayType<T>::ValueType& array, const typename type_traits::
+    ArrayType<T>::MemberType& member, typename boost::enable_if<
+    typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
   throw InvalidOperationException("Adding a member to a fixed-size array");
 }
 
-template <typename T, size_t N> void ArrayVariant::add(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, const T& element,
-    typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
-  array.push_back(element); 
+template <typename T> void ArrayVariant::add(typename type_traits::
+    ArrayType<T>::ValueType& array, const typename type_traits::
+    ArrayType<T>::MemberType& member, typename boost::disable_if<
+    typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
+  array.push_back(member); 
 }
 
-template <typename T, size_t N> void ArrayVariant::resize(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, size_t numElements,
-    typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
-  if (numElements != N)
+template <typename T> void ArrayVariant::resize(typename type_traits::
+    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
+    enable_if<typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
+  if (numMembers != type_traits::ArrayType<T>::NumMembers)
     throw InvalidOperationException("Resizing a fixed-size array");
 }
 
-template <typename T, size_t N> void ArrayVariant::resize(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, size_t numElements,
-    typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
-  array.resize(numElements);
+template <typename T> void ArrayVariant::resize(typename type_traits::
+    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
+    disable_if<typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
+  array.resize(numMembers);
 }
 
-template <typename T, size_t N> void ArrayVariant::clear(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
-    disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T> void ArrayVariant::clear(typename type_traits::
+    ArrayType<T>::ValueType& array, typename boost::enable_if<typename
+    type_traits::ArrayType<T>::IsFixedSize>::type*) {
   throw InvalidOperationException("Clearing a fixed-size array");
 }
 
-template <typename T, size_t N> void ArrayVariant::clear(typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType& array, typename boost::
-    enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T> void ArrayVariant::clear(typename type_traits::
+    ArrayType<T>::ValueType& array, typename boost::disable_if<typename
+    type_traits::ArrayType<T>::IsFixedSize>::type*) {
   array.clear();
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::read(std::istream& stream) {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::read(std::istream& stream) {
   CollectionVariant::Value::read(stream);
 }
 
-template <typename T, size_t N>
-void ArrayVariant::ValueImplT<T, N>::write(std::ostream& stream) const {
+template <typename T>
+void ArrayVariant::ValueImplT<T>::write(std::ostream& stream) const {
   CollectionVariant::Value::write(stream);
 }
 

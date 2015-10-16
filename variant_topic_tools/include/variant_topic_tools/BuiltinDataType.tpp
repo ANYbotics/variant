@@ -17,7 +17,6 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/BuiltinSerializer.h>
-#include <variant_topic_tools/BuiltinTypeTraits.h>
 #include <variant_topic_tools/BuiltinVariant.h>
 
 namespace variant_topic_tools {
@@ -29,7 +28,6 @@ namespace variant_topic_tools {
 template <typename T>
 BuiltinDataType::ImplT<T>::ImplT(const std::string& identifier) :
   BuiltinDataType::Impl(identifier) {
-  BOOST_STATIC_ASSERT(!ros::message_traits::IsMessage<T>::value);
 }
 
 template <typename T>

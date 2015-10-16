@@ -23,34 +23,46 @@
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_MEMBER_POINTER_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_MEMBER_POINTER_H
 
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Shared pointer to an array member
     */
-  template <class A, typename T> class ArrayMemberPointer :
-    public Pointer<T> {
+  template <typename T> class ArrayMemberPointer :
+    public Pointer<typename type_traits::ArrayType<T>::MemberValueType> {
   public:
-    /** \brief Definition of the array pointer type
+    BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+    
+    /** \brief Definition of the array value type
       */
-    typedef Pointer<A> ArrayPtr;
+    typedef typename type_traits::ArrayType<T>::ValueType ValueType;
+    
+    /** \brief Definition of the array member type
+      */
+    typedef typename type_traits::ArrayType<T>::MemberValueType
+      MemberValueType;
+    
+    /** \brief Definition of the number of array members
+      */
+    static const size_t NumMembers = type_traits::ArrayType<T>::NumMembers;
       
     /** \brief Default constructor
       */ 
-    ArrayMemberPointer(A* array = 0, size_t index = 0);
+    ArrayMemberPointer(ValueType* array = 0, size_t index = 0);
     
     /** \brief Constructor (overloaded version taking an array pointer
       *   and an index)
       */ 
-    ArrayMemberPointer(const ArrayPtr& array, size_t index);
+    ArrayMemberPointer(const Pointer<ValueType>& array, size_t index);
     
     /** \brief Copy constructor
       */ 
-    ArrayMemberPointer(const ArrayMemberPointer<A, T>& src);
+    ArrayMemberPointer(const ArrayMemberPointer<T>& src);
     
     /** \brief Copy constructor (overloaded version taking a pointer)
       */ 
-    ArrayMemberPointer(const Pointer<T>& src);
+    ArrayMemberPointer(const Pointer<MemberValueType>& src);
     
     /** \brief Destructor
       */ 
@@ -58,11 +70,11 @@ namespace variant_topic_tools {
 
     /** \brief Set the array
       */
-    void setArray(const ArrayPtr& array);
+    void setArray(const Pointer<ValueType>& array);
     
     /** \brief Retrieve the array
       */
-    const ArrayPtr& getArray() const;
+    const Pointer<ValueType>& getArray() const;
     
     /** \brief Set the array member index
       */
@@ -76,11 +88,12 @@ namespace variant_topic_tools {
     /** \brief Array member pointer implementation
       */
     class Impl :
-      public Pointer<T>::Impl {
+      public Pointer<MemberValueType>::ImplA {
     public:
       /** \brief Default constructor
         */
-      Impl(const ArrayPtr& array = ArrayPtr(), size_t index = 0);
+      Impl(const Pointer<ValueType>& array = Pointer<ValueType>(), size_t
+        index = 0);
       
       /** \brief Destructor
         */
@@ -88,11 +101,11 @@ namespace variant_topic_tools {
       
       /** \brief Retrieve the stored pointer (implementation)
         */
-      T* get() const;
+      MemberValueType* get() const;
       
       /** \brief The shared array
         */ 
-      ArrayPtr array;
+      Pointer<ValueType> array;
       
       /** \brief The member index
         */ 

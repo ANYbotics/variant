@@ -16,8 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/BuiltinPointer.h>
-#include <variant_topic_tools/MessageDataType.h>
 #include <variant_topic_tools/MessageMemberPointer.h>
 #include <variant_topic_tools/Exceptions.h>
 
@@ -29,7 +27,7 @@ namespace variant_topic_tools {
 
 template <typename T>
 MessageVariant::ValueImplT<T>::ValueImplT(const std::vector<MessageMember>&
-    members, const Pointer<T>& message) :
+    members, const Pointer<ValueType>& message) :
   message(message) {
   for (size_t i = 0; i < members.size(); ++i)
     this->members.appendField(members[i].getName(), members[i]);
@@ -50,30 +48,24 @@ MessageVariant::ValueImplT<T>::~ValueImplT() {
 /*****************************************************************************/
 
 template <typename T>
-void MessageVariant::ValueImplT<T>::set(const Pointer<T>& value) {
+void MessageVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
   this->message = value;
 }
       
 template <typename T>
-void MessageVariant::ValueImplT<T>::setValue(const T& value) {
+typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::
+    ValueImplT<T>::getValue() {
   if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
-  
-  *this->message = value;
-}
-
-template <typename T>
-T& MessageVariant::ValueImplT<T>::getValue() {
-  if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
+    this->message = Pointer<ValueType>(new ValueType());
   
   return *this->message;
 }
 
 template <typename T>
-const T& MessageVariant::ValueImplT<T>::getValue() const {
+const typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::
+    ValueImplT<T>::getValue() const {
   if (!this->message) {
-    static T message = T();
+    static ValueType message = ValueType();
     return message;
   }
   else
@@ -86,27 +78,21 @@ size_t MessageVariant::ValueImplT<T>::getNumMembers() const {
 }
 
 template <typename T>
-void MessageVariant::ValueImplT<T>::setMember(size_t index, const
-    Variant& member) {
-  if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
-  
-//   members.getField(index).setValue(member);
+void MessageVariant::ValueImplT<T>::setMember(size_t index, const Variant&
+    member) {
+  this->getMember(index).setValue(member);
 }
 
 template <typename T>
 void MessageVariant::ValueImplT<T>::setMember(const std::string& name,
     const Variant& member) {
-  if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
-  
-//   members.getField(name).setValue(member);
+  this->getMember(name).setValue(member);
 }
 
 template <typename T>
 Variant MessageVariant::ValueImplT<T>::getMember(size_t index) const {
   if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
+    this->message = Pointer<ValueType>(new ValueType());
   
   Variant member = this->members[index].getValue().getType().createVariant();
 //   Variant::template set<T>(member,
@@ -119,7 +105,7 @@ template <typename T>
 Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name)
     const {
   if (!this->message)
-    this->message = BuiltinPointer<T>(new T());
+    this->message = Pointer<ValueType>(new ValueType());
   
   Variant member = this->members[name].getValue().getType().createVariant();
 //   Variant::template set<T>(member,

@@ -31,27 +31,25 @@ namespace variant_topic_tools {
 template <typename T>
 MessageDataType::ImplT<T>::ImplT() :
   Impl(ros::message_traits::template definition<T>()) {
-  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
-  
   T message;
   MessageStream stream(message);
   
   ros::serialization::serialize(stream, message);
   
-  const std::vector<size_t>& memberOffsets = stream.getMemberOffsets();
-  const std::vector<DataType>& memberTypes = stream.getMemberTypes();
-
-  BOOST_ASSERT(memberTypes.size() <= this->members.size());
-  for (size_t i = 0, j = 0; i < memberOffsets.size(); ++i, ++j) {
-    while (this->members[j].isConstant())
-      ++j;
+  size_t numConstants = 0;
+  for (size_t i = 0; i < this->members.size(); ++i) {
+    if (this->members[i].isVariable()) {
+      BOOST_ASSERT(i-numConstants < stream.getNumMembers());
       
-    if (memberTypes[i] != this->members[j].getType())
-      ROS_INFO_STREAM("MISMATCH " << memberTypes[i] << " " << this->members[j].getType());
-//     BOOST_ASSERT(memberTypes[i] == this->members[j].getType());
-//     boost::static_pointer_cast<MessageVariable::Impl>(
-//       this->members[j].impl)->offset = memberOffsets[i];
+      boost::static_pointer_cast<MessageVariable::Impl>(
+        this->members[i].impl)->offset = stream.getMemberOffset(
+          i-numConstants);
+    }
+    else
+      ++numConstants;
   }
+  
+  BOOST_ASSERT(this->members.size()-numConstants == stream.getNumMembers());
 }
 
 template <typename T>

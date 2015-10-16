@@ -49,7 +49,7 @@ namespace variant_topic_tools {
     
     /** \brief Constructor (templated version taking a message
       */ 
-    template <class M> Message(const M& message, const MessageHeader&
+    template <typename T> Message(const T& message, const MessageHeader&
       header = MessageHeader());
     
     /** \brief Copy constructor
@@ -102,7 +102,7 @@ namespace variant_topic_tools {
 
     /** \brief Morph the message
       */
-    template <class M> void morph();
+    template <typename T> void morph();
 
     /** \brief Attempt to convert the message to a variant
       */
@@ -110,7 +110,7 @@ namespace variant_topic_tools {
       
     /** \brief Attempt to convert the message to an invariant
       */
-    template <class M> boost::shared_ptr<M> toInvariant()
+    template <typename T> boost::shared_ptr<T> toInvariant()
       const;
 
     /** \brief Read serialized message contents from stream

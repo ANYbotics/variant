@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 
+#include <variant_topic_tools/BuiltinTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 #include <variant_topic_tools/Variant.h>
 
@@ -73,9 +74,15 @@ namespace variant_topic_tools {
       public Variant::ValueT<T>,
       public Value {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
+      
+      /** \brief Declaration of the value type
+        */
+      typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
+      
       /** \brief Default constructor
         */ 
-      ValueImplT(const Pointer<T>& value = Pointer<T>());
+      ValueImplT(const Pointer<ValueType>& value = Pointer<ValueType>());
       
       /** \brief Copy constructor
         */ 
@@ -87,35 +94,70 @@ namespace variant_topic_tools {
       
       /** \brief Set the variant's value pointer (implementation)
         */
-      void set(const Pointer<T>& value);
+      void set(const Pointer<ValueType>& value);
       
       /** \brief Set the variant's value (implementation)
         */
-      void setValue(const T& value);
+      void setValue(const Variant::Value& value);
       
       /** \brief Retrieve the variant's value (implementation of the
         *   non-const version)
         */
-      T& getValue();
+      ValueType& getValue();
       
       /** \brief Retrieve the variant's value (implementation of the
         *   const version)
         */
-      const T& getValue() const;
+      const ValueType& getValue() const;
       
       /** \brief Clone this variant value (implementation)
         */
       ValuePtr clone() const;
       
+      /** \brief Read the variant from a stream (re-implementation)
+        */
+      void read(std::istream& stream);
+    
+      /** \brief Write this variant value to a stream (re-implementation)
+        */
+      void write(std::ostream& stream) const;
+      
       /** \brief The strong-typed value
         */
-      Pointer<T> value;
+      Pointer<ValueType> value;
     };
     
     /** \brief Create a built-in variant
       */ 
-    template <typename T> static BuiltinVariant create(const DataType& type,
-      const Pointer<T>& value = Pointer<T>());
+    template <typename T> static BuiltinVariant create(const DataType& type);
+    
+    /** \brief Read a built-in variant from a stream (overloaded version
+      *   taking a boolean value)
+      */
+    template <typename T> static void read(std::istream& stream,
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::enable_if<boost::is_same<T, bool> >::type* = 0);
+    
+    /** \brief Read a built-in variant from a stream (overloaded version
+      *   taking a non-boolean value)
+      */
+    template <typename T> static void read(std::istream& stream,
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0);
+    
+    /** \brief Write a variant to a stream (overloaded version taking
+      *   a boolean value)
+      */
+    template <typename T> static void write(std::ostream& stream, const
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::enable_if<boost::is_same<T, bool> >::type* = 0);
+    
+    /** \brief Write a variant to a stream (overloaded version taking
+      *   a non-boolean value)
+      */
+    template <typename T> static void write(std::ostream& stream, const
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0);
   };
 };
 

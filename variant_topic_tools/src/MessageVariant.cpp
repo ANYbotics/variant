@@ -72,6 +72,13 @@ MessageVariant::ValueImplV::~ValueImplV() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
+void MessageVariant::Value::setValue(const Variant::Value& value) {
+  const Value& messageValue = dynamic_cast<const Value&>(value);
+  
+  for (size_t i = 0; i < getNumMembers(); ++i)
+    setMember(i, messageValue.getMember(i));
+}
+
 size_t MessageVariant::ValueImplV::getNumMembers() const {
   return members.getNumFields();
 }

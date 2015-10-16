@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/Variant.h>
 
 namespace variant_topic_tools {
@@ -25,44 +24,40 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-template <typename T, size_t N>
-ArraySerializer::ImplT<T, N>::ImplT() {
+template <typename T>
+ArraySerializer::ImplT<T>::ImplT() {
 }
 
-template <typename T, size_t N>
-ArraySerializer::ImplT<T, N>::~ImplT() {
+template <typename T>
+ArraySerializer::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T, size_t N> ArraySerializer ArraySerializer::create() {
+template <typename T> ArraySerializer ArraySerializer::create() {
   ArraySerializer arraySerializer;
-  arraySerializer.impl.reset(new ImplT<T, N>());
+  arraySerializer.impl.reset(new ImplT<T>());
   
   return arraySerializer;
 }
 
-template <typename T, size_t N>
-void ArraySerializer::ImplT<T, N>::serialize(ros::serialization::OStream&
-    stream, const Variant& value) {
-  ros::serialization::serialize(stream, value.template getValue<typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType>());
+template <typename T>
+void ArraySerializer::ImplT<T>::serialize(ros::serialization::OStream& stream,
+    const Variant& value) {
+  ros::serialization::serialize(stream, value.template getValue<T>());
 }
 
-template <typename T, size_t N>
-void ArraySerializer::ImplT<T, N>::deserialize(ros::serialization::IStream&
+template <typename T>
+void ArraySerializer::ImplT<T>::deserialize(ros::serialization::IStream&
     stream, Variant& value) {
-  ros::serialization::deserialize(stream, value.template getValue<typename
-    ArrayTypeTraits::ToArray<T, N>::ArrayType>());
+  ros::serialization::deserialize(stream, value.template getValue<T>());
 }
 
-template <typename T, size_t N>
-void ArraySerializer::ImplT<T, N>::advance(ros::serialization::IStream&
-    stream) {
-  Serializer::template advance<typename ArrayTypeTraits::ToArray<T, N>::
-    ArrayType>(stream);
+template <typename T>
+void ArraySerializer::ImplT<T>::advance(ros::serialization::IStream& stream) {
+  Serializer::template advance<T>(stream);
 }
 
 }

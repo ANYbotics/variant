@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
 
+#include <variant_topic_tools/ArrayTypeTraits.h>
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
@@ -70,7 +71,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      ImplV(const Serializer& elementSerializer, size_t numElements);
+      ImplV(const Serializer& memberSerializer, size_t numMembers);
       
       /** \brief Destructor
         */
@@ -94,9 +95,11 @@ namespace variant_topic_tools {
     /** \brief Array serializer implementation (templated strong-typed
       *   version)
       */
-    template <typename T, size_t N> class ImplT :
+    template <typename T> class ImplT :
       public Impl {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+      
       /** \brief Default constructor
         */
       ImplT();
@@ -120,14 +123,14 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream);
     };
     
-    /** \brief Constructor (overloaded version taking an element serializer
-      *   and a number of elements)
+    /** \brief Constructor (overloaded version taking an member serializer
+      *   and a number of members)
       */ 
-    ArraySerializer(const Serializer& elementSerializer, size_t numElements);
+    ArraySerializer(const Serializer& memberSerializer, size_t numMembers);
     
     /** \brief Create an array serializer
       */ 
-    template <typename T, size_t N> static ArraySerializer create();
+    template <typename T> static ArraySerializer create();
   };
 };
 

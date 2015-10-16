@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 /** \file MessageTypeTraits.h
-  * \brief Header file providing the MessageTypeTraits class interface
+  * \brief Header file providing the message type traits
   */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_TRAITS_H
@@ -26,11 +26,17 @@
 #include <ros/message_traits.h>
 
 namespace variant_topic_tools {
-  /** \brief Message type traits
-    */
-  struct MessageTypeTraits {
+  namespace type_traits {
     template <typename T> struct IsMessage :
       public ros::message_traits::IsMessage<T> {
+    };
+
+    template <typename T> struct MessageType {
+      typedef T ValueType;
+    };
+    
+    template <typename T> struct ToMessageType {
+      typedef T MessageType;
     };
   };
 };

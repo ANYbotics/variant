@@ -30,9 +30,9 @@ namespace variant_topic_tools {
 ArrayDataType::ArrayDataType() {
 }
 
-ArrayDataType::ArrayDataType(const DataType& elementType, size_t numElements) {
+ArrayDataType::ArrayDataType(const DataType& memberType, size_t numMembers) {
   impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplV(elementType, numElements)));
+    new ImplV(memberType, numMembers)));
 }
 
 ArrayDataType::ArrayDataType(const ArrayDataType& src) :
@@ -48,18 +48,18 @@ ArrayDataType::ArrayDataType(const DataType& src) :
 ArrayDataType::~ArrayDataType() {
 }
 
-ArrayDataType::Impl::Impl(const DataType& elementType) :
-  elementType(elementType) {
-  if (!elementType.isValid())
+ArrayDataType::Impl::Impl(const DataType& memberType) :
+  memberType(memberType) {
+  if (!memberType.isValid())
     throw InvalidDataTypeException();  
 }
 
 ArrayDataType::Impl::~Impl() {
 }
 
-ArrayDataType::ImplV::ImplV(const DataType& elementType, size_t numElements) :
-  Impl(elementType),
-  numElements(numElements) {
+ArrayDataType::ImplV::ImplV(const DataType& memberType, size_t numMembers) :
+  Impl(memberType),
+  numMembers(numMembers) {
 }
 
 ArrayDataType::ImplV::~ImplV() {
@@ -69,41 +69,41 @@ ArrayDataType::ImplV::~ImplV() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-const DataType& ArrayDataType::getElementType() const {
+const DataType& ArrayDataType::getMemberType() const {
   if (!impl) {
-    static DataType elementType;
-    return elementType;
+    static DataType memberType;
+    return memberType;
   }
   else
-    return boost::static_pointer_cast<Impl>(*impl)->elementType;
+    return boost::static_pointer_cast<Impl>(*impl)->memberType;
 }
 
-size_t ArrayDataType::getNumElements() const {
+size_t ArrayDataType::getNumMembers() const {
   if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->getNumElements();
+    return boost::static_pointer_cast<Impl>(*impl)->getNumMembers();
   else
     return 0;
 }
 
 const std::string& ArrayDataType::Impl::getIdentifier() const {
   if (identifier.empty()) {
-    identifier = elementType.getIdentifier()+(isFixedSize() ?
-      "["+boost::lexical_cast<std::string>(getNumElements())+"]" : "[]");
+    identifier = memberType.getIdentifier()+(isFixedSize() ?
+      "["+boost::lexical_cast<std::string>(getNumMembers())+"]" : "[]");
   }
 
   return identifier;
 }
 
 size_t ArrayDataType::Impl::getSize() const {
-  return getNumElements()*elementType.getSize();
+  return getNumMembers()*memberType.getSize();
 }
 
 bool ArrayDataType::Impl::isFixedSize() const {
-  return getNumElements();
+  return getNumMembers();
 }
 
-size_t ArrayDataType::ImplV::getNumElements() const {
-  return numElements;
+size_t ArrayDataType::ImplV::getNumMembers() const {
+  return numMembers;
 }
 
 /*****************************************************************************/
@@ -111,11 +111,11 @@ size_t ArrayDataType::ImplV::getNumElements() const {
 /*****************************************************************************/
 
 Serializer ArrayDataType::ImplV::createSerializer(const DataType& type) const {
-  return ArraySerializer(elementType.createSerializer(), numElements);
+  return ArraySerializer(memberType.createSerializer(), numMembers);
 }
 
 Variant ArrayDataType::ImplV::createVariant(const DataType& type) const {
-  return ArrayVariant(type, elementType, numElements);
+  return ArrayVariant(type, memberType, numMembers);
 }
 
 /*****************************************************************************/

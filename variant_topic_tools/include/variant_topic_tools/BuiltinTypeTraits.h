@@ -17,24 +17,49 @@
  ******************************************************************************/
 
 /** \file BuiltinTypeTraits.h
-  * \brief Header file providing the BuiltinTypeTraits class interface
+  * \brief Header file providing the built-in type traits
   */
 
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
 
-#include <ros/ros.h>
+#include <string>
+
+#include <boost/type_traits.hpp>
+
+#include <ros/duration.h>
+#include <ros/time.h>
 
 namespace variant_topic_tools {
-  /** \brief Array type traits
-    */
-  struct BuiltinTypeTraits {
-    template <typename T, size_t D = 0> struct ToBuiltin {
-      typedef T BuiltinType;
+  namespace type_traits {
+    template <typename T, typename D = void> struct IsBuiltin :
+      public boost::type_traits::ice_or<
+        boost::is_integral<T>::value,
+        boost::is_floating_point<T>::value> {
     };
     
-    template <size_t D> struct ToBuiltin<bool, D> {
-      typedef uint8_t BuiltinType;
+    template <typename D> struct IsBuiltin<std::string, D> :
+      public boost::true_type {
+    };
+    
+    template <typename D> struct IsBuiltin<ros::Duration, D> :
+      public boost::true_type {
+    };
+    
+    template <typename D> struct IsBuiltin<ros::Time, D> :
+      public boost::true_type {
+    };
+    
+    template <typename T, typename D = void> struct BuiltinType {
+      typedef T ValueType;
+    };
+    
+    template <typename D> struct BuiltinType<bool, D> {
+      typedef uint8_t ValueType;
+    };
+    
+    template <typename T> struct ToBuiltinType {
+      typedef T BuiltinType;
     };
   };
 };

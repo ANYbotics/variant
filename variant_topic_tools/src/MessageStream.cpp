@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/DataTypeRegistry.h>
+#include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageStream.h"
 
 namespace variant_topic_tools {
@@ -46,12 +46,22 @@ const uint8_t* MessageStream::getData() const {
   return data;
 }
 
-const std::vector<DataType>& MessageStream::getMemberTypes() const {
-  return memberTypes;
+size_t MessageStream::getNumMembers() const {
+  return memberOffsets.size();
 }
 
-const std::vector<size_t>& MessageStream::getMemberOffsets() const {
-  return memberOffsets;
+const DataType& MessageStream::getMemberType(size_t index) const {
+  if (index < memberTypes.size())
+    return memberTypes[index];
+  else
+    throw NoSuchMemberException(index);
+}
+
+size_t MessageStream::getMemberOffset(size_t index) const {
+  if (index < memberOffsets.size())
+    return memberOffsets[index];
+  else
+    throw NoSuchMemberException(index);
 }
 
 }

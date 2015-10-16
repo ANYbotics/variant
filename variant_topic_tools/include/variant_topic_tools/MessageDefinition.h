@@ -70,7 +70,7 @@ namespace variant_topic_tools {
     /** \brief Set the message type represented by this message
       *   definition (templated version)
       */ 
-    template <class M> void setMessageType();
+    template <typename T> void setMessageType();
     
     /** \brief Set the message data type represented by this message
       *   definition
@@ -88,7 +88,7 @@ namespace variant_topic_tools {
     
     /** \brief Create a message definition
       */ 
-    template <class M> static MessageDefinition create();
+    template <typename T> static MessageDefinition create();
     
     /** \brief Attempt to load the message definition for the specified
       *   message data type

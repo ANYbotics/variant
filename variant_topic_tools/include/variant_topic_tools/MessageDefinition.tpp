@@ -24,16 +24,16 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <class M> void MessageDefinition::setMessageType() {
-  this->setMessageType(MessageType::template create<M>());
+template <typename T> void MessageDefinition::setMessageType() {
+  this->setMessageType(MessageType::template create<T>());
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class M> MessageDefinition MessageDefinition::create() {
-  return MessageDefinition(MessageType::template create<M>());
+template <typename T> MessageDefinition MessageDefinition::create() {
+  return MessageDefinition(MessageType::template create<T>());
 }
 
 }

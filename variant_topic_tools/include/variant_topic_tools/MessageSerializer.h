@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 
+#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
@@ -97,6 +98,8 @@ namespace variant_topic_tools {
     template <typename T> class ImplT :
       public Impl {
     public:
+      BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+      
       /** \brief Default constructor
         */
       ImplT();

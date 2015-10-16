@@ -22,16 +22,6 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T> void CollectionVariant::setValue(size_t index, const T&
-    value) {
-  this->setMember(index, Variant(value));
-}
-
-template <typename T> void CollectionVariant::setValue(const std::string&
-    name, const T& value) {
-  this->setMember(name, Variant(value));
-}
-
 template <typename T> T& CollectionVariant::getValue(size_t index) {
   return this->getMember(index).template getValue<T>();
 }

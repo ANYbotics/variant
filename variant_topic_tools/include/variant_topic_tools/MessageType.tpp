@@ -26,13 +26,13 @@ namespace variant_topic_tools {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class M> MessageType MessageType::create() {
-  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<M>::value);
+template <typename T> MessageType MessageType::create() {
+  BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
   
   return MessageType(
-    ros::message_traits::template datatype<M>(),
-    ros::message_traits::template md5sum<M>(),
-    ros::message_traits::template definition<M>()
+    ros::message_traits::template datatype<T>(),
+    ros::message_traits::template md5sum<T>(),
+    ros::message_traits::template definition<T>()
   );
 }
 
