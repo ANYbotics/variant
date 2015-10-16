@@ -18,7 +18,6 @@
 
 #include <typeinfo>
 
-#include <variant_topic_tools/DataTypeRegistry.h>
 #include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
@@ -168,7 +167,6 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
   typedef typename type_traits::ToDataType<T>::DataType Type;
   
   if (!dst.type.isValid()) {
-    ROS_INFO("TYPE %s", typeid(Type).name());
     dst.type = DataType(typeid(Type));
     
     if (dst.type.isValid()) {

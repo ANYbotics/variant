@@ -38,30 +38,27 @@ TEST(Serializer, Array) {
   ros::serialization::OStream o1(d1.data(), d1.size());
   ros::serialization::IStream i1(d1.data(), d1.size());
 
-  typedef boost::array<int, 3> boost_array_int_3;
-  typedef std::vector<int32_t> std_vector_int;
-  
-  boost_array_int_3 a1;
+  boost::array<int, 3> a1;
   a1[0] = 0; a1[1] = 1; a1[2] = 2;
-  std_vector_int a2(3);
+  std::vector<int32_t> a2(3);
   a2[0] = 0; a2[1] = 1; a2[2] = 2;
   Variant v1, v2;
   
-  Serializer s1 = registry.getDataType<boost_array_int_3>().createSerializer();
-  Serializer s2 = registry.getDataType<std_vector_int>().createSerializer();
+  Serializer s1 = registry.getDataType<int[3]>().createSerializer();
+  Serializer s2 = registry.getDataType<int[]>().createSerializer();
   
   s1.serialize(o1, a1);
   EXPECT_EQ(d1.size()-ros::serialization::serializationLength(a1),
     o1.getLength());
   s1.deserialize(i1, v1);
-  EXPECT_EQ(a1[0], v1.getValue<boost_array_int_3>()[0]);
-  EXPECT_EQ(a1[1], v1.getValue<boost_array_int_3>()[1]);
-  EXPECT_EQ(a1[2], v1.getValue<boost_array_int_3>()[2]);
+  EXPECT_EQ(a1[0], v1.getValue<int[3]>()[0]);
+  EXPECT_EQ(a1[1], v1.getValue<int[3]>()[1]);
+  EXPECT_EQ(a1[2], v1.getValue<int[3]>()[2]);
   s2.serialize(o1, a2);
   s2.deserialize(i1, v2);
-  EXPECT_EQ(a2[0], v2.getValue<std_vector_int>()[0]);
-  EXPECT_EQ(a2[1], v2.getValue<std_vector_int>()[1]);
-  EXPECT_EQ(a2[2], v2.getValue<std_vector_int>()[2]);
+  EXPECT_EQ(a2[0], v2.getValue<int[]>()[0]);
+  EXPECT_EQ(a2[1], v2.getValue<int[]>()[1]);
+  EXPECT_EQ(a2[2], v2.getValue<int[]>()[2]);
   
   registry.clear();
 }

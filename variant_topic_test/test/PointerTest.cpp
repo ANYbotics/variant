@@ -42,14 +42,14 @@ TEST(Pointer, Array) {
   (*a1)[0] = 0;
   (*a1)[1] = 1;
   (*a1)[2] = 2;  
-  ArrayMemberPointer<boost::array<int, 3> > p1(a1, 1);
+  ArrayMemberPointer<int[3]> p1(a1, 1);
   
   std::vector<int>* a2 = new std::vector<int>(3);
   (*a2)[0] = 0;
   (*a2)[1] = 1;
   (*a2)[2] = 2;  
-  ArrayMemberPointer<std::vector<int> > p2(a2, 1);
-  ArrayMemberPointer<std::vector<int> > p3(p2.getArray(), 2);
+  ArrayMemberPointer<int[]> p2(a2, 1);
+  ArrayMemberPointer<int[]> p3(p2.getArray(), 2);
   
   EXPECT_EQ(a1, p1.getArray().get());
   EXPECT_EQ(1, p1.getIndex());
@@ -87,10 +87,9 @@ TEST(Pointer, ArrayOfMessages) {
   variant_msgs::Test* m1 = new variant_msgs::Test();
   m1->string_array[1].data = "Test";
   
-  MessageMemberPointer<variant_msgs::Test, boost::array<std_msgs::String, 3> >
+  MessageMemberPointer<variant_msgs::Test, std_msgs::String[3]>
     p1(m1, offsetof(variant_msgs::Test, string_array));
-  ArrayMemberPointer<boost::array<std_msgs::String, 3>, std_msgs::String>
-    p2(p1, 1);
+  ArrayMemberPointer<std_msgs::String[3]> p2(p1, 1);
   MessageMemberPointer<std_msgs::String, std::string>
     p3(p2, offsetof(std_msgs::String, data));
   

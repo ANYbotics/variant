@@ -16,8 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <variant_topic_tools/DataTypeRegistry.h>
-
 namespace variant_topic_tools {
 
 /*****************************************************************************/
@@ -33,9 +31,6 @@ template <typename T> MessageStream::MessageStream(const T& data) :
 /*****************************************************************************/
 
 template <typename T> void MessageStream::next(const T& member) {
-  DataTypeRegistry registry;
-  
-  this->memberTypes.push_back(registry.template getDataType<T>());
   this->memberOffsets.push_back(reinterpret_cast<size_t>(&member)-
     reinterpret_cast<size_t>(data));
 }

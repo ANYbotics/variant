@@ -31,7 +31,6 @@ MessageStream::MessageStream(const uint8_t* data) :
 
 MessageStream::MessageStream(const MessageStream& src) :
   data(src.data),
-  memberTypes(src.memberTypes),
   memberOffsets(src.memberOffsets) {
 }
 
@@ -48,13 +47,6 @@ const uint8_t* MessageStream::getData() const {
 
 size_t MessageStream::getNumMembers() const {
   return memberOffsets.size();
-}
-
-const DataType& MessageStream::getMemberType(size_t index) const {
-  if (index < memberTypes.size())
-    return memberTypes[index];
-  else
-    throw NoSuchMemberException(index);
 }
 
 size_t MessageStream::getMemberOffset(size_t index) const {

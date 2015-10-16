@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
   
   Serializer s1 = registry.getDataType<int32_t>().createSerializer();
   Serializer s2 = registry.getDataType<double>().createSerializer();
-  Serializer s3 = registry.getDataType("int32[3]").createSerializer();
-  Serializer s4 = registry.getDataType("int32[]").createSerializer();
+  Serializer s3 = registry.getDataType<int32_t[3]>().createSerializer();
+  Serializer s4 = registry.getDataType<int32_t>().createSerializer();
   
   s1.serialize(o1, b1);
   s3.serialize(o1, a1);

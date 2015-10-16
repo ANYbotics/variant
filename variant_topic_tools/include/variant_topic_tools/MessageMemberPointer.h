@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_POINTER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_MEMBER_POINTER_H
 
+#include <variant_topic_tools/DataTypeTraits.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 
@@ -30,18 +31,26 @@ namespace variant_topic_tools {
   /** \brief Shared pointer
     */
   template <typename T, typename M> class MessageMemberPointer :
-    public Pointer<M> {
+    public Pointer<typename type_traits::DataType<M>::ValueType> {
   public:
     BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
     
+    /** \brief Definition of the message value type
+      */
+    typedef typename type_traits::MessageType<T>::ValueType ValueType;
+    
+    /** \brief Definition of the message member value type
+      */
+    typedef typename type_traits::DataType<M>::ValueType MemberValueType;
+      
     /** \brief Default constructor
       */ 
-    MessageMemberPointer(T* message = 0, size_t offset = 0);
+    MessageMemberPointer(ValueType* message = 0, size_t offset = 0);
     
     /** \brief Constructor (overloaded version taking a message pointer
       *   and an offset)
       */ 
-    MessageMemberPointer(const Pointer<T>& message, size_t offset);
+    MessageMemberPointer(const Pointer<ValueType>& message, size_t offset);
     
     /** \brief Copy constructor
       */ 
@@ -49,7 +58,7 @@ namespace variant_topic_tools {
     
     /** \brief Copy constructor (overloaded version taking a pointer)
       */ 
-    MessageMemberPointer(const Pointer<M>& src);
+    MessageMemberPointer(const Pointer<MemberValueType>& src);
     
     /** \brief Destructor
       */ 
@@ -57,11 +66,11 @@ namespace variant_topic_tools {
     
     /** \brief Set the message
       */
-    void setMessage(const Pointer<T>& message);
+    void setMessage(const Pointer<ValueType>& message);
     
     /** \brief Retrieve the message
       */
-    const Pointer<T>& getMessage() const;
+    const Pointer<ValueType>& getMessage() const;
     
     /** \brief Set the message member offset
       */
@@ -75,11 +84,12 @@ namespace variant_topic_tools {
     /** \brief Message member pointer implementation
       */
     class Impl :
-      public Pointer<M>::ImplA {
+      public Pointer<MemberValueType>::ImplA {
     public:
       /** \brief Constructor
         */
-      Impl(const Pointer<T>& message = Pointer<T>(), size_t offset = 0);
+      Impl(const Pointer<ValueType>& message = Pointer<ValueType>(), size_t
+        offset = 0);
       
       /** \brief Destructor
         */
@@ -87,11 +97,11 @@ namespace variant_topic_tools {
       
       /** \brief Retrieve the stored pointer (implementation)
         */
-      M* get() const;
+      MemberValueType* get() const;
       
       /** \brief The shared message
         */ 
-      Pointer<T> message;
+      Pointer<ValueType> message;
       
       /** \brief The member offset
         */ 

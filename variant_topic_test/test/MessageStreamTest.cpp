@@ -35,16 +35,10 @@ TEST(MessageStream, Output) {
   
   EXPECT_EQ(offsetof(variant_msgs::Test, header),
     s1.getMemberOffset(0));
-  EXPECT_EQ(registry.getDataType<std_msgs::Header>(),
-    s1.getMemberType(0));
   EXPECT_EQ(offsetof(variant_msgs::Test, builtin_int),
     s1.getMemberOffset(1));
-  EXPECT_EQ(registry.getDataType<int32_t>(),
-    s1.getMemberType(1));
   EXPECT_EQ(offsetof(variant_msgs::Test, builtin_string),
     s1.getMemberOffset(4));
-  EXPECT_EQ(registry.getDataType<std::string>(),
-    s1.getMemberType(4));
   
   registry.clear();
 }

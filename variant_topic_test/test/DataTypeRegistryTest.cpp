@@ -30,10 +30,10 @@ TEST(DataTypeRegistry, Array) {
 
   ArrayDataType a1 = registry.addArrayDataType<int, 3>();
   ArrayDataType a2 = registry.addArrayDataType<int, 0>();
-  ArrayDataType a3 = registry.addArrayDataType<boost::array<double, 3> >();
-  ArrayDataType a4 = registry.addArrayDataType<std::vector<double> >();
-//   ArrayDataType a5 = registry.addArrayDataType<bool[3]>();
-//   ArrayDataType a6 = registry.addArrayDataType<bool[]>();
+  ArrayDataType a3 = registry.addArrayDataType<double[3]>();
+  ArrayDataType a4 = registry.addArrayDataType<double[]>();
+  ArrayDataType a5 = registry.addArrayDataType<bool[3]>();
+  ArrayDataType a6 = registry.addArrayDataType<bool[]>();
   ArrayDataType a7 = registry.addArrayDataType("int8", 3);
   ArrayDataType a8 = registry.addArrayDataType(typeid(int8_t));
   
@@ -45,10 +45,10 @@ TEST(DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType("float64[3]").isArray());
   EXPECT_TRUE(registry.getDataType<double[]>().isArray());
   EXPECT_TRUE(registry.getDataType("float64[]").isArray());
-//   EXPECT_TRUE(registry.getDataType<bool[3]>().isArray());
-//   EXPECT_TRUE(registry.getDataType("bool[3]").isArray());
-//   EXPECT_TRUE(registry.getDataType<bool[]>().isArray());
-//   EXPECT_TRUE(registry.getDataType("bool[]").isArray());  
+  EXPECT_TRUE(registry.getDataType<bool[3]>().isArray());
+  EXPECT_TRUE(registry.getDataType("bool[3]").isArray());
+  EXPECT_TRUE(registry.getDataType<bool[]>().isArray());
+  EXPECT_TRUE(registry.getDataType("bool[]").isArray());  
   EXPECT_TRUE(registry.getDataType<int8_t[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("int8[3]").isArray());
   EXPECT_TRUE(registry.getDataType<int8_t[]>().isArray());
