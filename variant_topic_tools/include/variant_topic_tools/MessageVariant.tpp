@@ -126,12 +126,6 @@ bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
   return this->members.hasField(name);
 }
 
-template <typename T>
-bool MessageVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
-    const {
-  return CollectionVariant::Value::isEqual(value);
-}
-
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
@@ -149,16 +143,6 @@ template <typename T> MessageVariant MessageVariant::create(const DataType&
 template <typename T>
 Variant::ValuePtr MessageVariant::ValueImplT<T>::clone() const {
   return Variant::ValuePtr(new ValueImplT<T>(*this));
-}
-
-template <typename T>
-void MessageVariant::ValueImplT<T>::read(std::istream& stream) {
-  CollectionVariant::Value::read(stream);
-}
-
-template <typename T>
-void MessageVariant::ValueImplT<T>::write(std::ostream& stream) const {
-  CollectionVariant::Value::write(stream);
 }
 
 }

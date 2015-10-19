@@ -126,12 +126,6 @@ bool ArrayVariant::ValueImplT<T>::isFixedSize() const {
   return NumMembers;
 }
 
-template <typename T>
-bool ArrayVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
-    const {
-  return CollectionVariant::Value::isEqual(value);
-}
-
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
@@ -225,16 +219,6 @@ template <typename T> void ArrayVariant::clear(typename type_traits::
     ArrayType<T>::ValueType& array, typename boost::disable_if<typename
     type_traits::ArrayType<T>::IsFixedSize>::type*) {
   array.clear();
-}
-
-template <typename T>
-void ArrayVariant::ValueImplT<T>::read(std::istream& stream) {
-  CollectionVariant::Value::read(stream);
-}
-
-template <typename T>
-void ArrayVariant::ValueImplT<T>::write(std::ostream& stream) const {
-  CollectionVariant::Value::write(stream);
 }
 
 }

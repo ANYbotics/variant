@@ -187,10 +187,6 @@ namespace variant_topic_tools {
     template <typename T> class ValueT :
       public virtual Value {
     public:
-      /** \brief Definition of the value type
-        */
-      typedef typename type_traits::DataType<T>::ValueType ValueType;
-      
       /** \brief Default constructor
         */ 
       ValueT();
@@ -201,35 +197,22 @@ namespace variant_topic_tools {
       
       /** \brief Set the variant's value pointer (abstract declaration)
         */
-      virtual void set(const Pointer<ValueType>& value) = 0;
+      virtual void set(const Pointer<T>& value) = 0;
       
       /** \brief Set the variant's value (overloaded version taking a
         *   variant value)
         */
-      void setValue(const ValueType& value);
+      void setValue(const T& value);
       
       /** \brief Retrieve the variant's value (abstract declaration of the
         *   non-const version)
         */
-      virtual ValueType& getValue() = 0;
+      virtual T& getValue() = 0;
       
       /** \brief Retrieve the variant's value (abstract declaration of the
         *   const version)
         */
-      virtual const ValueType& getValue() const = 0;
-      
-      /** \brief True, if this variant value equals another variant value
-        *   (implementation)
-        */
-      bool isEqual(const Value& value) const;
-      
-      /** \brief Read the variant from a stream (implementation)
-        */
-      void read(std::istream& stream);
-    
-      /** \brief Write this variant value to a stream (implementation)
-        */
-      void write(std::ostream& stream) const;
+      virtual const T& getValue() const = 0;
     };
 
     /** \brief The variant's data type
@@ -255,7 +238,15 @@ namespace variant_topic_tools {
       value, typename boost::enable_if<boost::is_base_of<Variant, T> >::
       type* = 0);
     
-    /** \brief Set a variant's value (overloaded version taking a non-variant)
+    /** \brief Set a variant's value (overloaded version taking a variant
+      *   value pointer)
+      */
+//     template <typename T> static void setValue(Variant& dst, const T&
+//       value, typename boost::enable_if<boost::is_base_of<Variant, T> >::
+//       type* = 0);
+    
+    /** \brief Set a variant's value (overloaded version taking a variant
+      *   value)
       */
     template <typename T> static void setValue(Variant& dst, const T& value,
       typename boost::disable_if<boost::is_base_of<Variant, T> >::type* = 0);
@@ -265,80 +256,11 @@ namespace variant_topic_tools {
     template <typename T> static void assign(Variant& dst, const T& src,
       typename boost::enable_if<boost::is_base_of<Variant, T> >::type* = 0);
     
-    /** \brief Assign a variant (overloaded version taking a non-variant)
+    /** \brief Assign a variant (overloaded version taking a variant value)
       */
     template <typename T> static void assign(Variant& dst, const T& src,
       typename boost::disable_if<boost::is_base_of<Variant, T> >::type* = 0);
     
-    /** \brief Compare the values of two variants (overloaded version
-      *   taking two comparable values)
-      */
-    template <typename T> static bool isEqual(const typename type_traits::
-      DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-      ValueType& rhs, typename boost::enable_if<boost::has_equal_to<typename
-      type_traits::DataType<T>::ValueType, typename type_traits::DataType<T>::
-      ValueType, bool> >::type* = 0, typename boost::disable_if<type_traits::
-      IsArray<T> >::type* = 0);
-    
-    /** \brief Compare the values of two variants (overloaded version
-      *   taking two arrays with comparable members)
-      */
-    template <typename T> static bool isEqual(const typename type_traits::
-      DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-      ValueType& rhs, typename boost::enable_if<boost::has_equal_to<typename
-      type_traits::ArrayType<T>::MemberValueType, typename type_traits::
-      ArrayType<T>::MemberValueType, bool> >::type* = 0);
-    
-    /** \brief Compare the values of two variants (overloaded version
-      *   taking two non-comparable values)
-      */
-    template <typename T> static bool isEqual(const typename type_traits::
-      DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-      ValueType& rhs, typename boost::disable_if<boost::has_equal_to<
-      typename type_traits::DataType<T>::ValueType, typename type_traits::
-      DataType<T>::ValueType, bool> >::type* = 0, typename boost::
-      disable_if<type_traits::IsArray<T> >::type* = 0);
-    
-    /** \brief Compare the values of two variants (overloaded version
-      *   taking two arrays with non-comparable members)
-      */
-    template <typename T> static bool isEqual(const typename type_traits::
-      DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-      ValueType& rhs, typename boost::disable_if<boost::has_equal_to<
-      typename type_traits::ArrayType<T>::MemberValueType, typename
-      type_traits::ArrayType<T>::MemberValueType, bool> >::type* = 0);
-      
-    /** \brief Read a variant from a stream (overloaded version taking
-      *   a stream-readable value)
-      */
-    template <typename T> static void read(std::istream& stream, typename
-      type_traits::DataType<T>::ValueType& value, typename boost::enable_if<
-      boost::has_right_shift<std::istream, typename type_traits::DataType<T>::
-      ValueType&> >::type* = 0);
-    
-    /** \brief Read a variant from a stream (overloaded version taking
-      *   a non-stream-readable value)
-      */
-    template <typename T> static void read(std::istream& stream, typename
-      type_traits::DataType<T>::ValueType& value, typename boost::disable_if<
-      boost::has_right_shift<std::istream, typename type_traits::DataType<T>::
-      ValueType&> >::type* = 0);
-    
-    /** \brief Write a variant to a stream (overloaded version taking
-      *   a stream-writable value)
-      */
-    template <typename T> static void write(std::ostream& stream, const
-      typename type_traits::DataType<T>::ValueType& value, typename
-      boost::enable_if<boost::has_left_shift<std::ostream, const typename
-      type_traits::DataType<T>::ValueType&> >::type* = 0);
-    
-    /** \brief Write a variant to a stream (overloaded version taking
-      *   a non-stream-writable value)
-      */
-    template <typename T> static void write(std::ostream& stream, const
-      typename type_traits::DataType<T>::ValueType& value, typename
-      boost::disable_if<boost::has_left_shift<std::ostream, const typename
-      type_traits::DataType<T>::ValueType&> >::type* = 0);
   };
   
   /** \brief Operator for reading the variant from a stream

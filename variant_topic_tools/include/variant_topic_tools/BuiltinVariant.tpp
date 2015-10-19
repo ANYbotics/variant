@@ -75,13 +75,20 @@ const typename BuiltinVariant::ValueImplT<T>::ValueType& BuiltinVariant::
     return *this->value;
 }
 
+template <typename T>
+bool BuiltinVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
+    const {
+  return BuiltinVariant::template isEqual<T>(dynamic_cast<const
+    ValueT<T>&>(value).getValue(), this->getValue());
+}
+
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
 template <typename T> BuiltinVariant BuiltinVariant::create(const DataType&
     type) {
-  BuiltinVariant variant;  
+  BuiltinVariant variant;
   
   variant.type = type;
   variant.value.reset(new ValueImplT<T>());
@@ -100,6 +107,25 @@ void BuiltinVariant::ValueImplT<T>::read(std::istream& stream) {
     this->value = BuiltinPointer<T>(new ValueType());
   
   BuiltinVariant::template read<T>(stream, *this->value);
+}
+
+template <typename T> bool BuiltinVariant::isEqual(const typename
+    type_traits::BuiltinType<T>::ValueType& lhs, const typename
+    type_traits::BuiltinType<T>::ValueType& rhs, typename boost::
+    enable_if<boost::has_equal_to<typename type_traits::BuiltinType<T>::
+    ValueType, typename type_traits::BuiltinType<T>::ValueType, bool> >::
+    type*) {
+  return (lhs == rhs);
+}
+
+template <typename T> bool BuiltinVariant::isEqual(const typename
+    type_traits::BuiltinType<T>::ValueType& lhs, const typename
+    type_traits::BuiltinType<T>::ValueType& rhs, typename boost::
+    disable_if<boost::has_equal_to<typename type_traits::BuiltinType<T>::
+    ValueType, typename type_traits::BuiltinType<T>::ValueType, bool> >::
+    type*) {
+  throw InvalidOperationException(
+    "Comparing two variants of non-comparable value types");
 }
 
 template <typename T>
@@ -125,8 +151,19 @@ template <typename T> void BuiltinVariant::read(std::istream& stream, typename
 
 template <typename T> void BuiltinVariant::read(std::istream& stream, typename
     type_traits::BuiltinType<T>::ValueType& value, typename boost::disable_if<
-    boost::is_same<T, bool> >::type*) {
-  Variant::template read<T>(stream, value);
+    boost::is_same<T, bool> >::type*, typename boost::enable_if<boost::
+    has_right_shift<std::istream, typename type_traits::BuiltinType<T>::
+    ValueType&> >::type*) {
+  stream >> value;
+}
+
+template <typename T> void BuiltinVariant::read(std::istream& stream, typename
+    type_traits::BuiltinType<T>::ValueType& value, typename boost::disable_if<
+    boost::is_same<T, bool> >::type*, typename boost::disable_if<boost::
+    has_right_shift<std::istream, typename type_traits::BuiltinType<T>::
+    ValueType&> >::type*) {
+  throw InvalidOperationException(
+    "Reading a variant of non-readable value type");
 }
 
 template <typename T> void BuiltinVariant::write(std::ostream& stream, const
@@ -137,8 +174,19 @@ template <typename T> void BuiltinVariant::write(std::ostream& stream, const
 
 template <typename T> void BuiltinVariant::write(std::ostream& stream, const
     typename type_traits::BuiltinType<T>::ValueType& value, typename boost::
-    disable_if<boost::is_same<T, bool> >::type*) {
-  Variant::template write<T>(stream, value);
+    disable_if<boost::is_same<T, bool> >::type*, typename boost::
+    enable_if<boost::has_left_shift<std::ostream, const typename type_traits::
+    BuiltinType<T>::ValueType&> >::type*) {
+  stream << value;
+}
+
+template <typename T> void BuiltinVariant::write(std::ostream& stream, const
+    typename type_traits::BuiltinType<T>::ValueType& value, typename boost::
+    disable_if<boost::is_same<T, bool> >::type*, typename boost::
+    disable_if<boost::has_left_shift<std::ostream, const typename type_traits::
+    BuiltinType<T>::ValueType&> >::type*) {
+  throw InvalidOperationException(
+    "Writing a variant of non-writable value type");
 }
 
 }

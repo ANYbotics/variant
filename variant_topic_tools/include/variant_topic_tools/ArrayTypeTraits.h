@@ -45,6 +45,10 @@ namespace variant_topic_tools {
       public boost::true_type {
     };
     
+    template <size_t N> struct IsArray<char[N]> :
+      public boost::false_type {
+    };
+    
     template <typename T, typename D = void> struct ArrayMemberType {
       typedef T ValueType;
     };
@@ -72,7 +76,7 @@ namespace variant_topic_tools {
     };
     
     template <typename T> struct ToArrayType {
-      typedef type_traits::ArrayType<T> ArrayType;
+      typedef T ArrayType;
     };
     
     template <typename T> struct ToArrayType<std::vector<T> > {

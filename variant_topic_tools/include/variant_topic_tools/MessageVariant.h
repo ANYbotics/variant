@@ -150,7 +150,7 @@ namespace variant_topic_tools {
     /** \brief Message variant value (templated implementation)
       */
     template <typename T> class ValueImplT :
-      public Variant::ValueT<T>,
+      public Variant::ValueT<typename type_traits::MessageType<T>::ValueType>,
       public Value {
     public:
       BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
@@ -222,22 +222,9 @@ namespace variant_topic_tools {
         */
       bool hasMember(const std::string& name) const;
       
-      /** \brief True, if this variant value equals another variant value
-        *   (re-implementation)
-        */
-      bool isEqual(const Variant::Value& value) const;
-      
       /** \brief Clone this variant value (implementation)
         */
       ValuePtr clone() const;
-      
-      /** \brief Read the variant from a stream (re-implementation)
-        */
-      void read(std::istream& stream);
-    
-      /** \brief Write this variant value to a stream (re-implementation)
-        */
-      void write(std::ostream& stream) const;
       
       /** \brief The message members
         */

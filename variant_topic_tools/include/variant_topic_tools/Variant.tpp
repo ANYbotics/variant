@@ -48,12 +48,15 @@ template <typename T> void Variant::setValue(const T& value) {
 
 template <typename T> typename type_traits::DataType<T>::ValueType& 
     Variant::getValue() {
+  typedef typename type_traits::DataType<T>::ValueType ValueType;
+  
   if (!this->type.isValid()) {
     this->type = DataType(typeid(T));
     
     if (this->type.isValid()) {
       this->value = this->type.createVariant().value;
-      return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
+      return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
+        getValue();
     }
     else
       throw InvalidDataTypeException();
@@ -62,7 +65,8 @@ template <typename T> typename type_traits::DataType<T>::ValueType&
     if (!this->value)
       this->value = this->type.createVariant().value;
     
-    return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->getValue();
+    return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
+      getValue();
   }
   else
     throw DataTypeMismatchException(this->type.getIdentifier(),
@@ -71,6 +75,8 @@ template <typename T> typename type_traits::DataType<T>::ValueType&
 
 template <typename T> const typename type_traits::DataType<T>::ValueType&
     Variant::getValue() const {
+  typedef typename type_traits::DataType<T>::ValueType ValueType;
+  
   if (this->type.isValid()) {
     if (typeid(T) == this->type.getTypeInfo()) {
       if (!this->value) {
@@ -78,7 +84,7 @@ template <typename T> const typename type_traits::DataType<T>::ValueType&
         return value;
       }
       else 
-        return boost::dynamic_pointer_cast<ValueT<T> >(this->value)->
+        return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
           getValue();
     }
     else
@@ -90,38 +96,25 @@ template <typename T> const typename type_traits::DataType<T>::ValueType&
 }
 
 template <typename T>
-void Variant::ValueT<T>::setValue(const ValueType& value) {
+void Variant::ValueT<T>::setValue(const T& value) {
   this->getValue() = value;
-}
-
-template <typename T>
-bool Variant::ValueT<T>::isEqual(const Value& value) const {
-  return Variant::template isEqual<T>(dynamic_cast<const
-    ValueT<T>&>(value).getValue(), this->getValue());
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T>
-void Variant::ValueT<T>::read(std::istream& stream) {
-  Variant::template read<T>(stream, this->getValue());
-}
-
-template <typename T>
-void Variant::ValueT<T>::write(std::ostream& stream) const {
-  Variant::template write<T>(stream, this->getValue());
-}
-
 template <typename T> void Variant::set(Variant& variant, const
     Pointer<typename type_traits::DataType<T>::ValueType>& value) {
+  typedef typename type_traits::DataType<T>::ValueType ValueType;
+  
   if (!variant.type.isValid()) {
     variant.type = DataType(typeid(T));
     
     if (variant.type.isValid()) {
       variant.value = variant.type.createVariant().value;
-      boost::dynamic_pointer_cast<ValueT<T> >(variant.value)->set(value);      
+      boost::dynamic_pointer_cast<ValueT<ValueType> >(variant.value)->
+        set(value);      
     }
     else
       throw InvalidDataTypeException();
@@ -130,7 +123,8 @@ template <typename T> void Variant::set(Variant& variant, const
     if (!variant.value)
       variant.value = variant.type.createVariant().value;
     
-    boost::dynamic_pointer_cast<ValueT<T> >(variant.value)->set(value);      
+    boost::dynamic_pointer_cast<ValueT<ValueType> >(variant.value)->
+      set(value);      
   }
   else
     throw DataTypeMismatchException(variant.type.getIdentifier(),
@@ -165,13 +159,14 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
 template <typename T> void Variant::setValue(Variant& dst, const T& value,
     typename boost::disable_if<boost::is_base_of<Variant, T> >::type*) {
   typedef typename type_traits::ToDataType<T>::DataType Type;
+  typedef typename type_traits::DataType<Type>::ValueType ValueType;
   
   if (!dst.type.isValid()) {
     dst.type = DataType(typeid(Type));
     
     if (dst.type.isValid()) {
       dst.value = dst.type.createVariant().value;
-      boost::dynamic_pointer_cast<ValueT<Type> >(dst.value)->
+      boost::dynamic_pointer_cast<ValueT<ValueType> >(dst.value)->
         setValue(value);
     }
     else
@@ -181,7 +176,7 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
     if (!dst.value)
       dst.value = dst.type.createVariant().value;
     
-    boost::dynamic_pointer_cast<ValueT<Type> >(dst.value)->
+    boost::dynamic_pointer_cast<ValueT<ValueType> >(dst.value)->
       setValue(value);
   }
   else
@@ -198,70 +193,6 @@ template <typename T> void Variant::assign(Variant& dst, const T& src,
 template <typename T> void Variant::assign(Variant& dst, const T& src,
     typename boost::disable_if<boost::is_base_of<Variant, T> >::type*) {
   dst.template setValue<T>(src);
-}
-
-template <typename T> bool Variant::isEqual(const typename type_traits::
-    DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-    ValueType& rhs, typename boost::enable_if<boost::has_equal_to<typename
-    type_traits::DataType<T>::ValueType, typename type_traits::DataType<T>::
-    ValueType, bool> >::type*,  typename boost::disable_if<type_traits::
-    IsArray<T> >::type*) {
-  return (lhs == rhs);
-}
-
-template <typename T> bool Variant::isEqual(const typename type_traits::
-    DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-    ValueType& rhs, typename boost::enable_if<boost::has_equal_to<typename
-    type_traits::ArrayType<T>::MemberValueType, typename type_traits::
-    ArrayType<T>::MemberValueType, bool> >::type*) {
-  return (lhs == rhs);
-}
-
-template <typename T> bool Variant::isEqual(const typename type_traits::
-    DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-    ValueType& rhs, typename boost::disable_if<boost::has_equal_to<typename
-      type_traits::DataType<T>::ValueType, typename type_traits::DataType<T>::
-      ValueType, bool> >::type*, typename boost::disable_if<type_traits::
-      IsArray<T> >::type*) {
-  throw InvalidOperationException(
-    "Comparing two variants of non-comparable type");
-}
-
-template <typename T> bool Variant::isEqual(const typename type_traits::
-    DataType<T>::ValueType& lhs, const typename type_traits::DataType<T>::
-    ValueType& rhs, typename boost::disable_if<boost::has_equal_to<typename
-    type_traits::ArrayType<T>::MemberValueType, typename type_traits::
-    ArrayType<T>::MemberValueType, bool> >::type*) {
-  throw InvalidOperationException(
-    "Comparing two variants of non-comparable type");
-}
-
-template <typename T> void Variant::read(std::istream& stream, typename
-    type_traits::DataType<T>::ValueType& value, typename boost::enable_if<
-    boost::has_right_shift<std::istream, typename type_traits::DataType<T>::
-    ValueType&> >::type*) {
-  stream >> value;
-}
-
-template <typename T> void Variant::read(std::istream& stream, typename
-    type_traits::DataType<T>::ValueType& value, typename boost::disable_if<
-    boost::has_right_shift<std::istream, typename type_traits::DataType<T>::
-    ValueType&> >::type*) {
-  throw InvalidOperationException(
-    "Reading a variant of non-readable type");
-}
-
-template <typename T> void Variant::write(std::ostream& stream, const
-    typename type_traits::DataType<T>::ValueType& value, typename boost::
-    enable_if<boost::has_left_shift<std::ostream, const typename
-    type_traits::DataType<T>::ValueType&> >::type*) {
-  stream << value;
-}
-
-template <typename T> void Variant::write(std::ostream& stream, const
-    typename type_traits::DataType<T>::ValueType& value, typename boost::
-    disable_if<boost::has_left_shift<std::ostream, const typename
-    type_traits::DataType<T>::ValueType&> >::type*) {
 }
 
 /*****************************************************************************/

@@ -23,6 +23,8 @@
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_VARIANT_H
 
+#include <boost/type_traits.hpp>
+
 #include <variant_topic_tools/BuiltinTypeTraits.h>
 #include <variant_topic_tools/Pointer.h>
 #include <variant_topic_tools/Variant.h>
@@ -71,7 +73,7 @@ namespace variant_topic_tools {
     /** \brief Built-in variant value (templated implementation)
       */
     template <typename T> class ValueImplT :
-      public Variant::ValueT<T>,
+      public Variant::ValueT<typename type_traits::BuiltinType<T>::ValueType>,
       public Value {
     public:
       BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
@@ -110,15 +112,20 @@ namespace variant_topic_tools {
         */
       const ValueType& getValue() const;
       
+      /** \brief True, if this variant value equals another variant value
+        *   (implementation)
+        */
+      bool isEqual(const Variant::Value& value) const;
+      
       /** \brief Clone this variant value (implementation)
         */
       ValuePtr clone() const;
       
-      /** \brief Read the variant from a stream (re-implementation)
+      /** \brief Read the variant from a stream (implementation)
         */
       void read(std::istream& stream);
     
-      /** \brief Write this variant value to a stream (re-implementation)
+      /** \brief Write this variant value to a stream (implementation)
         */
       void write(std::ostream& stream) const;
       
@@ -131,6 +138,24 @@ namespace variant_topic_tools {
       */ 
     template <typename T> static BuiltinVariant create(const DataType& type);
     
+    /** \brief Compare the values of two built-in variants (overloaded
+      *   version taking two comparable values)
+      */
+    template <typename T> static bool isEqual(const typename type_traits::
+      BuiltinType<T>::ValueType& lhs, const typename type_traits::
+      BuiltinType<T>::ValueType& rhs, typename boost::enable_if<boost::
+      has_equal_to<typename type_traits::BuiltinType<T>::ValueType,
+      typename type_traits::BuiltinType<T>::ValueType, bool> >::type* = 0);
+    
+    /** \brief Compare the values of two built-in variants (overloaded
+      *   version taking two non-comparable values)
+      */
+    template <typename T> static bool isEqual(const typename type_traits::
+      BuiltinType<T>::ValueType& lhs, const typename type_traits::
+      BuiltinType<T>::ValueType& rhs, typename boost::disable_if<boost::
+      has_equal_to<typename type_traits::BuiltinType<T>::ValueType,
+      typename type_traits::BuiltinType<T>::ValueType, bool> >::type* = 0);
+    
     /** \brief Read a built-in variant from a stream (overloaded version
       *   taking a boolean value)
       */
@@ -139,12 +164,23 @@ namespace variant_topic_tools {
       boost::enable_if<boost::is_same<T, bool> >::type* = 0);
     
     /** \brief Read a built-in variant from a stream (overloaded version
-      *   taking a non-boolean value)
+      *   taking a non-boolean, stream-readable value)
       */
     template <typename T> static void read(std::istream& stream,
       typename type_traits::BuiltinType<T>::ValueType& value, typename
-      boost::disable_if<boost::is_same<T, bool> >::type* = 0);
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0, typename
+      boost::enable_if<boost::has_right_shift<std::istream, typename
+      type_traits::BuiltinType<T>::ValueType&> >::type* = 0);
     
+    /** \brief Read a built-in variant from a stream (overloaded version
+      *   taking a non-boolean, non-stream-readable value)
+      */
+    template <typename T> static void read(std::istream& stream,
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0, typename
+      boost::disable_if<boost::has_right_shift<std::istream, typename
+      type_traits::BuiltinType<T>::ValueType&> >::type* = 0);
+
     /** \brief Write a variant to a stream (overloaded version taking
       *   a boolean value)
       */
@@ -153,11 +189,22 @@ namespace variant_topic_tools {
       boost::enable_if<boost::is_same<T, bool> >::type* = 0);
     
     /** \brief Write a variant to a stream (overloaded version taking
-      *   a non-boolean value)
+      *   a non-boolean, stream-writable value)
       */
     template <typename T> static void write(std::ostream& stream, const
       typename type_traits::BuiltinType<T>::ValueType& value, typename
-      boost::disable_if<boost::is_same<T, bool> >::type* = 0);
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0, typename
+      boost::enable_if<boost::has_left_shift<std::ostream, const typename
+      type_traits::BuiltinType<T>::ValueType&> >::type* = 0);
+    
+    /** \brief Write a variant to a stream (overloaded version taking
+      *   a non-boolean, non-stream-writable value)
+      */
+    template <typename T> static void write(std::ostream& stream, const
+      typename type_traits::BuiltinType<T>::ValueType& value, typename
+      boost::disable_if<boost::is_same<T, bool> >::type* = 0, typename
+      boost::disable_if<boost::has_left_shift<std::ostream, const typename
+      type_traits::BuiltinType<T>::ValueType&> >::type* = 0);
   };
 };
 
