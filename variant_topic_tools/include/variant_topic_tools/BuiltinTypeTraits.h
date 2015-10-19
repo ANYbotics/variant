@@ -61,6 +61,10 @@ namespace variant_topic_tools {
     template <typename T> struct ToBuiltinType {
       typedef T BuiltinType;
     };
+    
+    template <size_t N> struct ToBuiltinType<char[N]> {
+      typedef std::string BuiltinType;
+    };
   };
 };
 

@@ -31,6 +31,7 @@ template <typename T> MessageStream::MessageStream(const T& data) :
 /*****************************************************************************/
 
 template <typename T> void MessageStream::next(const T& member) {
+  this->memberTypeInfo.push_back(&typeid(T));
   this->memberOffsets.push_back(reinterpret_cast<size_t>(&member)-
     reinterpret_cast<size_t>(data));
 }

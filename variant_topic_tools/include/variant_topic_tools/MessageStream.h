@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_STREAM_H
 
+#include <typeinfo>
 #include <vector>
 
 #include <variant_topic_tools/Forwards.h>
@@ -59,6 +60,11 @@ namespace variant_topic_tools {
       */
     size_t getNumMembers() const;
     
+    /** \brief Access the type information of the streamed message member
+      *   with the specified index
+      */
+    const std::type_info& getMemberTypeInfo(size_t index) const;
+    
     /** \brief Access the offset of the streamed message member with the
       *   specified index
       */
@@ -76,6 +82,10 @@ namespace variant_topic_tools {
     /** \brief The message stream's data
       */
     const uint8_t* data;
+    
+    /** \brief The type information of the streamed message members
+      */
+    std::vector<const std::type_info*> memberTypeInfo;
     
     /** \brief The offsets of the streamed message members
       */

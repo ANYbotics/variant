@@ -95,8 +95,8 @@ Variant MessageVariant::ValueImplT<T>::getMember(size_t index) const {
     this->message = Pointer<ValueType>(new ValueType());
   
   Variant member = this->members[index].getValue().getType().createVariant();
-//   Variant::template set<T>(member,
-//     MessageMemberPointer<ArrayType, T>(this->message, index));
+//   Variant::template set<int>(member, MessageMemberPointer<ValueType, int>(
+//     this->message, this->members[index].getValue().getOffset()));
   
   return member;
 }

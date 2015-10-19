@@ -129,14 +129,14 @@ TEST(Variant, Message) {
 //   EXPECT_EQ(1, v2.getNumMembers());
 //   EXPECT_TRUE(v2["data"].hasType());
 //   EXPECT_FALSE(v2["data"].isEmpty());
-//   EXPECT_NO_THROW(v2["data"] = std::string("Test"));
+//   EXPECT_NO_THROW(v2["data"] = "Test");
 //   EXPECT_EQ("Test", v2["data"].getValue<std::string>());
   
 //   EXPECT_TRUE(v3.hasType());
 //   EXPECT_FALSE(v3.isEmpty());
 //   EXPECT_TRUE(v3["header"].hasType());
 //   EXPECT_FALSE(v3["header"].isEmpty());
-//   EXPECT_NO_THROW(v3["builtin_string"] = std::string("Test"));
+//   EXPECT_NO_THROW(v3["builtin_string"] = "Test");
 //   EXPECT_EQ("Test", v3["builtin_string"].getValue<std::string>());
   
   registry.clear();

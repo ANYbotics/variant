@@ -114,19 +114,19 @@ int main(int argc, char **argv) {
 
   MessageVariant v5 = MessageDefinition::create<variant_msgs::Test>().
     getMessageDataType().createVariant();
-  v5["header/frame_id"] = std::string("map");
-  v5["builtin_string"] = std::string("Test");
-  v5["string/data"] = std::string("Test");
+  v5["header/frame_id"] = "map";
+  v5["builtin_string"] = "Test";
+  v5["string/data"] = "Test";
   v5["builtin_int_array/0"] = 0;
   v5["builtin_int_array/1"] = 1;
   v5["builtin_int_array/2"] = 2;
-  v5["string_array/0/data"] = std::string("Test0");
-  v5["string_array/1/data"] = std::string("Test1");
-  v5["string_array/2/data"] = std::string("Test2");
+  v5["string_array/0/data"] = "Test0";
+  v5["string_array/1/data"] = "Test1";
+  v5["string_array/2/data"] = "Test2";
   v5["string_vector"].asArray().resize(3);
-  v5["string_vector/0/data"] = std::string("Test0");
-  v5["string_vector/1/data"] = std::string("Test1");
-  v5["string_vector/2/data"] = std::string("Test2");
+  v5["string_vector/0/data"] = "Test0";
+  v5["string_vector/1/data"] = "Test1";
+  v5["string_vector/2/data"] = "Test2";
   
   std::cout << v5 << "\n";
   std::cout << v5.hasMember("header/frame_id") << "\n";
