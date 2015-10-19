@@ -70,7 +70,7 @@ TEST(DataType, Message) {
   
   MessageDataType m1 = registry.addMessageDataType<std_msgs::Bool>();
   MessageDataType m2 = registry.addMessageDataType("my_msgs/Double");
-  m2.addVariable<double>("data");
+  m2.addVariableMember<double>("data");
   MessageDataType m3 = registry.addMessageDataType("my_msgs/Complex",
     "float64 real\n"
     "float64 imaginary\n"

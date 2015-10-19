@@ -36,20 +36,14 @@ MessageDataType::ImplT<T>::ImplT() :
   
   ros::serialization::serialize(stream, message);
   
-  size_t numConstants = 0;
-  for (size_t i = 0; i < this->members.size(); ++i) {
-    if (this->members[i].isVariable()) {
-      BOOST_ASSERT(i-numConstants < stream.getNumMembers());
-      
-      boost::static_pointer_cast<MessageVariable::Impl>(
-        this->members[i].impl)->offset = stream.getMemberOffset(
-          i-numConstants);
-    }
-    else
-      ++numConstants;
+  BOOST_ASSERT(this->variableMembers.size() == stream.getNumMembers());
+  for (size_t i = 0; i < this->variableMembers.size(); ++i) {
+//     BOOST_ASSERT(this->variableMembers[i].getType().getTypeInfo() == 
+//       stream.getMemberTypeInfo(i));
+    
+    boost::static_pointer_cast<MessageVariable::Impl>(
+      this->variableMembers[i].impl)->offset = stream.getMemberOffset(i);
   }
-  
-  BOOST_ASSERT(this->members.size()-numConstants == stream.getNumMembers());
 }
 
 template <typename T>
@@ -111,14 +105,14 @@ template <typename T> MessageDataType MessageDataType::create() {
   return dataType;
 }
 
-template <typename T> MessageConstant MessageDataType::addConstant(const
+template <typename T> MessageConstant MessageDataType::addConstantMember(const
     std::string& name, const T& value) {
-  return this->addConstant(name, Variant(value));
+  return this->addConstantMember(name, Variant(value));
 }
 
-template <typename T> MessageVariable MessageDataType::addVariable(const
+template <typename T> MessageVariable MessageDataType::addVariableMember(const
     std::string& name) {
-  return this->addVariable(name, typeid(T));
+  return this->addVariableMember(name, typeid(T));
 }
 
 template <typename T>
@@ -130,11 +124,18 @@ Serializer MessageDataType::ImplT<T>::createSerializer(const DataType& type)
 template <typename T>
 Variant MessageDataType::ImplT<T>::createVariant(const DataType& type) const {
   return static_cast<const Variant&>(MessageVariant::template create<T>(type,
-    this->members));
+    this->variableMembers));
 }
 
 template <typename T>
-void MessageDataType::ImplT<T>::addMember(const MessageMember& member) {
+void MessageDataType::ImplT<T>::addConstantMember(const MessageConstant&
+    member) {
+  throw ImmutableDataTypeException();
+}
+
+template <typename T>
+void MessageDataType::ImplT<T>::addVariableMember(const MessageVariable&
+    member) {
   throw ImmutableDataTypeException();
 }
 

@@ -30,7 +30,6 @@
 
 #include <variant_topic_tools/DataTypeTraits.h>
 #include <variant_topic_tools/Forwards.h>
-#include <variant_topic_tools/MessageMember.h>
 #include <variant_topic_tools/TypeInfoHash.h>
 
 namespace variant_topic_tools {
@@ -129,12 +128,14 @@ namespace variant_topic_tools {
       std::string& identifier);
     
     /** \brief Add a message data type to the data type registry
-      *   (variant-typed version taking an identifier and a sequence
-      *   of message members)
+      *   (variant-typed version taking an identifier, a sequence
+      *   of constant message members, and a sequence of variable
+      *   message members)
       */ 
-    MessageDataType addMessageDataType(const std::string&
-      identifier, const std::vector<MessageMember>& members =
-      std::vector<MessageMember>());
+    MessageDataType addMessageDataType(const std::string& identifier,
+      const std::vector<MessageConstant>& constantMembers = std::
+      vector<MessageConstant>(), const std::vector<MessageVariable>&
+      variableMembers = std::vector<MessageVariable>());
     
     /** \brief Add a message data type to the data type registry
       *   (variant-typed version taking an identifier and a definition)

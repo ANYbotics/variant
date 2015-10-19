@@ -43,6 +43,18 @@ namespace variant_topic_tools {
     */
   class MessageDataType;
   
+  /** \brief Forward declaration of the message member
+    */
+  class MessageMember;
+  
+  /** \brief Forward declaration of the constant message member
+    */
+  class MessageConstant;
+  
+  /** \brief Forward declaration of the variable message member
+    */
+  class MessageVariable;
+  
   /** \brief Forward declaration of the data type registry
     */
   class DataTypeRegistry;

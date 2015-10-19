@@ -26,7 +26,7 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageVariant::ValueImplT<T>::ValueImplT(const std::vector<MessageMember>&
+MessageVariant::ValueImplT<T>::ValueImplT(const std::vector<MessageVariable>&
     members, const Pointer<ValueType>& message) :
   message(message) {
   for (size_t i = 0; i < members.size(); ++i)
@@ -131,7 +131,7 @@ bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
 /*****************************************************************************/
 
 template <typename T> MessageVariant MessageVariant::create(const DataType&
-    type, const std::vector<MessageMember>& members) {
+    type, const std::vector<MessageVariable>& members) {
   MessageVariant variant;
   
   variant.type = type;

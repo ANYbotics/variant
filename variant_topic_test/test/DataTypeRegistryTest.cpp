@@ -80,7 +80,7 @@ TEST(DataTypeRegistry, Message) {
     ros::message_traits::datatype<std_msgs::Bool>(),
     ros::message_traits::definition<std_msgs::Bool>());
   MessageDataType m3 = registry.addMessageDataType("my_msgs/Double");
-  m3.addVariable<double>("data");
+  m3.addVariableMember<double>("data");
   
   EXPECT_TRUE(registry.getDataType<std_msgs::String>().isMessage());
   EXPECT_TRUE(registry.getDataType(

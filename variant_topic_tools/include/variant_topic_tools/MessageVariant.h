@@ -25,10 +25,10 @@
 
 #include <vector>
 
-#include <variant_topic_tools/MessageFieldCollection.h>
-#include <variant_topic_tools/MessageMember.h>
-#include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/CollectionVariant.h>
+#include <variant_topic_tools/MessageFieldCollection.h>
+#include <variant_topic_tools/MessageTypeTraits.h>
+#include <variant_topic_tools/MessageVariable.h>
 
 namespace variant_topic_tools {
   /** \brief Message variant type
@@ -92,8 +92,8 @@ namespace variant_topic_tools {
     public:
       /** \brief Default constructor
         */ 
-      ValueImplV(const std::vector<MessageMember>& members =
-        std::vector<MessageMember>());
+      ValueImplV(const std::vector<MessageVariable>& members =
+        std::vector<MessageVariable>());
       
       /** \brief Copy constructor
         */ 
@@ -161,8 +161,8 @@ namespace variant_topic_tools {
       
       /** \brief Default constructor
         */ 
-      ValueImplT(const std::vector<MessageMember>& members =
-        std::vector<MessageMember>(), const Pointer<ValueType>&
+      ValueImplT(const std::vector<MessageVariable>& members =
+        std::vector<MessageVariable>(), const Pointer<ValueType>&
         message = Pointer<ValueType>());
       
       /** \brief Copy constructor
@@ -228,7 +228,7 @@ namespace variant_topic_tools {
       
       /** \brief The message members
         */
-      MessageFieldCollection<MessageMember> members;
+      MessageFieldCollection<MessageVariable> members;
       
       /** \brief The strong-typed message
         */
@@ -236,15 +236,15 @@ namespace variant_topic_tools {
     };
     
     /** \brief Constructor (overloaded version taking a message data type
-      *   and a message field collection)
+      *   and a sequence of variable members)
       */ 
-    MessageVariant(const DataType& type, const std::vector<MessageMember>&
+    MessageVariant(const DataType& type, const std::vector<MessageVariable>&
       members);
     
     /** \brief Create a message variant
       */ 
     template <typename T> static MessageVariant create(const DataType& type,
-      const std::vector<MessageMember>& members);
+      const std::vector<MessageVariable>& members);
   };
 };
 

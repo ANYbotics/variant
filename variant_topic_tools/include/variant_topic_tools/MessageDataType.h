@@ -66,38 +66,65 @@ namespace variant_topic_tools {
       */
     size_t getNumMembers() const;
     
+    /** \brief Retrieve the number of constant members of this message data
+      *   type
+      */
+    size_t getNumConstantMembers() const;
+    
+    /** \brief Retrieve the number of variable members of this message data
+      *   type
+      */
+    size_t getNumVariableMembers() const;
+    
     /** \brief Access a member of the message data type by index
       */
     const MessageMember& getMember(size_t index) const;
+    
+    /** \brief Access a constant member of the message data type by index
+      */
+    const MessageConstant& getConstantMember(size_t index) const;
+    
+    /** \brief Access a variable member of the message data type by index
+      */
+    const MessageVariable& getVariableMember(size_t index) const;
     
     /** \brief True, if this message data type is simple
       */
     bool isSimple() const;
     
-    /** \brief Add a constant member to this message data type (version
-      *   taking a variant value)
+    /** \brief Add a constant member to this message data type (overloaded
+      *   version taking a message constant)
       */
-    MessageConstant addConstant(const std::string& name, const Variant& value);
+    void addConstantMember(const MessageConstant& member);
+    
+    /** \brief Add a constant member to this message data type (overloaded
+      *   version taking a name and a variant value)
+      */
+    MessageConstant addConstantMember(const std::string& name, const
+      Variant& value);
     
     /** \brief Add a constant member to this message data type (version
       *   templated on the value type)
       */
-    template <typename T> MessageConstant addConstant(const std::string& name,
-      const T& value);
+    template <typename T> MessageConstant addConstantMember(const
+      std::string& name, const T& value);
     
-    /** \brief Add a variable member to this message data type (version
-      *   taking a data type)
+    /** \brief Add a variable member to this message data type (overloaded
+      *   version taking a message variable)
       */
-    MessageVariable addVariable(const std::string& name, const DataType& type);
+    void addVariableMember(const MessageVariable& member);
+    
+    /** \brief Add a variable member to this message data type (overloaded
+      *   version taking a name and a data type)
+      */
+    MessageVariable addVariableMember(const std::string& name, const
+      DataType& type);
     
     /** \brief Add a variable member to this message data type (version
       *   templated on the variable type)
       */
-    template <typename T> MessageVariable addVariable(const std::string& name);
-    
-    /** \brief Add a member to this message data type
-      */
-    void addMember(const MessageMember& member);
+    template <typename T> MessageVariable addVariableMember(const
+      std::string& name);
     
     /** \brief Assignment operator
       */
@@ -115,9 +142,10 @@ namespace variant_topic_tools {
       public DataType::Impl {
     public:
       /** \brief Constructor (overloaded version taking a sequence of
-        *   members)
+        *   constant members and a sequence of variable members)
         */
-      Impl(const std::vector<MessageMember>& members);
+      Impl(const std::vector<MessageConstant>& constantMembers, const
+        std::vector<MessageVariable>& variableMembers);
       
       /** \brief Constructor (overloaded version taking a definition)
         */
@@ -142,13 +170,23 @@ namespace variant_topic_tools {
         */
       virtual bool isSimple() const = 0;
       
-      /** \brief Add a member to this message data type (abstract declaration)
+      /** \brief Add a constant member to this message data type (abstract
+        *   declaration)
         */
-      virtual void addMember(const MessageMember& member) = 0;
+      virtual void addConstantMember(const MessageConstant& member) = 0;
     
-      /** \brief The members of this message data type
+      /** \brief Add a variable member to this message data type (abstract
+        *   declaration)
         */
-      std::vector<MessageMember> members;
+      virtual void addVariableMember(const MessageVariable& member) = 0;
+    
+      /** \brief The constant members of this message data type
+        */
+      std::vector<MessageConstant> constantMembers;
+      
+      /** \brief The variable members of this message data type
+        */
+      std::vector<MessageVariable> variableMembers;
     };
     
     /** \brief Message data type implementation (variant-typed version)
@@ -156,11 +194,11 @@ namespace variant_topic_tools {
     class ImplV :
       public Impl {
     public:
-      /** \brief Constructor (overloaded version taking an identifier and
-        *   a sequence of members)
+      /** \brief Constructor (overloaded version taking an identifier, a
+        *   sequence of constant members, and a sequence of variable members)
         */
-      ImplV(const std::string& identifier, const std::vector<MessageMember>&
-        members);
+      ImplV(const std::string& identifier, const std::vector<MessageConstant>&
+        constantMember, const std::vector<MessageVariable>& variableMembers);
       
       /** \brief Constructor (overloaded version taking an identifier and
         *   a definition)
@@ -208,9 +246,15 @@ namespace variant_topic_tools {
         */ 
       Variant createVariant(const DataType& type) const;
       
-      /** \brief Add a member to this message data type (implementation)
+      /** \brief Add a constant member to this message data type
+        *   (implementation)
         */
-      void addMember(const MessageMember& member);
+      void addConstantMember(const MessageConstant& member);
+      
+      /** \brief Add a variable member to this message data type
+        *   (implementation)
+        */
+      void addVariableMember(const MessageVariable& member);
       
       /** \brief The identifier representing this message data type
         */
@@ -279,16 +323,24 @@ namespace variant_topic_tools {
         */ 
       Variant createVariant(const DataType& type) const;
       
-      /** \brief Add a member to this message data type (implementation)
+      /** \brief Add a constant member to this message data type
+        *   (implementation)
         */
-      void addMember(const MessageMember& member);
+      void addConstantMember(const MessageConstant& member);
+      
+      /** \brief Add a variable member to this message data type
+        *   (implementation)
+        */
+      void addVariableMember(const MessageVariable& member);
+      
     };
     
-    /** \brief Constructor (overloaded version taking an identifier and a
-      *   sequence of message members)
+    /** \brief Constructor (overloaded version taking an identifier, a
+      *   sequence of constant members, and a sequence of variable members)
       */ 
     MessageDataType(const std::string& identifier, const
-      std::vector<MessageMember>& members);
+      std::vector<MessageConstant>& constantMembers, const
+      std::vector<MessageVariable>& variableMembers);
     
     /** \brief Constructor (overloaded version taking an identifier and
       *   a definition)

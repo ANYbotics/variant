@@ -29,7 +29,7 @@ MessageVariant::MessageVariant() {
 }
 
 MessageVariant::MessageVariant(const DataType& type, const
-    std::vector<MessageMember>& members) :
+    std::vector<MessageVariable>& members) :
   CollectionVariant(type) {
   if (type.isValid())
     value.reset(new ValueImplV(members));
@@ -54,7 +54,7 @@ MessageVariant::Value::Value() {
 MessageVariant::Value::~Value() {
 }
 
-MessageVariant::ValueImplV::ValueImplV(const std::vector<MessageMember>&
+MessageVariant::ValueImplV::ValueImplV(const std::vector<MessageVariable>&
     members) {
   for (size_t i = 0; i < members.size(); ++i)
     this->members.appendField(members[i].getName(),

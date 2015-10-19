@@ -40,7 +40,8 @@ int main(int argc, char **argv) {
   registry.addMessageDataType<std_msgs::String>();
   registry.addMessageDataType(ros::message_traits::datatype<std_msgs::Bool>(),
     ros::message_traits::definition<std_msgs::Bool>());
-  registry.addMessageDataType("my_msgs/Double").addVariable<double>("data");
+  registry.addMessageDataType("my_msgs/Double").addVariableMember<double>(
+    "data");
   registry.addMessageDataType("my_msgs/Complex",
     "float64 PI=3.14159\n"
     "string COMMENT=This is a complex message type.\n"
@@ -96,7 +97,7 @@ int main(int argc, char **argv) {
   std::cout << "\n";
   
   MessageDataType m3 = registry["my_msgs/Double"];
-  m3.addConstant("PI", M_PI);
+  m3.addConstantMember("PI", M_PI);
   std::cout << m3.getMD5Sum() << "\n";
   std::cout << m3.getDefinition();
   std::cout << m3.getSize() << "\n";

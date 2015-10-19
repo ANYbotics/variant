@@ -36,8 +36,8 @@ TEST(MessageDefinition, Parse) {
   MessageDataType t2 = d2.getMessageDataType();
   
   EXPECT_TRUE(t1.isValid());
-  EXPECT_EQ("header", t1[0].getName());
-  EXPECT_TRUE(t1[1].isConstant());
+  EXPECT_TRUE(t1[0].isConstant());
+  EXPECT_EQ("header", t1[1].getName());
   EXPECT_TRUE(t1[2].isVariable());
   EXPECT_TRUE(t1[2].getType().isBuiltin());
   EXPECT_TRUE(t1[4].getType().isMessage());
