@@ -1,8 +1,8 @@
-# ros-topic-variant
+# ros-variant
 
 ## Synopsis
 
-C++ implementation of ROS node(let) wrappers.
+Topic tools for treating ROS messages as type-erased variants.
 
 **Author(s):** Ralf Kaestner
 
@@ -16,28 +16,15 @@ C++ implementation of ROS node(let) wrappers.
 
 ## Description
 
-This project provides templated C++ class wrappers for implementing the core
-functionalities of ROS nodes and nodelets based on the object adapter design
-pattern. The main features available to the node(let) developer are:
+This project provides a partially templated C++ API for treating ROS messages
+as type-erased variants. Similar to the Python API of ROS, it thus renders ROS
+messages and their members accessible without the requirement for including any
+message headers at compile time. The goal of this functionality is to motivate
+developers to contribute more C++ packages which are intended to inspect and
+operate on any message type.
 
-* Flexible instantation of the node(let) implementation as ROS node or
-  nodelet, allowing for the following runtime use cases:
-  * Dedicated ROS node (single node implementation per process)
-
-  * ROS "supernode" (multiple node implementations per process)
-
-  * ROS nodelets (plugin-based loading and unloading of node implementations
-    by the nodelet manager)
-    
-* Signal-based cleanup handlers
-
-* Configuration server advertising a node(let)'s parameters as ROS services
-
-* Callback handlers for parameter changes (either using rosparam or ROS
-  services)
-
-This project further provides a tutorial package which practically demonstrates
-the different use cases by example.
+This project further provides a test package which practically demonstrates
+API usage by example.
 
 ## Installation
 
@@ -47,9 +34,7 @@ The maintainers of this project do not yet provide binary packages.
 
 ### Building from source
 
-This project maintains two parallel build system branches and may either
-be built using catkin or the CMake build system with an open-source macro
-extension called ReMake.
+This project may be built from source using catkin.
 
 Here, we assume you intend to build the project for the ROS distribution
 named `ROS_DISTRO`.
@@ -61,7 +46,7 @@ package repositories of recent Ubuntu and ROS releases. To install them,
 simply use the command
 
 ```
-sudo apt-get install ros-ROS_DISTRO-roscpp, ros-ROS_DISTRO-nodelet ros-ROS_DISTRO-rospy, ros-ROS_DISTRO-message-generation, ros-ROS_DISTRO-std-msgs
+sudo apt-get install ros-ROS_DISTRO-roscpp, ros-ROS_DISTRO-std-msgs
 
 ```
 
@@ -104,74 +89,9 @@ may attempt to build this project using catkin as follows:
 
   to start the build
 
-#### Building with ReMake
-
-##### Preparing the build system
-
-If you already have installed ReMake on your build system, you may
-skip this step. Otherwise, before attempting to build this project the
-traditional CMake way, you must install ReMake following
-[these instructions](https://github.com/kralf/remake).
-
-##### Building with CMake
-
-Once ReMake is available on your build system, you may attempt to build this
-project the CMake way. Assuming that you have cloned the project sources into
-`PROJECT_DIR`, a typical out-of-source build might look like this:
-
-* Create a build directory using 
-
-  ```
-  mkdir -p PROJECT_DIR/build
-  ```
-
-* Switch into the build directoy by 
-
-  ```
-  cd PROJECT_DIR/build
-  ```
-
-* In the build directory, run 
-
-  ```
-  cmake -DROS_DISTRIBUTION=ROS_DISTRO PROJECT_DIR
-  ```
-
-  to configure the build
-
-* If you want to inspect or modify the build configuration, issue 
-
-  ```
-  ccmake PROJECT_DIR
-  ```
-
-* Build the project using 
-
-  ```
-  make
-  ```
-
-* If you intend to install the project, call 
-
-  ```
-  make packages_install
-  ```
-
-  (from packages on Debian-based Linux only) or 
-
-  ```
-  make install
-  ```
-
 ## API documentation
 
-This project generates its API documentation from source. To access it, you
-may either inspect the build directory tree after the project has been built
-using `make` or install the documentation package through
-
-```
-sudo apt-get install roscpp-nodewrap-doc
-```
+This project does not yet provide any API documentation.
 
 ## Feature requests and bug reports
 
