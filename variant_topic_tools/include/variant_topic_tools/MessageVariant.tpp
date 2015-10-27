@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/MessageMemberPointer.h>
+#include <variant_topic_tools/MessageVariable.h>
 #include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
@@ -94,11 +95,8 @@ Variant MessageVariant::ValueImplT<T>::getMember(size_t index) const {
   if (!this->message)
     this->message = Pointer<ValueType>(new ValueType());
   
-  Variant member = this->members[index].getValue().getType().createVariant();
-//   Variant::template set<int>(member, MessageMemberPointer<ValueType, int>(
-//     this->message, this->members[index].getValue().getOffset()));
-  
-  return member;
+  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
+    this->members[index].getValue().impl)->createVariant(this->message);
 }
 
 template <typename T>
@@ -107,11 +105,8 @@ Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name)
   if (!this->message)
     this->message = Pointer<ValueType>(new ValueType());
   
-  Variant member = this->members[name].getValue().getType().createVariant();
-//   Variant::template set<T>(member,
-//     MessageMemberPointer<ArrayType, T>(this->message, index));
-  
-  return member;
+  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
+    this->members[name].getValue().impl)->createVariant(this->message);
 }
 
 template <typename T>

@@ -76,10 +76,6 @@ namespace variant_topic_tools {
         */
       size_t getSize() const;
       
-      /** \brief Retrieve the offset of this message member (implementation)
-        */
-      size_t getOffset() const;
-      
       /** \brief True, if this message member represents a fixed-size
         *   message member, as opposed to a variable-size message member
         *   (implementation)

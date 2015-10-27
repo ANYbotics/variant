@@ -16,10 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <typeinfo>
+
 #include <variant_topic_tools/Exceptions.h>
+#include <variant_topic_tools/DataTypeRegistry.h>
+#include <variant_topic_tools/MessageConstant.h>
 #include <variant_topic_tools/MessageDefinition.h>
 #include <variant_topic_tools/MessageSerializer.h>
-#include <variant_topic_tools/MessageStream.h>
+#include <variant_topic_tools/MessageVariable.h>
 #include <variant_topic_tools/MessageVariant.h>
 
 namespace variant_topic_tools {
@@ -30,20 +34,11 @@ namespace variant_topic_tools {
 
 template <typename T>
 MessageDataType::ImplT<T>::ImplT() :
-  Impl(ros::message_traits::template definition<T>()) {
-  T message;
-  MessageStream stream(message);
+  Impl(ros::message_traits::template definition<T>()),
+  memberIndex(0) {
+  ros::serialization::serialize(*this, this->message);
   
-  ros::serialization::serialize(stream, message);
-  
-  BOOST_ASSERT(this->variableMembers.size() == stream.getNumMembers());
-  for (size_t i = 0; i < this->variableMembers.size(); ++i) {
-//     BOOST_ASSERT(this->variableMembers[i].getType().getTypeInfo() == 
-//       stream.getMemberTypeInfo(i));
-    
-    boost::static_pointer_cast<MessageVariable::Impl>(
-      this->variableMembers[i].impl)->offset = stream.getMemberOffset(i);
-  }
+  BOOST_ASSERT(memberIndex == this->variableMembers.size());
 }
 
 template <typename T>
@@ -137,6 +132,57 @@ template <typename T>
 void MessageDataType::ImplT<T>::addVariableMember(const MessageVariable&
     member) {
   throw ImmutableDataTypeException();
+}
+
+template <typename T>
+template <typename M> void MessageDataType::ImplT<T>::next(const M& member) {
+  BOOST_ASSERT(memberIndex < this->variableMembers.size());
+
+  MessageDataType::template addMember<T, typename type_traits::ToDataType<M>::
+    DataType>(this->variableMembers[memberIndex], reinterpret_cast<size_t>(
+    &member)-reinterpret_cast<size_t>(&this->message));
+  
+  Variant memberVariant = this->variableMembers[memberIndex].getType().
+    createVariant();      
+  BOOST_ASSERT(memberVariant.getValueTypeInfo() == typeid(M));
+  
+  ++memberIndex;
+}
+
+template <typename T, typename M> void MessageDataType::addMember(
+    MessageVariable& member, size_t offset, typename boost::enable_if<
+    type_traits::IsArray<M> >::type*, typename boost::enable_if<typename
+    type_traits::ArrayType<M>::IsFixedSize>::type*) {
+  BOOST_ASSERT(member.getType().isArray());
+  
+  ArrayDataType arrayType(member.getType());
+    
+  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
+    member = MessageVariable::template create<T, bool[type_traits::
+      ArrayType<M>::NumMembers]>(member.getName(), offset);
+  else
+    member = MessageVariable::template create<T, M>(member.getName(), offset);
+}
+
+template <typename T, typename M> void MessageDataType::addMember(
+    MessageVariable& member, size_t offset, typename boost::enable_if<
+    type_traits::IsArray<M> >::type*, typename boost::disable_if<typename
+    type_traits::ArrayType<M>::IsFixedSize>::type*) {
+  BOOST_ASSERT(member.getType().isArray());
+  
+  ArrayDataType arrayType(member.getType());
+    
+  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
+    member = MessageVariable::template create<T, bool[]>(member.getName(),
+      offset);
+  else
+    member = MessageVariable::template create<T, M>(member.getName(), offset);
+}
+
+template <typename T, typename M> void MessageDataType::addMember(
+    MessageVariable& member, size_t offset, typename boost::disable_if<
+    type_traits::IsArray<M> >::type*) {
+  member = MessageVariable::template create<T, M>(member.getName(), offset);
 }
 
 }

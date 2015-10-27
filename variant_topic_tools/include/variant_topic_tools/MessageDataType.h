@@ -24,10 +24,8 @@
 #define VARIANT_TOPIC_TOOLS_MESSAGE_DATA_TYPE_H
 
 #include <variant_topic_tools/DataType.h>
-#include <variant_topic_tools/MessageConstant.h>
-#include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/DataTypeTraits.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
-#include <variant_topic_tools/MessageVariable.h>
 
 namespace variant_topic_tools {
   /** \brief Message data type
@@ -333,6 +331,19 @@ namespace variant_topic_tools {
         */
       void addVariableMember(const MessageVariable& member);
       
+      /** \brief Process the next variable member to determine its memory
+        *   offset
+        */
+      template <typename M> void next(const M& member);
+      
+      /** \brief The message used to determine the variable member memory
+        *   offsets
+        */
+      T message;
+      
+      /** \brief The index of the currently processed variable member
+        */
+      size_t memberIndex;
     };
     
     /** \brief Constructor (overloaded version taking an identifier, a
@@ -352,6 +363,29 @@ namespace variant_topic_tools {
       *   message type)
       */ 
     template <typename T> static MessageDataType create();
+    
+    /** \brief Add a variable message member (overloaded version for adding
+      *   a fixed-size array member)
+      */ 
+    template <typename T, typename M> static void addMember(
+      MessageVariable& member, size_t offset, typename boost::enable_if<
+      type_traits::IsArray<M> >::type* = 0, typename boost::enable_if<
+      typename type_traits::ArrayType<M>::IsFixedSize>::type* = 0);
+    
+    /** \brief Add a variable message member (overloaded version for adding
+      *   a non-fixed-size array member)
+      */ 
+    template <typename T, typename M> static void addMember(
+      MessageVariable& member, size_t offset, typename boost::enable_if<
+      type_traits::IsArray<M> >::type* = 0, typename boost::disable_if<
+      typename type_traits::ArrayType<M>::IsFixedSize>::type* = 0);
+    
+    /** \brief Add a variable message member (overloaded version for adding
+      *   a non-array member)
+      */ 
+    template <typename T, typename M> static void addMember(
+      MessageVariable& member, size_t offset, typename boost::
+      disable_if<type_traits::IsArray<M> >::type* = 0);
   };
 };
 

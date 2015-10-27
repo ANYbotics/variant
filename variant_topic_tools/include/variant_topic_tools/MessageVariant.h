@@ -28,7 +28,6 @@
 #include <variant_topic_tools/CollectionVariant.h>
 #include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
-#include <variant_topic_tools/MessageVariable.h>
 
 namespace variant_topic_tools {
   /** \brief Message variant type

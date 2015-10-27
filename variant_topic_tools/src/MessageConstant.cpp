@@ -95,10 +95,6 @@ size_t MessageConstant::Impl::getSize() const {
   return 0;
 }
 
-size_t MessageConstant::Impl::getOffset() const {
-  return 0;
-}
-
 bool MessageConstant::Impl::isFixedSize() const {
   return true;
 }

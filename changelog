@@ -1,42 +1,103 @@
-ros-topic-variant (0.1-7) unstable; urgency=low
+ros-variant (0.1-17) unstable; urgency=low
+
+  * Message variant tests successful
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Tue, 27 Oct 2015 16:13:00 +0200
+
+ros-variant (0.1-16) unstable; urgency=low
+
+  * Message data type now separates constant and variable members
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 11:10:52 +0200
+
+ros-variant (0.1-15) unstable; urgency=low
+
+  * Reverted templated variant value to represent actual value type
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 09:54:51 +0200
+
+ros-variant (0.1-14) unstable; urgency=low
 
   * Progress commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 20 Aug 2015 17:00:00 +0100
- 
-ros-topic-variant (0.1-6) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 07:41:39 +0200
+
+ros-variant (0.1-13) unstable; urgency=low
+
+  * Another progress commit
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Fri, 16 Oct 2015 15:45:00 +0200
+
+ros-variant (0.1-12) unstable; urgency=low
 
   * Progress commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 17 Aug 2015 07:04:00 +0100
- 
-ros-topic-variant (0.1-5) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Fri, 16 Oct 2015 13:03:12 +0200
+
+ros-variant (0.1-11) unstable; urgency=low
+
+  * Refined traits, code cleanups
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 08 Oct 2015 14:02:55 +0200
+
+ros-variant (0.1-10) unstable; urgency=low
+
+  * Removed SharedVariant and friend-relationship between Variant and
+    CollectionVariant
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 05 Oct 2015 16:03:59 +0200
+
+ros-variant (0.1-9) unstable; urgency=low
+
+  * Renamed some classes, code cleanups
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 05 Oct 2015 07:51:54 +0200
+
+ros-variant (0.1-8) unstable; urgency=low
 
   * Progress commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 12 Aug 2015 12:56:00 +0100
- 
-ros-topic-variant (0.1-4) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 01 Oct 2015 10:16:04 +0200
+
+ros-variant (0.1-7) unstable; urgency=low
 
   * Progress commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 10 Aug 2015 07:54:00 +0100
- 
-ros-topic-variant (0.1-3) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 20 Aug 2015 17:59:39 +0200
+
+ros-variant (0.1-6) unstable; urgency=low
+
+  * Progress commit
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 17 Aug 2015 07:05:01 +0200
+
+ros-variant (0.1-5) unstable; urgency=low
+
+  * Progress commit
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 12 Aug 2015 12:56:26 +0200
+
+ros-variant (0.1-4) unstable; urgency=low
+
+  * Progress commit
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 10 Aug 2015 07:54:58 +0200
+
+ros-variant (0.1-3) unstable; urgency=low
 
   * Created test package
   * Moved test binaries to test package
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 09:56:00 +0100
- 
-ros-topic-variant (0.1-2) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 09:57:09 +0200
+
+ros-variant (0.1-2) unstable; urgency=low
 
   * Progress commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 06:47:00 +0100
- 
-ros-topic-variant (0.1-1) unstable; urgency=low
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 06:47:21 +0200
+
+ros-variant (0.1-1) unstable; urgency=low
 
   * Initial commit
 
- -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 30 Jul 2015 05:47:00 +0100
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 30 Jul 2015 05:48:09 +0200

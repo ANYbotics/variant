@@ -20,8 +20,11 @@
 
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
+#include "variant_topic_tools/MessageConstant.h"
 #include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
+#include "variant_topic_tools/MessageMember.h"
+#include "variant_topic_tools/MessageVariable.h"
 #include "variant_topic_tools/MessageVariant.h"
 
 namespace variant_topic_tools {
@@ -88,7 +91,7 @@ MessageDataType::Impl::Impl(const std::string& definition) {
         memberType = "std_msgs/Header";
       
       if (registry.getDataType(memberType).isValid()) {
-        MessageVariable member(memberName, memberType, 0);
+        MessageVariable member(memberName, memberType);
         variableMembers.push_back(member);
       }
       else
@@ -275,7 +278,7 @@ void MessageDataType::addVariableMember(const MessageVariable& member) {
 
 MessageVariable MessageDataType::addVariableMember(const std::string& name,
     const DataType& type) {
-  MessageVariable member(name, type, 0);
+  MessageVariable member(name, type);
   addVariableMember(member);
   
   return member;

@@ -52,6 +52,13 @@ const DataType& Variant::getType() const {
   return type;
 }
 
+const std::type_info& Variant::getValueTypeInfo() const {
+  if (value)
+    return value->getTypeInfo();
+  else
+    return typeid(void);
+}
+
 bool Variant::hasType() const {
   return type.isValid();
 }
@@ -86,6 +93,10 @@ bool Variant::isMessage() const {
 
 bool Variant::isEmpty() const {
   return !value;
+}
+
+const std::type_info& Variant::Value::getTypeInfo() const {
+  return typeid(void);
 }
 
 /*****************************************************************************/

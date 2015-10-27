@@ -25,6 +25,8 @@
 
 #include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/MessageMember.h>
+#include <variant_topic_tools/MessageTypeTraits.h>
+#include <variant_topic_tools/Pointer.h>
 
 namespace variant_topic_tools {
   /** \brief Variable message member
@@ -33,6 +35,7 @@ namespace variant_topic_tools {
     public MessageMember {
   friend class MessageDataType;
   friend class MessageMember;
+  friend class MessageVariant;
   public:
     /** \brief Default constructor
       */ 
@@ -58,7 +61,7 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      Impl(const std::string& name, const DataType& type, size_t offset);
+      Impl(const std::string& name, const DataType& type);
       
       /** \brief Destructor
         */
@@ -71,10 +74,6 @@ namespace variant_topic_tools {
       /** \brief Retrieve the size of this message member (implementation)
         */
       size_t getSize() const;
-      
-      /** \brief Retrieve the offset of this message member (implementation)
-        */
-      size_t getOffset() const;
       
       /** \brief True, if this message member represents a fixed-size
         *   message member, as opposed to a variable-size message member
@@ -89,21 +88,71 @@ namespace variant_topic_tools {
       /** \brief The data type of this message variable
         */
       DataType type;
+    };
+    
+    /** \brief Message variable implementation (version templated on the
+      *   message type)
+      */
+    template <typename T> class ImplT :
+      public Impl {
+    public:
+      BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
       
-      /** \brief The offset of this message variable
+      /** \brief Definition of the value type
+        */
+      typedef typename type_traits::MessageType<T>::ValueType ValueType;
+      
+      /** \brief Constructor
+        */
+      ImplT(const std::string& name, const DataType& type);
+      
+      /** \brief Destructor
+        */
+      virtual ~ImplT();
+      
+      /** \brief Create a variant from this variable message member (abstract
+        *   declaration)
+        */ 
+      virtual Variant createVariant(const Pointer<ValueType>& message)
+        const = 0;
+    };
+    
+    /** \brief Message variable implementation (version templated on the
+      *   message type and the member type)
+      */
+    template <typename T, typename M> class ImplM :
+      public ImplT<T> {
+    public:
+      /** \brief Definition of the value type
+        */
+      typedef typename ImplT<T>::ValueType ValueType;
+      
+      /** \brief Constructor
+        */
+      ImplM(const std::string& name, const DataType& type, size_t offset);
+      
+      /** \brief Destructor
+        */
+      virtual ~ImplM();
+      
+      /** \brief Create a variant from this variable message member
+        *   (implementation)
+        */ 
+      Variant createVariant(const Pointer<ValueType>& message) const;
+      
+      /** \brief The memory offset of this message variable
         */
       size_t offset;
     };
     
     /** \brief Constructor (overloaded version taking a name and a data type)
       */ 
-    MessageVariable(const std::string& name, const DataType& type, size_t
-      offset);
+    MessageVariable(const std::string& name, const DataType& type);
     
     /** \brief Create a message variable
       */ 
-    template <typename T> static MessageVariable create(const std::string&
-      name, size_t offset);
+    template <typename T, typename M> static MessageVariable create(const
+      std::string& name, size_t offset);
   };
 };
 

@@ -96,6 +96,11 @@ template <typename T> const typename type_traits::DataType<T>::ValueType&
 }
 
 template <typename T>
+const std::type_info& Variant::ValueT<T>::getTypeInfo() const {
+  return typeid(T);
+}
+
+template <typename T>
 void Variant::ValueT<T>::setValue(const T& value) {
   this->getValue() = value;
 }
@@ -204,7 +209,7 @@ template <typename T> Variant& Variant::operator=(const T& src) {
   return *this;
 }
 
-template <typename T> Variant::operator const T&() const {
+template <typename T> Variant::operator T() const {
   return this->template getValue<T>();
 }
 

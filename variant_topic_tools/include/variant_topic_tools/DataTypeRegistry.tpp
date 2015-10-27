@@ -78,6 +78,11 @@ template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
   return messageDataType;
 }
 
+template <typename T> void DataTypeRegistry::addDataType() {
+  DataType dataType = DataTypeRegistry::template createDataType<T>();
+  this->addDataType(dataType);
+}
+
 template <typename T> BuiltinDataType DataTypeRegistry::createDataType(
     typename boost::enable_if<type_traits::IsBuiltin<T> >::type*) {
   return BuiltinDataType();

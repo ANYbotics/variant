@@ -23,6 +23,8 @@
 #ifndef VARIANT_TOPIC_TOOLS_VARIANT_H
 #define VARIANT_TOPIC_TOOLS_VARIANT_H
 
+#include <typeinfo>
+
 #include <boost/type_traits.hpp>
 
 #include <ros/ros.h>
@@ -35,6 +37,7 @@ namespace variant_topic_tools {
   /** \brief Variant type
     */  
   class Variant {
+  friend class MessageVariable;
   public:
     /** \brief Default constructor
       */ 
@@ -62,9 +65,16 @@ namespace variant_topic_tools {
     template <typename T> const typename type_traits::DataType<T>::ValueType&
       getValue() const;
     
-    /** \brief Access the type of the variant's value
+    /** \brief Retrieve the data type of this variant
       */
     const DataType& getType() const;
+    
+    /** \brief Retrieve the value type information of this variant
+      *
+      * \note The value type information can be different from the type
+      *   information associated with this variant's data type.
+      */ 
+    const std::type_info& getValueTypeInfo() const;
     
     /** \brief True, if the variant has a type
       */
@@ -125,7 +135,7 @@ namespace variant_topic_tools {
     
     /** \brief Conversion operator
       */
-    template <typename T> operator const T&() const;
+    template <typename T> operator T() const;
     
     /** \brief True, if this variant is equal to another variant
       */
@@ -159,6 +169,10 @@ namespace variant_topic_tools {
       /** \brief Destructor
         */ 
       virtual ~Value();
+      
+      /** \brief Retrieve the variant's value type information
+        */ 
+      virtual const std::type_info& getTypeInfo() const;
       
       /** \brief Set the variant's value (abstract declaration)
         */
@@ -195,6 +209,11 @@ namespace variant_topic_tools {
         */ 
       virtual ~ValueT();
       
+      /** \brief Retrieve the variant's value type information
+        *   (re-implementation)
+        */ 
+      const std::type_info& getTypeInfo() const;
+    
       /** \brief Set the variant's value pointer (abstract declaration)
         */
       virtual void set(const Pointer<T>& value) = 0;
@@ -237,13 +256,6 @@ namespace variant_topic_tools {
     template <typename T> static void setValue(Variant& dst, const T&
       value, typename boost::enable_if<boost::is_base_of<Variant, T> >::
       type* = 0);
-    
-    /** \brief Set a variant's value (overloaded version taking a variant
-      *   value pointer)
-      */
-//     template <typename T> static void setValue(Variant& dst, const T&
-//       value, typename boost::enable_if<boost::is_base_of<Variant, T> >::
-//       type* = 0);
     
     /** \brief Set a variant's value (overloaded version taking a variant
       *   value)

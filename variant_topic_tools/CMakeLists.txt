@@ -68,7 +68,6 @@ add_library(variant_topic_tools
   src/MessageHeader.cpp
   src/MessageMember.cpp
   src/MessageSerializer.cpp
-  src/MessageStream.cpp
   src/MessageTraits.cpp
   src/MessageType.cpp
   src/MessageVariable.cpp

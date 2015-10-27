@@ -16,18 +16,59 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/DataTypeRegistry.h>
+#include <variant_topic_tools/MessageMemberPointer.h>
+
 namespace variant_topic_tools {
+
+/*****************************************************************************/
+/* Constructors and Destructor                                               */
+/*****************************************************************************/
+
+template <typename T>
+MessageVariable::ImplT<T>::ImplT(const std::string& name, const DataType&
+    type) :
+  Impl(name, type) {
+}
+
+template <typename T>
+MessageVariable::ImplT<T>::~ImplT() {
+}
+
+template <typename T, typename M>
+MessageVariable::ImplM<T, M>::ImplM(const std::string& name, const DataType&
+    type, size_t offset) :
+  ImplT<T>(name, type),
+  offset(offset) {
+}
+
+template <typename T, typename M>
+MessageVariable::ImplM<T, M>::~ImplM() {
+}
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageVariable MessageVariable::create(const
-    std::string& name, size_t offset) {
+template <typename T, typename M> MessageVariable MessageVariable::create(
+    const std::string& name, size_t offset) {
+  DataTypeRegistry registry;
   MessageVariable messageVariable;
-  messageVariable.impl.reset(new Impl(name, typeid(T), offset));
+  
+  messageVariable.impl.reset(new ImplM<T, M>(name, registry.template
+    getDataType<M>(), offset));
   
   return messageVariable;
+}
+
+template <typename T, typename M> Variant MessageVariable::ImplM<T, M>::
+    createVariant(const Pointer<ValueType>& message) const {
+  Variant variant = this->type.createVariant();
+  
+  Variant::template set<M>(variant, MessageMemberPointer<T, M>(message,
+    this->offset));
+  
+  return variant;
 }
 
 }

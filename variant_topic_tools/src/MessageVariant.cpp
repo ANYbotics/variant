@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/MessageDataType.h"
+#include <variant_topic_tools/MessageVariable.h>
 #include "variant_topic_tools/MessageVariant.h"
 
 namespace variant_topic_tools {

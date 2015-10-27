@@ -152,6 +152,11 @@ namespace variant_topic_tools {
       */
     void addDataType(const DataType& dataType);
     
+    /** \brief Add a data type to the data type registry (templated
+      *   version)
+      */
+    template <typename T> void addDataType();
+    
     /** \brief Remove a data type from the data type registry
       */
     void removeDataType(const DataType& dataType);

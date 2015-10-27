@@ -29,8 +29,8 @@ MessageVariable::MessageVariable() {
 }
 
 MessageVariable::MessageVariable(const std::string& name, const DataType&
-    type, size_t offset) {
-  impl.reset(new Impl(name, type, offset));
+    type) {
+  impl.reset(new Impl(name, type));
 }
 
 MessageVariable::MessageVariable(const MessageVariable& src) :
@@ -46,11 +46,9 @@ MessageVariable::MessageVariable(const MessageMember& src) :
 MessageVariable::~MessageVariable() {
 }
 
-MessageVariable::Impl::Impl(const std::string& name, const DataType& type,
-    size_t offset) :
+MessageVariable::Impl::Impl(const std::string& name, const DataType& type) :
   MessageMember::Impl(name),
-  type(type),
-  offset(offset) {
+  type(type) {
   if (!type.isValid())
     throw InvalidDataTypeException();
 }
@@ -68,10 +66,6 @@ const DataType& MessageVariable::Impl::getType() const {
 
 size_t MessageVariable::Impl::getSize() const {
   return type.getSize();
-}
-
-size_t MessageVariable::Impl::getOffset() const {
-  return offset;
 }
 
 bool MessageVariable::Impl::isFixedSize() const {

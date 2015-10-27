@@ -33,9 +33,11 @@ using namespace variant_topic_tools;
 
 TEST(Variant, Builtin) {
   BuiltinVariant v1 = DataType("float64").createVariant();
+  BuiltinVariant v2 = DataType("bool").createVariant();
   
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
+  EXPECT_EQ(typeid(double), v1.getValueTypeInfo());
   EXPECT_EQ(0.0, v1.getValue<double>());
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_ANY_THROW(v1.getValue<int>());
@@ -58,6 +60,8 @@ TEST(Variant, Builtin) {
   
   EXPECT_FALSE(v1.hasType());
   EXPECT_TRUE(v1.isEmpty());
+  
+  EXPECT_EQ(typeid(uint8_t), v2.getValueTypeInfo());
 }
 
 TEST(Variant, Array) {
@@ -109,35 +113,54 @@ TEST(Variant, Array) {
 TEST(Variant, Message) {
   DataTypeRegistry registry;
   
-//   MessageVariant v1(MessageDefinition::create<std_msgs::Bool>().
-//     getMessageDataType());
-//   MessageVariant v2(MessageDefinition::create<std_msgs::String>().
-//     getMessageDataType());
-//   MessageVariant v3(MessageDefinition::create<variant_msgs::Test>().
-//     getMessageDataType());
+  MessageVariant v1(MessageDefinition::create<std_msgs::Bool>().
+    getMessageDataType().createVariant());
+  MessageVariant v2(MessageDefinition::create<std_msgs::String>().
+    getMessageDataType().createVariant());
+  MessageVariant v3(MessageDefinition::create<variant_msgs::Test>().
+    getMessageDataType().createVariant());
+  MessageVariant v4(registry.getDataType<variant_msgs::Test>().
+    createVariant());
   
-//   EXPECT_TRUE(v1.hasType());
-//   EXPECT_FALSE(v1.isEmpty());
-//   EXPECT_EQ(1, v1.getNumMembers());
-//   EXPECT_TRUE(v1["data"].hasType());
-//   EXPECT_FALSE(v1["data"].isEmpty());
-//   EXPECT_NO_THROW(v1["data"] = true);
-//   EXPECT_EQ(true, v1["data"].getValue<bool>());
+  EXPECT_TRUE(v1.hasType());
+  EXPECT_FALSE(v1.isEmpty());
+  EXPECT_EQ(typeid(void), v1.getValueTypeInfo());
+  EXPECT_EQ(1, v1.getNumMembers());
+  EXPECT_TRUE(v1["data"].hasType());
+  EXPECT_FALSE(v1["data"].isEmpty());
+  EXPECT_NO_THROW(v1["data"] = true);
+  EXPECT_EQ(true, v1["data"].getValue<bool>());
   
-//   EXPECT_TRUE(v2.hasType());
-//   EXPECT_FALSE(v2.isEmpty());
-//   EXPECT_EQ(1, v2.getNumMembers());
-//   EXPECT_TRUE(v2["data"].hasType());
-//   EXPECT_FALSE(v2["data"].isEmpty());
-//   EXPECT_NO_THROW(v2["data"] = "Test");
-//   EXPECT_EQ("Test", v2["data"].getValue<std::string>());
+  EXPECT_TRUE(v2.hasType());
+  EXPECT_FALSE(v2.isEmpty());
+  EXPECT_EQ(typeid(void), v2.getValueTypeInfo());
+  EXPECT_EQ(1, v2.getNumMembers());
+  EXPECT_TRUE(v2["data"].hasType());
+  EXPECT_FALSE(v2["data"].isEmpty());
+  EXPECT_NO_THROW(v2["data"] = "Test");
+  EXPECT_EQ("Test", v2["data"].getValue<std::string>());
   
-//   EXPECT_TRUE(v3.hasType());
-//   EXPECT_FALSE(v3.isEmpty());
-//   EXPECT_TRUE(v3["header"].hasType());
-//   EXPECT_FALSE(v3["header"].isEmpty());
-//   EXPECT_NO_THROW(v3["builtin_string"] = "Test");
-//   EXPECT_EQ("Test", v3["builtin_string"].getValue<std::string>());
+  EXPECT_TRUE(v3.hasType());
+  EXPECT_FALSE(v3.isEmpty());
+  EXPECT_EQ(typeid(void), v3.getValueTypeInfo());
+  EXPECT_TRUE(v3["header"].hasType());
+  EXPECT_FALSE(v3["header"].isEmpty());
+  EXPECT_EQ(typeid(void), v3["header"].getValueTypeInfo());
+  EXPECT_NO_THROW(v3["builtin_string"] = "Test");
+  EXPECT_EQ("Test", v3["builtin_string"].getValue<std::string>());
+  
+  EXPECT_TRUE(v4.hasType());
+  EXPECT_FALSE(v4.isEmpty());
+  EXPECT_EQ(typeid(variant_msgs::Test), v4.getValueTypeInfo());
+  EXPECT_TRUE(v4["header"].hasType());
+  EXPECT_FALSE(v4["header"].isEmpty());
+  EXPECT_EQ(typeid(std_msgs::Header), v4["header"].getValueTypeInfo());
+  EXPECT_NO_THROW(v4["builtin_string"] = "Test");
+  EXPECT_EQ("Test", v4["builtin_string"].getValue<std::string>());
+  EXPECT_EQ(typeid(bool[3]),
+    v4["builtin_boolean_array"].getType().getTypeInfo());
+  EXPECT_EQ(typeid(boost::array<uint8_t, 3>),
+    v4["builtin_boolean_array"].getValueTypeInfo());
   
   registry.clear();
 }
