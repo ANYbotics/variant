@@ -54,6 +54,10 @@ namespace variant_topic_tools {
       */
     BuiltinDataType& operator=(const DataType& src);
     
+    /** \brief True, if this built-in data type is numeric
+      */
+    bool isNumeric() const;
+    
   protected:
     /** \brief Built-in data type implementation
       */
@@ -72,6 +76,11 @@ namespace variant_topic_tools {
         *   (implementation)
         */ 
       const std::string& getIdentifier() const;
+    
+      /** \brief True, if this built-in data type is numeric (abstract
+        *   declaration)
+        */
+      virtual bool isNumeric() const = 0;
     
       /** \brief The identifier representing this built-in data type
         */
@@ -109,6 +118,10 @@ namespace variant_topic_tools {
         */ 
       bool isFixedSize() const;
       
+      /** \brief True, if this built-in data type is numeric (implementation)
+        */
+      bool isNumeric() const;
+    
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
       Serializer createSerializer(const DataType& type) const;

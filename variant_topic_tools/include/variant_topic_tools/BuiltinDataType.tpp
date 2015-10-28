@@ -53,6 +53,11 @@ bool BuiltinDataType::ImplT<T>::isFixedSize() const {
   return ros::message_traits::template isFixedSize<T>();
 }
 
+template <typename T>
+bool BuiltinDataType::ImplT<T>::isNumeric() const {
+  return type_traits::BuiltinType<T>::IsNumeric::value;
+}
+
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/

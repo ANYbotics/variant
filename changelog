@@ -1,3 +1,9 @@
+ros-variant (0.1-19) unstable; urgency=low
+
+  * Added numeric value access for built-in types
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 28 Oct 2015 07:03:00 +0200
+
 ros-variant (0.1-18) unstable; urgency=low
 
   * Adapted README

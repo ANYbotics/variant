@@ -51,6 +51,13 @@ BuiltinDataType::Impl::~Impl() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
+bool BuiltinDataType::isNumeric() const {
+  if (impl)
+    return boost::dynamic_pointer_cast<Impl>(*impl)->isNumeric();
+  else
+    return false;
+}
+
 const std::string& BuiltinDataType::Impl::getIdentifier() const {
   return identifier;
 }

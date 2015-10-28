@@ -53,6 +53,10 @@ namespace variant_topic_tools {
       */ 
     ~BuiltinVariant();
 
+    /** \brief Retrieve the built-in variant's numeric value
+      */
+    double getNumericValue() const;
+      
     using Variant::operator=;
     
   protected:
@@ -68,6 +72,11 @@ namespace variant_topic_tools {
       /** \brief Destructor
         */ 
       virtual ~Value();
+      
+      /** \brief Retrieve the built-in variant's numeric value (abstract
+        *   declaration)
+        */
+      virtual double getNumericValue() const = 0;
     };
     
     /** \brief Built-in variant value (templated implementation)
@@ -112,6 +121,11 @@ namespace variant_topic_tools {
         */
       const ValueType& getValue() const;
       
+      /** \brief Retrieve the built-in variant's numeric value
+        *   (implementation)
+        */
+      double getNumericValue() const;
+    
       /** \brief True, if this variant value equals another variant value
         *   (implementation)
         */
@@ -137,6 +151,20 @@ namespace variant_topic_tools {
     /** \brief Create a built-in variant
       */ 
     template <typename T> static BuiltinVariant create(const DataType& type);
+    
+    /** \brief Retrieve the built-in variant's numeric value (overloaded
+      *   version taking a numeric value)
+      */
+    template <typename T> static double getNumericValue(const T& value,
+      typename boost::enable_if<typename type_traits::BuiltinType<T>::
+      IsNumeric>::type* = 0);
+      
+    /** \brief Retrieve the built-in variant's numeric value (overloaded
+      *   version taking a non-numeric value)
+      */
+    template <typename T> static double getNumericValue(const T& value,
+      typename boost::disable_if<typename type_traits::BuiltinType<T>::
+      IsNumeric>::type* = 0);
     
     /** \brief Compare the values of two built-in variants (overloaded
       *   version taking two comparable values)

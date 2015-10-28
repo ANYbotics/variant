@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <limits.h>
+
 #include "variant_topic_tools/BuiltinVariant.h"
 
 namespace variant_topic_tools {
@@ -44,6 +46,17 @@ BuiltinVariant::Value::Value() {
 }
 
 BuiltinVariant::Value::~Value() {
+}
+
+/*****************************************************************************/
+/* Accessors                                                                 */
+/*****************************************************************************/
+
+double BuiltinVariant::getNumericValue() const {
+  if (value)
+    return boost::dynamic_pointer_cast<Value>(value)->getNumericValue();
+  else
+    return std::numeric_limits<double>::quiet_NaN();
 }
 
 }

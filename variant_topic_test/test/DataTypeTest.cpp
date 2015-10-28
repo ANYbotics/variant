@@ -60,6 +60,7 @@ TEST(DataType, Builtin) {
   EXPECT_TRUE(b1.isFixedSize());
   EXPECT_EQ(sizeof(int32_t), b1.getSize());
   EXPECT_FALSE(b1.createVariant().isEmpty());
+  EXPECT_TRUE(b1.isNumeric());
 }
 
 TEST(DataType, Message) {

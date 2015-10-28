@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <limits.h>
+
 #include <variant_topic_tools/BuiltinPointer.h>
 
 namespace variant_topic_tools {
@@ -76,6 +78,16 @@ const typename BuiltinVariant::ValueImplT<T>::ValueType& BuiltinVariant::
 }
 
 template <typename T>
+double BuiltinVariant::ValueImplT<T>::getNumericValue() const {
+  if (!this->value) {
+    static ValueType value = ValueType();
+    return BuiltinVariant::template getNumericValue<ValueType>(value);
+  }
+  else
+    return BuiltinVariant::template getNumericValue<ValueType>(*this->value);
+}
+
+template <typename T>
 bool BuiltinVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
     const {
   return BuiltinVariant::template isEqual<T>(dynamic_cast<const
@@ -107,6 +119,18 @@ void BuiltinVariant::ValueImplT<T>::read(std::istream& stream) {
     this->value = BuiltinPointer<T>(new ValueType());
   
   BuiltinVariant::template read<T>(stream, *this->value);
+}
+
+template <typename T> double BuiltinVariant::getNumericValue(const T&
+    value, typename boost::enable_if<typename type_traits::BuiltinType<T>::
+    IsNumeric>::type*) {
+  return value;
+}
+
+template <typename T> double BuiltinVariant::getNumericValue(const T&
+    value, typename boost::disable_if<typename type_traits::BuiltinType<T>::
+    IsNumeric>::type*) {
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 template <typename T> bool BuiltinVariant::isEqual(const typename

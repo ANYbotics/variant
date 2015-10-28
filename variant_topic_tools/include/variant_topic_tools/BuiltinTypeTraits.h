@@ -52,10 +52,14 @@ namespace variant_topic_tools {
     
     template <typename T, typename D = void> struct BuiltinType {
       typedef T ValueType;
+      typedef typename boost::type_traits::ice_or<
+        boost::is_integral<T>::value,
+        boost::is_floating_point<T>::value> IsNumeric;
     };
     
     template <typename D> struct BuiltinType<bool, D> {
       typedef uint8_t ValueType;
+      typedef boost::true_type IsNumeric;
     };
     
     template <typename T> struct ToBuiltinType {

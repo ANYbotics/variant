@@ -55,6 +55,7 @@ TEST(Variant, Builtin) {
   
   EXPECT_TRUE(v1 != 1);
   EXPECT_FALSE(v1 == 1);
+  EXPECT_EQ(1.0, v1.getNumericValue());
   
   v1.clear();
   
@@ -62,6 +63,7 @@ TEST(Variant, Builtin) {
   EXPECT_TRUE(v1.isEmpty());
   
   EXPECT_EQ(typeid(uint8_t), v2.getValueTypeInfo());
+  EXPECT_EQ(0.0, v2.getNumericValue());
 }
 
 TEST(Variant, Array) {
