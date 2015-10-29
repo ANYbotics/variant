@@ -24,17 +24,16 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageHeader::MessageHeader(const std::string& publisher, const std::string&
-    topic, bool latched) :
-  publisher(publisher),
-  topic(topic),
-  latched(latched) {
+MessageHeader::MessageHeader() :
+  fields(new Fields()) {
+}
+
+MessageHeader::MessageHeader(const FieldsPtr& fields) :
+  fields(fields) {
 }
 
 MessageHeader::MessageHeader(const MessageHeader& src) :
-  publisher(src.publisher),
-  topic(src.topic),
-  latched(src.latched) {
+  fields(src.fields) {
 }
 
 MessageHeader::~MessageHeader() {
@@ -44,29 +43,60 @@ MessageHeader::~MessageHeader() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
+void MessageHeader::setField(const std::string& name, const std::string&
+    value) {
+  (*fields)[name] = value;
+}
+
+const std::string& MessageHeader::getField(const std::string& name) const {
+  Fields::const_iterator it = fields->find(name);
+    
+  if (it == fields->end()) {
+    static std::string value = std::string();
+    return value;
+  }
+  else
+    return it->second;
+}
+
 void MessageHeader::setPublisher(const std::string& publisher) {
-  this->publisher = publisher;
+  (*fields)["callerid"] = publisher;
 }
 
 const std::string& MessageHeader::getPublisher() const {
-  return publisher;
+  return getField("callerid");
 }
 
 void MessageHeader::setTopic(const std::string& topic) {
-  this->topic = topic;
+  (*fields)["topic"] = topic;
 }
 
 const std::string& MessageHeader::getTopic() const {
-  return topic;
+  return getField("topic");
+}
+
+void MessageHeader::setLatched(bool latched) {
+  (*fields)["latching"] = latched ? "1" : "0";
 }
 
 bool MessageHeader::isLatched() const {
-  return latched;
+  return (getField("latching") == "1");
 }
 
+bool MessageHeader::hasField(const std::string& name) const {
+  return (fields->find(name) != fields->end());
+}
 
-void MessageHeader::setLatched(bool latched) {
-  this->latched = latched;
+/*****************************************************************************/
+/* Operators                                                                 */
+/*****************************************************************************/
+
+std::string& MessageHeader::operator[](const std::string& name) {
+  return (*fields)[name];
+}
+
+const std::string& MessageHeader::operator[](const std::string& name) const {
+  return getField(name);
 }
 
 }

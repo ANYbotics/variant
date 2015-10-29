@@ -25,16 +25,18 @@
 
 #include <ros/ros.h>
 
+#include <variant_topic_tools/Forwards.h>
+
 namespace variant_topic_tools {
   /** \brief Variant message header
     */
   class MessageHeader {
   friend class Message;
+  friend class ros::serialization::PreDeserialize<Message>;
   public:
     /** \brief Default constructor
       */ 
-    MessageHeader(const std::string& publisher = std::string(), const
-      std::string& topic = std::string(), bool latched = false);
+    MessageHeader();
     
     /** \brief Copy constructor
       */ 
@@ -44,6 +46,14 @@ namespace variant_topic_tools {
       */ 
     ~MessageHeader();
 
+    /** \brief Set a field of the message header
+      */ 
+    void setField(const std::string& name, const std::string& value);
+    
+    /** \brief Retrieve a field of the message header
+      */ 
+    const std::string& getField(const std::string& name) const;
+    
     /** \brief Set the name of the publishing node
       */ 
     void setPublisher(const std::string& publisher);
@@ -69,18 +79,37 @@ namespace variant_topic_tools {
       */ 
     bool isLatched() const;
 
+    /** \brief True, if the message header contains a field with the
+      *   specified name
+      */ 
+    bool hasField(const std::string& name) const;
+    
+    /** \brief Operator for retrieving a field of the message header
+      *   (non-const version)
+      */ 
+    std::string& operator[](const std::string& name);
+    
+    /** \brief Operator for retrieving a field of the message header
+      *   (const version)
+      */ 
+    const std::string& operator[](const std::string& name) const;
+    
   protected:
-    /** \brief The message publisher
+    /** \brief Definition of the fields type
       */ 
-    std::string publisher;
+    typedef std::map<std::string, std::string> Fields;
     
-    /** \brief The message publishing topic
+    /** \brief Definition of the fields pointer type
       */ 
-    std::string topic;
+    typedef boost::shared_ptr<std::map<std::string, std::string> > FieldsPtr;
     
-    /** \brief True, if the message publication is latched
+    /** \brief The fields of the message header
       */ 
-    bool latched;
+    FieldsPtr fields;
+    
+    /** \brief Constructor (overloaded version taking a fields pointer)
+      */ 
+    MessageHeader(const FieldsPtr& fields);
   };
 };
 

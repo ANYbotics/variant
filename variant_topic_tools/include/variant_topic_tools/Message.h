@@ -29,13 +29,14 @@
 
 #include <variant_msgs/Variant.h>
 
+#include <variant_topic_tools/Forwards.h>
 #include <variant_topic_tools/MessageHeader.h>
 #include <variant_topic_tools/MessageType.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message type
+  /** \brief Generic message type
     * 
-    * The variant message type can be used to subscribe to any topic.
+    * This generic message type can be used to subscribe to any topic.
     * It is heavily inspired by the ShapeShifter message type provided
     * in the topic_tools package.
     */
@@ -61,26 +62,24 @@ namespace variant_topic_tools {
     ~Message();
 
     /** \brief Set the message header
+      * 
+      * \note This will modify the message type from the fields of the
+      *   specified header.
       */
     void setHeader(const MessageHeader& header);
     
-    /** \brief Retrieve the message header (non-const version)
-      */
-    MessageHeader& getHeader();
-    
-    /** \brief Retrieve the message header (const version)
+    /** \brief Retrieve the message header
       */
     const MessageHeader& getHeader() const;
     
     /** \brief Set the message type
+      * 
+      * \note This will modify the message header from the members of the
+      *   specified type.
       */
     void setType(const MessageType& type);
     
-    /** \brief Retrieve the message type (non-const version)
-      */
-    MessageType& getType();
-    
-    /** \brief Retrieve the message type (const version)
+    /** \brief Retrieve the message type
       */
     const MessageType& getType() const;
 
@@ -104,14 +103,21 @@ namespace variant_topic_tools {
       */
     template <typename T> void morph();
 
-    /** \brief Attempt to convert the message to a variant
+    /** \brief Attempt to serialize this message from a variant
       */
-    boost::shared_ptr<variant_msgs::Variant> toVariant() const;
+    void serialize(const MessageVariant& variant);
       
-    /** \brief Attempt to convert the message to an invariant
+    /** \brief Attempt to deserialize this message into a variant
       */
-    template <typename T> boost::shared_ptr<T> toInvariant()
-      const;
+    void deserialize(MessageVariant& variant) const;
+      
+    /** \brief Attempt to convert the message to a variant message
+      */
+    boost::shared_ptr<variant_msgs::Variant> toVariantMessage() const;
+      
+    /** \brief Attempt to convert the message to a strong-typed message
+      */
+    template <typename T> boost::shared_ptr<T> toMessage() const;
 
     /** \brief Read serialized message contents from stream
       */ 

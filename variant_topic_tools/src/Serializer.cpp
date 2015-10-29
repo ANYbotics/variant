@@ -51,6 +51,13 @@ Serializer::Impl::~Impl() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
+size_t Serializer::getSerializedLength(const Variant& value) const {
+  if (impl)
+    return impl->getSerializedLength(value);
+  else
+    return 0;
+}
+
 bool Serializer::isValid() const {
   return impl;
 }
@@ -79,12 +86,17 @@ void Serializer::deserialize(ros::serialization::IStream& stream, Variant&
     throw InvalidSerializerException();
 }
 
-void Serializer::advance(ros::serialization::IStream& stream, const Variant&
+void Serializer::advance(ros::serialization::Stream& stream, const Variant&
     value) {
   if (impl)
-    impl->advance(stream, value);
+    return impl->advance(stream, value);
   else
     throw InvalidSerializerException();
+}
+
+void Serializer::Impl::advance(ros::serialization::Stream& stream, const
+    Variant& value) {
+  stream.advance(getSerializedLength(value));
 }
 
 /*****************************************************************************/

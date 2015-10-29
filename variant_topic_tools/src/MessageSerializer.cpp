@@ -61,6 +61,22 @@ MessageSerializer::ImplV::~ImplV() {
 }
 
 /*****************************************************************************/
+/* Accessors                                                                 */
+/*****************************************************************************/
+
+size_t MessageSerializer::ImplV::getSerializedLength(const Variant& value)
+    const {
+  MessageVariant messageValue = value;
+  size_t length = 0;
+
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
+    length += memberSerializers[i].getValue().getSerializedLength(
+      messageValue[i]);
+  
+  return length;
+}
+
+/*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
@@ -80,14 +96,6 @@ void MessageSerializer::ImplV::deserialize(ros::serialization::IStream& stream,
     Variant member = messageValue[i];
     memberSerializers[i].getValue().deserialize(stream, member);
   }
-}
-
-void MessageSerializer::ImplV::advance(ros::serialization::IStream& stream,
-    const Variant& value) {
-  MessageVariant messageValue = value;
-
-  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
-    memberSerializers[i].getValue().advance(stream, messageValue[i]);
 }
 
 }

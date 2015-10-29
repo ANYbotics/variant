@@ -16,7 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Message.h"
+#include "variant_topic_tools/MessageDefinition.h"
+#include "variant_topic_tools/MessageSerializer.h"
+#include "variant_topic_tools/MessageVariant.h"
 
 namespace variant_topic_tools {
 
@@ -46,10 +50,10 @@ Message::~Message() {
 
 void Message::setHeader(const MessageHeader& header) {
   this->header = header;
-}
-
-MessageHeader& Message::getHeader() {
-  return header;
+  
+  type.setMD5Sum(header["md5sum"]);
+  type.setDataType(header["type"]);
+  type.setDefinition(header["message_definition"]);
 }
 
 const MessageHeader& Message::getHeader() const {
@@ -58,10 +62,10 @@ const MessageHeader& Message::getHeader() const {
 
 void Message::setType(const MessageType& type) {
   this->type = type;
-}
-
-MessageType& Message::getType() {
-  return type;
+  
+  header["md5sum"] = type.getMD5Sum();
+  header["type"] = type.getDataType();
+  header["message_definition"] = type.getDefinition();
 }
 
 const MessageType& Message::getType() const {
@@ -88,7 +92,38 @@ size_t Message::getSize() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-boost::shared_ptr<variant_msgs::Variant> Message::toVariant() const {
+void Message::serialize(const MessageVariant& variant) {
+  MessageDataType dataType = variant.getType();
+  MessageType type(dataType.getIdentifier(), dataType.getMD5Sum(),
+    dataType.getDefinition());
+  
+  setType(type);
+  MessageSerializer serializer = variant.createSerializer();
+  data.resize(serializer.getSerializedLength(variant));
+  ros::serialization::OStream stream(const_cast<uint8_t*>(
+    data.data()), data.size());
+  
+  serializer.serialize(stream, variant);
+}
+
+void Message::deserialize(MessageVariant& variant) const {
+  DataTypeRegistry registry;
+  DataType dataType = registry.getDataType(type.getDataType());
+  
+  if (!dataType) {
+    MessageDefinition definition(type);
+    dataType = definition.getMessageDataType();
+  }
+  
+  variant = dataType.createVariant();
+  MessageSerializer serializer = variant.createSerializer();
+  ros::serialization::IStream stream(const_cast<uint8_t*>(
+    data.data()), data.size());
+  
+  serializer.deserialize(stream, variant);
+}
+
+boost::shared_ptr<variant_msgs::Variant> Message::toVariantMessage() const {
   boost::shared_ptr<variant_msgs::Variant> variant(
     new variant_msgs::Variant());
   

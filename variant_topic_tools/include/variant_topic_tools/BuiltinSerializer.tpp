@@ -33,6 +33,16 @@ BuiltinSerializer::ImplT<T>::~ImplT() {
 }
 
 /*****************************************************************************/
+/* Accessors                                                                 */
+/*****************************************************************************/
+
+template <typename T>
+size_t BuiltinSerializer::ImplT<T>::getSerializedLength(const Variant& value)
+    const {
+  return ros::serialization::serializationLength(value.template getValue<T>());
+}
+
+/*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
@@ -53,13 +63,6 @@ template <typename T>
 void BuiltinSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
     stream, Variant& value) {
   ros::serialization::deserialize(stream, value.template getValue<T>());
-}
-
-template <typename T>
-void BuiltinSerializer::ImplT<T>::advance(ros::serialization::IStream&
-    stream, const Variant& value) {
-  stream.advance(ros::serialization::serializationLength(value.template
-    getValue<T>()));
 }
 
 }

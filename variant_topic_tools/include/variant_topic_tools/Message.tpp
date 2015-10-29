@@ -46,7 +46,7 @@ template <typename T> void Message::morph() {
   this->setType(MessageType::template create<T>());
 }
 
-template <typename T> boost::shared_ptr<T> Message::toInvariant() const {
+template <typename T> boost::shared_ptr<T> Message::toMessage() const {
   if (ros::message_traits::template datatype<T>() != type.getDataType())
     throw DataTypeMismatchException(ros::message_traits::template
       datatype<T>(), type.getDataType());

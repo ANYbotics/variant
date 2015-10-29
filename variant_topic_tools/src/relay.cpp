@@ -94,9 +94,9 @@ void callback(const ros::MessageEvent<variant_topic_tools::Message>&
   }
 
   if(!lazy || publisher.getNumSubscribers()) {
-    boost::shared_ptr<const variant_msgs::Variant> variant =
-      message->toVariant();
-    publisher.publish(variant);
+    boost::shared_ptr<const variant_msgs::Variant> variantMessage =
+      message->toVariantMessage();
+    publisher.publish(variantMessage);
   }
   else
     subscriber = ros::Subscriber();

@@ -52,6 +52,10 @@ namespace variant_topic_tools {
       */ 
     ~Serializer();
 
+    /** \brief Retrieve the serialized length of a variant value
+      */ 
+    size_t getSerializedLength(const Variant& value) const;
+    
     /** \brief True, if this serializer is valid
       */ 
     bool isValid() const;
@@ -68,9 +72,9 @@ namespace variant_topic_tools {
       */ 
     void deserialize(ros::serialization::IStream& stream, Variant& value);
     
-    /** \brief Advance an input stream by the length of a serialized value
+    /** \brief Advance a stream by the length of a serialized value
       */ 
-    void advance(ros::serialization::IStream& stream, const Variant& value);
+    void advance(ros::serialization::Stream& stream, const Variant& value);
     
     /** \brief Void pointer conversion
       */
@@ -91,6 +95,11 @@ namespace variant_topic_tools {
         */
       virtual ~Impl();
 
+      /** \brief Retrieve the serialized length of a variant value (abstract
+        *   declaration)
+        */ 
+      virtual size_t getSerializedLength(const Variant& value) const = 0;
+    
       /** \brief Serialize a variant value (abstract declaration)
         */ 
       virtual void serialize(ros::serialization::OStream& stream, const
@@ -101,11 +110,9 @@ namespace variant_topic_tools {
       virtual void deserialize(ros::serialization::IStream& stream,
         Variant& value) = 0;
         
-      /** \brief Advance an input stream by the length of a serialized
-        *   value (abstract declaration)
+      /** \brief Advance a stream by the length of a serialized value
         */ 
-      virtual void advance(ros::serialization::IStream& stream, const
-        Variant& value) = 0;
+      void advance(ros::serialization::Stream& stream, const Variant& value);
     };
     
     /** \brief Declaration of the serializer implementation pointer type

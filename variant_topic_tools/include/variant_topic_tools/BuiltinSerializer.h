@@ -85,6 +85,11 @@ namespace variant_topic_tools {
         */
       virtual ~ImplT();
 
+      /** \brief Retrieve the serialized length of a variant value
+        *   (implementation)
+        */ 
+      size_t getSerializedLength(const Variant& value) const;
+    
       /** \brief Serialize a variant value (implementation)
         */ 
       void serialize(ros::serialization::OStream& stream, const
@@ -93,12 +98,6 @@ namespace variant_topic_tools {
       /** \brief Deserialize a variant value (implementation)
         */ 
       void deserialize(ros::serialization::IStream& stream, Variant& value);
-        
-      /** \brief Advance an input stream by the length of a serialized
-        *   value (implementation)
-        */ 
-      void advance(ros::serialization::IStream& stream, const Variant&
-        value);
     };
     
     /** \brief Create a built-in serializer

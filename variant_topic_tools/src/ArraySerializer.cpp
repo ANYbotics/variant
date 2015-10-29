@@ -62,6 +62,24 @@ ArraySerializer::ImplV::~ImplV() {
 }
 
 /*****************************************************************************/
+/* Accessors                                                                 */
+/*****************************************************************************/
+
+size_t ArraySerializer::ImplV::getSerializedLength(const Variant& value)
+    const {
+  ArrayVariant arrayValue = value;
+  size_t length = 0;
+
+  if (!numMembers)
+    length += sizeof(uint32_t);
+  
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
+    length += memberSerializer.getSerializedLength(arrayValue[i]);
+  
+  return length;
+}
+
+/*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
@@ -91,17 +109,6 @@ void ArraySerializer::ImplV::deserialize(ros::serialization::IStream& stream,
     Variant member = arrayValue[i];
     memberSerializer.deserialize(stream, member);
   }
-}
-
-void ArraySerializer::ImplV::advance(ros::serialization::IStream& stream,
-    const Variant& value) {
-  ArrayVariant arrayValue = value;
-
-  if (!numMembers)
-    stream.advance(sizeof(uint32_t));
-  
-  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
-    memberSerializer.advance(stream, arrayValue[i]);
 }
 
 }

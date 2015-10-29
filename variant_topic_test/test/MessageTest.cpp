@@ -23,6 +23,7 @@
 #include <variant_msgs/Test.h>
 
 #include <variant_topic_tools/Message.h>
+#include <variant_topic_tools/MessageVariant.h>
 
 using namespace variant_topic_tools;
 
@@ -30,8 +31,8 @@ TEST(Message, Conversion) {
   variant_msgs::Test m1;
   m1.builtin_int = 42;
   m1.builtin_string = "Test";
-  variant_topic_tools::Message m2 = m1;
-  variant_msgs::Test::Ptr m3 = m2.toInvariant<variant_msgs::Test>();
+  Message m2 = m1;
+  variant_msgs::Test::Ptr m3 = m2.toMessage<variant_msgs::Test>();
   
   EXPECT_EQ(ros::message_traits::datatype<variant_msgs::Test>(),
     m2.getType().getDataType());
@@ -41,5 +42,24 @@ TEST(Message, Conversion) {
     m2.getType().getDefinition());
   EXPECT_EQ(m1.builtin_int, m3->builtin_int);
   EXPECT_EQ(m1.builtin_string, m3->builtin_string);
-  EXPECT_ANY_THROW(m2.toInvariant<std_msgs::Bool>());
+  EXPECT_ANY_THROW(m2.toMessage<std_msgs::Bool>());
+}
+
+TEST(Message, Serialization) {
+  variant_msgs::Test m1, m2;
+  m1.builtin_int = 42;
+  m1.builtin_string = "Test";
+  Message m3 = m1;
+  MessageVariant v1;
+  
+  EXPECT_NO_THROW(m3.deserialize(v1));
+  EXPECT_EQ(m1.builtin_int, v1["builtin_int"].getValue<int>());
+  EXPECT_EQ(m1.builtin_string, v1["builtin_string"].getValue<std::string>());
+  
+  EXPECT_NO_THROW(m3.serialize(v1));
+  EXPECT_EQ(ros::serialization::serializationLength<variant_msgs::Test>(m1),
+    m3.getData().size());
+  EXPECT_NO_THROW(m2 = *m3.toMessage<variant_msgs::Test>());
+  EXPECT_EQ(m1.builtin_int, m2.builtin_int);
+  EXPECT_EQ(m1.builtin_string, m2.builtin_string);
 }

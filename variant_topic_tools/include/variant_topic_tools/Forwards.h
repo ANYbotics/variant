@@ -67,6 +67,10 @@ namespace variant_topic_tools {
     */
   template <typename T> class MessageField;
   
+  /** \brief Forward declaration of the message type
+    */
+  class Message;
+  
   /** \brief Forward declaration of the message definition
     */
   class MessageDefinition;

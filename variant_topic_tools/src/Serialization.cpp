@@ -27,19 +27,7 @@ namespace ros {
 
 void PreDeserialize<variant_topic_tools::Message>::notify(const
     PreDeserializeParams<variant_topic_tools::Message>& params) {
-  variant_topic_tools::MessageHeader header;
-  variant_topic_tools::MessageType type;
-  
-  header.setPublisher((*params.connection_header)["callerid"]);
-  header.setTopic((*params.connection_header)["topic"]);
-  header.setLatched((*params.connection_header)["latching"] == "1");
-  
-  type.setMD5Sum((*params.connection_header)["md5sum"]);
-  type.setDataType((*params.connection_header)["type"]);
-  type.setDefinition((*params.connection_header)["message_definition"]);
-
-  params.message->setHeader(header);
-  params.message->setType(type);
+  params.message->setHeader(params.connection_header);
 }
 
   }
