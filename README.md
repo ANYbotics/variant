@@ -91,7 +91,9 @@ may attempt to build this project using catkin as follows:
 
 ## API documentation
 
-This project does not yet provide any API documentation.
+This project does not yet build its API documentation. Some basic documentation
+is however inlined with the interface definitions and can thus be found in the
+source headers.
 
 ## Feature requests and bug reports
 
