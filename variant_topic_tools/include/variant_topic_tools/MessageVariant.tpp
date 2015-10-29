@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/MessageMemberPointer.h>
+#include <variant_topic_tools/MessageSerializer.h>
 #include <variant_topic_tools/MessageVariable.h>
 #include <variant_topic_tools/Exceptions.h>
 
@@ -27,11 +28,10 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageVariant::ValueImplT<T>::ValueImplT(const std::vector<MessageVariable>&
-    members, const Pointer<ValueType>& message) :
+MessageVariant::ValueImplT<T>::ValueImplT(const MessageFieldCollection<
+    MessageVariable>& members, const Pointer<ValueType>& message) :
+  members(members),
   message(message) {
-  for (size_t i = 0; i < members.size(); ++i)
-    this->members.appendField(members[i].getName(), members[i]);
 }
 
 template <typename T>
@@ -126,7 +126,7 @@ bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
 /*****************************************************************************/
 
 template <typename T> MessageVariant MessageVariant::create(const DataType&
-    type, const std::vector<MessageVariable>& members) {
+    type, const MessageFieldCollection<MessageVariable>& members) {
   MessageVariant variant;
   
   variant.type = type;
@@ -138,6 +138,12 @@ template <typename T> MessageVariant MessageVariant::create(const DataType&
 template <typename T>
 Variant::ValuePtr MessageVariant::ValueImplT<T>::clone() const {
   return Variant::ValuePtr(new ValueImplT<T>(*this));
+}
+
+template <typename T>
+Serializer MessageVariant::ValueImplT<T>::createSerializer(const DataType&
+    type) const {
+  return MessageSerializer::template create<T>();
 }
 
 }

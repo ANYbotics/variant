@@ -91,8 +91,8 @@ namespace variant_topic_tools {
     public:
       /** \brief Default constructor
         */ 
-      ValueImplV(const std::vector<MessageVariable>& members =
-        std::vector<MessageVariable>());
+      ValueImplV(const MessageFieldCollection<Variant>& members =
+        MessageFieldCollection<Variant>());
       
       /** \brief Copy constructor
         */ 
@@ -141,6 +141,10 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
+      /** \brief Create a serializer for this variant (implementation)
+        */ 
+      Serializer createSerializer(const DataType& type) const;
+      
       /** \brief The message members
         */
       MessageFieldCollection<Variant> members;
@@ -160,8 +164,8 @@ namespace variant_topic_tools {
       
       /** \brief Default constructor
         */ 
-      ValueImplT(const std::vector<MessageVariable>& members =
-        std::vector<MessageVariable>(), const Pointer<ValueType>&
+      ValueImplT(const MessageFieldCollection<MessageVariable>& members =
+        MessageFieldCollection<MessageVariable>(), const Pointer<ValueType>&
         message = Pointer<ValueType>());
       
       /** \brief Copy constructor
@@ -225,6 +229,10 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
+      /** \brief Create a serializer for this variant (implementation)
+        */ 
+      Serializer createSerializer(const DataType& type) const;
+      
       /** \brief The message members
         */
       MessageFieldCollection<MessageVariable> members;
@@ -235,15 +243,15 @@ namespace variant_topic_tools {
     };
     
     /** \brief Constructor (overloaded version taking a message data type
-      *   and a sequence of variable members)
+      *   and a collection of member variants)
       */ 
-    MessageVariant(const DataType& type, const std::vector<MessageVariable>&
-      members);
+    MessageVariant(const DataType& type, const MessageFieldCollection<
+      Variant>& members);
     
     /** \brief Create a message variant
       */ 
     template <typename T> static MessageVariant create(const DataType& type,
-      const std::vector<MessageVariable>& members);
+      const MessageFieldCollection<MessageVariable>& members);
   };
 };
 

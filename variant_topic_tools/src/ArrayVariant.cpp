@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArrayDataType.h"
+#include "variant_topic_tools/ArraySerializer.h"
 #include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/Exceptions.h"
 
@@ -227,6 +228,14 @@ void ArrayVariant::ValueImplV::clear() {
 
 Variant::ValuePtr ArrayVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
+}
+
+Serializer ArrayVariant::ValueImplV::createSerializer(const DataType& type)
+    const {
+  if (!members.empty())
+    return ArraySerializer(members.front().createSerializer(), numMembers);
+  else
+    return ArraySerializer(Serializer(), 0);
 }
 
 /*****************************************************************************/

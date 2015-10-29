@@ -25,6 +25,7 @@
 
 #include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/DataTypeTraits.h>
+#include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
 
 namespace variant_topic_tools {
@@ -135,11 +136,11 @@ namespace variant_topic_tools {
     class Impl :
       public DataType::Impl {
     public:
-      /** \brief Constructor (overloaded version taking a sequence of
-        *   constant members and a sequence of variable members)
+      /** \brief Constructor (overloaded version taking a collection of
+        *   constant members and a collection of variable members)
         */
-      Impl(const std::vector<MessageConstant>& constantMembers, const
-        std::vector<MessageVariable>& variableMembers);
+      Impl(const MessageFieldCollection<MessageConstant>& constantMembers,
+        const MessageFieldCollection<MessageVariable>& variableMembers);
       
       /** \brief Constructor (overloaded version taking a definition)
         */
@@ -171,11 +172,11 @@ namespace variant_topic_tools {
     
       /** \brief The constant members of this message data type
         */
-      std::vector<MessageConstant> constantMembers;
+      MessageFieldCollection<MessageConstant> constantMembers;
       
       /** \brief The variable members of this message data type
         */
-      std::vector<MessageVariable> variableMembers;
+      MessageFieldCollection<MessageVariable> variableMembers;
     };
     
     /** \brief Message data type implementation (variant-typed version)
@@ -186,8 +187,9 @@ namespace variant_topic_tools {
       /** \brief Constructor (overloaded version taking an identifier, a
         *   sequence of constant members, and a sequence of variable members)
         */
-      ImplV(const std::string& identifier, const std::vector<MessageConstant>&
-        constantMember, const std::vector<MessageVariable>& variableMembers);
+      ImplV(const std::string& identifier, const MessageFieldCollection<
+        MessageConstant>& constantMembers, const MessageFieldCollection<
+        MessageVariable>& variableMembers);
       
       /** \brief Constructor (overloaded version taking an identifier and
         *   a definition)
@@ -343,8 +345,8 @@ namespace variant_topic_tools {
       *   sequence of constant members, and a sequence of variable members)
       */ 
     MessageDataType(const std::string& identifier, const
-      std::vector<MessageConstant>& constantMembers, const
-      std::vector<MessageVariable>& variableMembers);
+      MessageFieldCollection<MessageConstant>& constantMembers, const
+      MessageFieldCollection<MessageVariable>& variableMembers);
     
     /** \brief Constructor (overloaded version taking an identifier and
       *   a definition)

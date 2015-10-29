@@ -28,9 +28,9 @@ namespace variant_topic_tools {
 MessageSerializer::MessageSerializer() {
 }
 
-MessageSerializer::MessageSerializer(const std::vector<MessageVariable>&
-    members) {
-  impl.reset(new ImplV(members));
+MessageSerializer::MessageSerializer(const MessageFieldCollection<Serializer>&
+    memberSerializers) {
+  impl.reset(new ImplV(memberSerializers));
 }
 
 MessageSerializer::MessageSerializer(const MessageSerializer& src) :
@@ -52,10 +52,9 @@ MessageSerializer::Impl::Impl() {
 MessageSerializer::Impl::~Impl() {
 }
 
-MessageSerializer::ImplV::ImplV(const std::vector<MessageVariable>& members) {
-  for (size_t i = 0; i < members.size(); ++i)
-    memberSerializers.appendField(members[i].getName(),
-      members[i].getType().createSerializer());
+MessageSerializer::ImplV::ImplV(const MessageFieldCollection<Serializer>&
+    memberSerializers) :
+  memberSerializers(memberSerializers) {
 }
 
 MessageSerializer::ImplV::~ImplV() {

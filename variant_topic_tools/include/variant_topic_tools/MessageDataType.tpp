@@ -38,7 +38,7 @@ MessageDataType::ImplT<T>::ImplT() :
   memberIndex(0) {
   ros::serialization::serialize(*this, this->message);
   
-  BOOST_ASSERT(memberIndex == this->variableMembers.size());
+  BOOST_ASSERT(memberIndex == this->variableMembers.getNumFields());
 }
 
 template <typename T>
@@ -137,14 +137,15 @@ void MessageDataType::ImplT<T>::addVariableMember(const MessageVariable&
 
 template <typename T>
 template <typename M> void MessageDataType::ImplT<T>::next(const M& member) {
-  BOOST_ASSERT(memberIndex < this->variableMembers.size());
+  BOOST_ASSERT(memberIndex < this->variableMembers.getNumFields());
 
   MessageDataType::template addMember<T, typename type_traits::ToDataType<M>::
-    DataType>(this->variableMembers[memberIndex], reinterpret_cast<size_t>(
-    &member)-reinterpret_cast<size_t>(&this->message));
+    DataType>(this->variableMembers[memberIndex].getValue(),
+    reinterpret_cast<size_t>(&member)-reinterpret_cast<size_t>(
+    &this->message));
   
-  Variant memberVariant = this->variableMembers[memberIndex].getType().
-    createVariant();      
+  Variant memberVariant = this->variableMembers[memberIndex].getValue().
+    getType().createVariant();      
   BOOST_ASSERT(memberVariant.getValueTypeInfo() == typeid(M));
   
   ++memberIndex;

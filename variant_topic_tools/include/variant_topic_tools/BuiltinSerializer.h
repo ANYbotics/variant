@@ -32,6 +32,7 @@ namespace variant_topic_tools {
   class BuiltinSerializer :
     public Serializer {
   friend class BuiltinDataType;
+  friend class BuiltinVariant;
   public:
     /** \brief Default constructor
       */ 

@@ -129,6 +129,10 @@ namespace variant_topic_tools {
       */
     void write(std::ostream& stream) const;
     
+    /** \brief Create a serializer for this variant
+      */ 
+    Serializer createSerializer() const;
+    
     /** \brief Assignment operator
       */
     template <typename T> Variant& operator=(const T& src);
@@ -193,7 +197,11 @@ namespace variant_topic_tools {
     
       /** \brief Write this variant value to a stream (abstract declaration)
         */
-      virtual void write(std::ostream& stream) const = 0;    
+      virtual void write(std::ostream& stream) const = 0;
+      
+      /** \brief Create a serializer for this variant (abstract declaration)
+        */ 
+      virtual Serializer createSerializer(const DataType& type) const = 0;
     };
 
     /** \brief Variant value (templated abstract base)

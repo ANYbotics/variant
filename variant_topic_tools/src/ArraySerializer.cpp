@@ -28,9 +28,9 @@ namespace variant_topic_tools {
 ArraySerializer::ArraySerializer() {
 }
 
-ArraySerializer::ArraySerializer(const DataType& memberType, size_t
+ArraySerializer::ArraySerializer(const Serializer& memberSerializer, size_t
     numMembers) {
-  impl.reset(new ImplV(memberType, numMembers));
+  impl.reset(new ImplV(memberSerializer, numMembers));
 }
 
 ArraySerializer::ArraySerializer(const ArraySerializer& src) :
@@ -52,8 +52,9 @@ ArraySerializer::Impl::Impl() {
 ArraySerializer::Impl::~Impl() {
 }
 
-ArraySerializer::ImplV::ImplV(const DataType& memberType, size_t numMembers) :
-  memberSerializer(memberType.createSerializer()),
+ArraySerializer::ImplV::ImplV(const Serializer& memberSerializer, size_t
+    numMembers) :
+  memberSerializer(memberSerializer),
   numMembers(numMembers) {
 }
 

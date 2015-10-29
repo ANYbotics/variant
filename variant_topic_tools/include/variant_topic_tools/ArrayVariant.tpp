@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include <variant_topic_tools/ArrayMemberPointer.h>
+#include <variant_topic_tools/ArraySerializer.h>
 #include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
@@ -164,6 +165,12 @@ void ArrayVariant::ValueImplT<T>::clear() {
 template <typename T>
 Variant::ValuePtr ArrayVariant::ValueImplT<T>::clone() const {
   return Variant::ValuePtr(new ValueImplT<T>(*this));
+}
+
+template <typename T>
+Serializer ArrayVariant::ValueImplT<T>::createSerializer(const DataType&
+    type) const {
+  return ArraySerializer::template create<T>();
 }
 
 template <typename T> void ArrayVariant::initialize(typename type_traits::

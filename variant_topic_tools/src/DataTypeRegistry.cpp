@@ -123,8 +123,8 @@ ArrayDataType DataTypeRegistry::addArrayDataType(const DataType& memberType,
 }
 
 MessageDataType DataTypeRegistry::addMessageDataType(const std::string&
-    identifier, const std::vector<MessageConstant>& constantMembers, const
-    std::vector<MessageVariable>& variableMembers) {
+    identifier, const MessageFieldCollection<MessageConstant>& constantMembers,
+    const MessageFieldCollection<MessageVariable>& variableMembers) {
   MessageDataType messageDataType(identifier, constantMembers,
     variableMembers);
   addDataType(messageDataType);

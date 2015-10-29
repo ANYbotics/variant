@@ -33,6 +33,7 @@ namespace variant_topic_tools {
   class MessageSerializer :
     public Serializer {
   friend class MessageDataType;
+  friend class MessageVariant;
   public:
     /** \brief Default constructor
       */ 
@@ -72,8 +73,8 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      ImplV(const std::vector<MessageVariable>& members =
-        std::vector<MessageVariable>());
+      ImplV(const MessageFieldCollection<Serializer>& memberSerializers =
+        MessageFieldCollection<Serializer>());
       
       /** \brief Destructor
         */
@@ -133,10 +134,11 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream, const Variant& value);
     };
     
-    /** \brief Constructor (overloaded version taking a sequence of member
+    /** \brief Constructor (overloaded version taking a collection of member
       *   serializers)
       */ 
-    MessageSerializer(const std::vector<MessageVariable>& members);
+    MessageSerializer(const MessageFieldCollection<Serializer>&
+      memberSerializers);
     
     
     /** \brief Create a message serializer

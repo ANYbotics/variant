@@ -19,6 +19,7 @@
 #include <limits.h>
 
 #include <variant_topic_tools/BuiltinPointer.h>
+#include <variant_topic_tools/BuiltinSerializer.h>
 
 namespace variant_topic_tools {
 
@@ -160,6 +161,12 @@ void BuiltinVariant::ValueImplT<T>::write(std::ostream& stream) const {
   }
   else
     BuiltinVariant::template write<T>(stream, *this->value);
+}
+
+template <typename T>
+Serializer BuiltinVariant::ValueImplT<T>::createSerializer(const DataType&
+    type) const {
+  return BuiltinSerializer::template create<T>();
 }
 
 template <typename T> void BuiltinVariant::read(std::istream& stream, typename

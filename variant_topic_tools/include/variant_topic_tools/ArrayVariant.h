@@ -184,6 +184,10 @@ namespace variant_topic_tools {
         */
       ValuePtr clone() const;
       
+      /** \brief Create a serializer for this variant (implementation)
+        */ 
+      Serializer createSerializer(const DataType& type) const;
+      
       /** \brief The array member type
         */
       DataType memberType;
@@ -274,6 +278,10 @@ namespace variant_topic_tools {
       /** \brief Clone this variant value (implementation)
         */
       ValuePtr clone() const;
+      
+      /** \brief Create a serializer for this variant (implementation)
+        */ 
+      Serializer createSerializer(const DataType& type) const;
       
       /** \brief The array member type
         */

@@ -1,3 +1,9 @@
+ros-variant (0.1-21) unstable; urgency=low
+
+  * Added method for serializer creation to variants
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 09:41:00 +0200
+
 ros-variant (0.1-20) unstable; urgency=low
 
   * Basic serializer testing

@@ -126,7 +126,7 @@ bool ArrayDataType::ImplV::isSimple() const {
 /*****************************************************************************/
 
 Serializer ArrayDataType::ImplV::createSerializer(const DataType& type) const {
-  return ArraySerializer(memberType, numMembers);
+  return ArraySerializer(memberType.createSerializer(), numMembers);
 }
 
 Variant ArrayDataType::ImplV::createVariant(const DataType& type) const {

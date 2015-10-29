@@ -33,6 +33,7 @@ namespace variant_topic_tools {
   class ArraySerializer :
     public Serializer {
   friend class ArrayDataType;
+  friend class ArrayVariant;
   public:
     /** \brief Default constructor
       */ 
@@ -72,7 +73,8 @@ namespace variant_topic_tools {
     public:
       /** \brief Default constructor
         */
-      ImplV(const DataType& memberType = DataType(), size_t numMembers = 0);
+      ImplV(const Serializer& memberSerializer = Serializer(), size_t
+        numMembers = 0);
       
       /** \brief Destructor
         */
@@ -136,10 +138,10 @@ namespace variant_topic_tools {
       void advance(ros::serialization::IStream& stream, const Variant& value);
     };
     
-    /** \brief Constructor (overloaded version taking an member serializer
+    /** \brief Constructor (overloaded version taking a member serializer
       *   and a number of members)
       */ 
-    ArraySerializer(const DataType& memberType, size_t numMembers);
+    ArraySerializer(const Serializer& memberSerializer, size_t numMembers);
     
     /** \brief Create an array serializer
       */ 

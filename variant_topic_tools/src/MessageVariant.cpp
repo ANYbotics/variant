@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/MessageDataType.h"
+#include <variant_topic_tools/MessageSerializer.h>
 #include <variant_topic_tools/MessageVariable.h>
 #include "variant_topic_tools/MessageVariant.h"
 
@@ -30,7 +31,7 @@ MessageVariant::MessageVariant() {
 }
 
 MessageVariant::MessageVariant(const DataType& type, const
-    std::vector<MessageVariable>& members) :
+    MessageFieldCollection<Variant>& members) :
   CollectionVariant(type) {
   if (type.isValid())
     value.reset(new ValueImplV(members));
@@ -55,11 +56,9 @@ MessageVariant::Value::Value() {
 MessageVariant::Value::~Value() {
 }
 
-MessageVariant::ValueImplV::ValueImplV(const std::vector<MessageVariable>&
-    members) {
-  for (size_t i = 0; i < members.size(); ++i)
-    this->members.appendField(members[i].getName(),
-      members[i].getType().createVariant());
+MessageVariant::ValueImplV::ValueImplV(const MessageFieldCollection<Variant>&
+    members) :
+  members(members) {
 }
 
 MessageVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
@@ -136,6 +135,17 @@ void MessageVariant::Value::writeMember(std::ostream& stream, size_t index)
 
 Variant::ValuePtr MessageVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
+}
+
+Serializer MessageVariant::ValueImplV::createSerializer(const DataType& type)
+    const {
+  MessageFieldCollection<Serializer> memberSerializers;
+  
+  for (size_t i = 0; i < members.getNumFields(); ++i)
+    memberSerializers.appendField(members[i].getName(),
+      members[i].getValue().createSerializer());
+  
+  return MessageSerializer(memberSerializers);
 }
 
 }

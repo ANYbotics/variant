@@ -143,6 +143,10 @@ namespace variant_topic_tools {
         */
       void write(std::ostream& stream) const;
       
+      /** \brief Create a serializer for this variant (implementation)
+        */ 
+      Serializer createSerializer(const DataType& type) const;
+      
       /** \brief The strong-typed value
         */
       Pointer<ValueType> value;

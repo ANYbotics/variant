@@ -20,6 +20,7 @@
 #include "variant_topic_tools/BuiltinVariant.h"
 #include "variant_topic_tools/CollectionVariant.h"
 #include "variant_topic_tools/MessageVariant.h"
+#include "variant_topic_tools/Serializer.h"
 #include "variant_topic_tools/Variant.h"
 
 namespace variant_topic_tools {
@@ -132,6 +133,13 @@ void Variant::read(std::istream& stream) {
 void Variant::write(std::ostream& stream) const {
   if (value)
     value->write(stream);
+}
+
+Serializer Variant::createSerializer() const {
+  if (value)
+    return value->createSerializer(type);
+  else
+    return Serializer();
 }
 
 /*****************************************************************************/

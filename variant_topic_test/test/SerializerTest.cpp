@@ -172,8 +172,8 @@ TEST(Serializer, VariantArray) {
   v3 += a2[0]; v3 += a2[1]; v3 += a2[2];
   ArrayVariant v4 = registry.getDataType("int32[]").createVariant();
   
-  Serializer s1 = registry.getDataType("int32[3]").createSerializer();
-  Serializer s2 = registry.getDataType("int32[]").createSerializer();
+  Serializer s1 = v1.createSerializer();
+  Serializer s2 = v3.createSerializer();
   
   s1.serialize(o1, v1);
   EXPECT_EQ(d1.size()-v1.getType().getSize(), o1.getLength());
@@ -249,7 +249,7 @@ TEST(Serializer, VariantMessage) {
   v1["builtin_int_vector/2"] = m1.builtin_int_vector[2];
   MessageVariant v2 = t1.createVariant();
   
-  Serializer s1 = t1.createSerializer();
+  Serializer s1 = v1.createSerializer();
     
   s1.serialize(o1, v1);
   s1.deserialize(i1, v2);
