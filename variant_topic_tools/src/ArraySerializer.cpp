@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/ArraySerializer.h"
+#include "variant_topic_tools/ArrayVariant.h"
 
 namespace variant_topic_tools {
 
@@ -27,9 +28,9 @@ namespace variant_topic_tools {
 ArraySerializer::ArraySerializer() {
 }
 
-ArraySerializer::ArraySerializer(const Serializer& memberSerializer, size_t
+ArraySerializer::ArraySerializer(const DataType& memberType, size_t
     numMembers) {
-  impl.reset(new ImplV(memberSerializer, numMembers));
+  impl.reset(new ImplV(memberType, numMembers));
 }
 
 ArraySerializer::ArraySerializer(const ArraySerializer& src) :
@@ -51,8 +52,9 @@ ArraySerializer::Impl::Impl() {
 ArraySerializer::Impl::~Impl() {
 }
 
-ArraySerializer::ImplV::ImplV(const Serializer& memberSerializer, size_t
-    numMembers) {
+ArraySerializer::ImplV::ImplV(const DataType& memberType, size_t numMembers) :
+  memberSerializer(memberType.createSerializer()),
+  numMembers(numMembers) {
 }
 
 ArraySerializer::ImplV::~ImplV() {
@@ -64,13 +66,41 @@ ArraySerializer::ImplV::~ImplV() {
 
 void ArraySerializer::ImplV::serialize(ros::serialization::OStream& stream,
     const Variant& value) {
+  ArrayVariant arrayValue = value;
+  
+  if (!numMembers)
+    stream.next((uint32_t)arrayValue.getNumMembers());
+  
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
+    memberSerializer.serialize(stream, arrayValue[i]);
 }
 
 void ArraySerializer::ImplV::deserialize(ros::serialization::IStream& stream,
     Variant& value) {
+  ArrayVariant arrayValue = value;
+
+  if (!numMembers) {
+    uint32_t numMembers = 0;
+    stream.next(numMembers);
+    
+    arrayValue.resize(numMembers);
+  }
+  
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i) {
+    Variant member = arrayValue[i];
+    memberSerializer.deserialize(stream, member);
+  }
 }
 
-void ArraySerializer::ImplV::advance(ros::serialization::IStream& stream) {
+void ArraySerializer::ImplV::advance(ros::serialization::IStream& stream,
+    const Variant& value) {
+  ArrayVariant arrayValue = value;
+
+  if (!numMembers)
+    stream.advance(sizeof(uint32_t));
+  
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
+    memberSerializer.advance(stream, arrayValue[i]);
 }
 
 }

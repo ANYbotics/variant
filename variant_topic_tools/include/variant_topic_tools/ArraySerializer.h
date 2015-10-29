@@ -24,6 +24,7 @@
 #define VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
 
 #include <variant_topic_tools/ArrayTypeTraits.h>
+#include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
@@ -69,9 +70,9 @@ namespace variant_topic_tools {
     class ImplV :
       public Impl {
     public:
-      /** \brief Constructor
+      /** \brief Default constructor
         */
-      ImplV(const Serializer& memberSerializer, size_t numMembers);
+      ImplV(const DataType& memberType = DataType(), size_t numMembers = 0);
       
       /** \brief Destructor
         */
@@ -89,7 +90,15 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (implementation)
         */ 
-      void advance(ros::serialization::IStream& stream);
+      void advance(ros::serialization::IStream& stream, const Variant& value);
+      
+      /** \brief The array member serializer
+        */
+      Serializer memberSerializer;
+      
+      /** \brief The number of array members
+        */
+      size_t numMembers;
     };
     
     /** \brief Array serializer implementation (templated strong-typed
@@ -99,6 +108,10 @@ namespace variant_topic_tools {
       public Impl {
     public:
       BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+      
+      /** \brief Definition of the value type
+        */
+      typedef typename type_traits::ArrayType<T>::ValueType ValueType;
       
       /** \brief Default constructor
         */
@@ -120,13 +133,13 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (implementation)
         */ 
-      void advance(ros::serialization::IStream& stream);
+      void advance(ros::serialization::IStream& stream, const Variant& value);
     };
     
     /** \brief Constructor (overloaded version taking an member serializer
       *   and a number of members)
       */ 
-    ArraySerializer(const Serializer& memberSerializer, size_t numMembers);
+    ArraySerializer(const DataType& memberType, size_t numMembers);
     
     /** \brief Create an array serializer
       */ 

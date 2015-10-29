@@ -204,28 +204,8 @@ const MessageVariable& MessageDataType::getVariableMember(size_t index) const {
     throw NoSuchMemberException(index);
 }
 
-bool MessageDataType::isSimple() const {
-  if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->isSimple();
-  else
-    return false;
-}
-
 const std::string& MessageDataType::ImplV::getIdentifier() const {
   return identifier;
-}
-
-size_t MessageDataType::ImplV::getSize() const {
-  if (isFixedSize()) {
-    size_t size = 0;
-    
-    for (size_t i = 0; i < variableMembers.size(); ++i)
-      size += variableMembers[i].getSize();
-  
-    return size;
-  }
-  else
-    return 0;
 }
 
 const std::string& MessageDataType::ImplV::getMD5Sum() const {
@@ -237,17 +217,30 @@ const std::string& MessageDataType::ImplV::getDefinition() const {
   return definition;
 }
 
-bool MessageDataType::ImplV::isSimple() const {
-  return false;
+size_t MessageDataType::ImplV::getSize() const {
+  if (isFixedSize()) {
+    size_t size = 0;
+    
+    for (size_t i = 0; i < variableMembers.size(); ++i)
+      size += variableMembers[i].getType().getSize();
+  
+    return size;
+  }
+  else
+    return 0;
 }
 
 bool MessageDataType::ImplV::isFixedSize() const {
   bool fixedSize = true;
   
   for (size_t i = 0; i < variableMembers.size(); ++i)
-    fixedSize &= variableMembers[i].isFixedSize();
+    fixedSize &= variableMembers[i].getType().isFixedSize();
   
   return fixedSize;
+}
+
+bool MessageDataType::ImplV::isSimple() const {
+  return false;
 }
 
 /*****************************************************************************/
@@ -286,15 +279,7 @@ MessageVariable MessageDataType::addVariableMember(const std::string& name,
 
 Serializer MessageDataType::ImplV::createSerializer(const DataType& type)
     const {
-  std::vector<Serializer> memberSerializers;
-  memberSerializers.reserve(variableMembers.size());
-  
-  for (size_t i = 0; i < variableMembers.size(); ++i) {
-    memberSerializers.push_back(variableMembers[i].getType().
-      createSerializer());
-  }
-  
-  return MessageSerializer(memberSerializers);
+  return MessageSerializer(variableMembers);
 }
 
 Variant MessageDataType::ImplV::createVariant(const DataType& type) const {

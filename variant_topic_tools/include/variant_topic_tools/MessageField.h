@@ -23,6 +23,8 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_H
 
+#include <boost/type_traits.hpp>
+
 #include <ros/ros.h>
 
 #include <variant_topic_tools/MessageFieldCollection.h>
@@ -110,6 +112,20 @@ namespace variant_topic_tools {
       */ 
     template <typename U> static bool isValid(const U& value, typename boost::
       disable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type* = 0);
+    
+    /** \brief Write a message field value to a stream (overloaded version
+      *   taking a stream-writable value)
+      */
+    template <typename U> static void writeValue(std::ostream& stream, const
+      U& value, typename boost::enable_if<boost::has_left_shift<std::ostream,
+      const U&> >::type* = 0);
+    
+    /** \brief Write a message field value to a stream (overloaded version
+      *   taking a non-stream-writable value)
+      */
+    template <typename U> static void writeValue(std::ostream& stream, const
+      U& value, typename boost::disable_if<boost::has_left_shift<std::ostream,
+      const U&> >::type* = 0);
   };
   
   /** \brief Operator for writing the message field to a stream

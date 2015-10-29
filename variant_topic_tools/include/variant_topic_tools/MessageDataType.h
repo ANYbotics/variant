@@ -86,10 +86,6 @@ namespace variant_topic_tools {
       */
     const MessageVariable& getVariableMember(size_t index) const;
     
-    /** \brief True, if this message data type is simple
-      */
-    bool isSimple() const;
-    
     /** \brief Add a constant member to this message data type (overloaded
       *   version taking a message constant)
       */
@@ -163,11 +159,6 @@ namespace variant_topic_tools {
         */
       virtual const std::string& getDefinition() const = 0;
       
-      /** \brief True, if this message data type is simple (abstract
-        *   declaration)
-        */
-      virtual bool isSimple() const = 0;
-      
       /** \brief Add a constant member to this message data type (abstract
         *   declaration)
         */
@@ -212,11 +203,6 @@ namespace variant_topic_tools {
         */ 
       const std::string& getIdentifier() const;
       
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
       /** \brief Retrieve the MD5 sum of this message data type
         *   (implementation)
         */
@@ -227,14 +213,20 @@ namespace variant_topic_tools {
         */
       const std::string& getDefinition() const;
       
-      /** \brief True, if this message data type is simple (implementation)
-        */
-      bool isSimple() const;
-      
-      /** \brief True, if this message data type has fixed size
+      /** \brief Retrieve the size of the instances of this data type
         *   (implementation)
         */
+      size_t getSize() const;
+      
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (implementation)
+        */ 
       bool isFixedSize() const;
+      
+      /** \brief True, if this data type represents a simple data type
+        *   (implementation)
+        */ 
+      bool isSimple() const;
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
@@ -289,11 +281,6 @@ namespace variant_topic_tools {
         */ 
       const std::type_info& getTypeInfo() const;
       
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
       /** \brief Retrieve the MD5 sum of this message data type
         *   (implementation)
         */
@@ -304,13 +291,19 @@ namespace variant_topic_tools {
         */
       const std::string& getDefinition() const;
       
-      /** \brief True, if this data type represents a fixed-size data type,
-        *   as opposed to a variable-size data type (implementation)
+      /** \brief Retrieve the size of the instances of this data type
+        *   (implementation)
+        */
+      size_t getSize() const;
+      
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (implementation)
         */ 
       bool isFixedSize() const;
       
-      /** \brief True, if this message data type is simple (implementation)
-        */
+      /** \brief True, if this data type represents a simple data type
+        *   (implementation)
+        */ 
       bool isSimple() const;
       
       /** \brief Create a serializer for this data type (re-implementation)
@@ -365,20 +358,20 @@ namespace variant_topic_tools {
     template <typename T> static MessageDataType create();
     
     /** \brief Add a variable message member (overloaded version for adding
-      *   a fixed-size array member)
+      *   a dynamic array member)
       */ 
     template <typename T, typename M> static void addMember(
       MessageVariable& member, size_t offset, typename boost::enable_if<
       type_traits::IsArray<M> >::type* = 0, typename boost::enable_if<
-      typename type_traits::ArrayType<M>::IsFixedSize>::type* = 0);
+      typename type_traits::ArrayType<M>::IsDynamic>::type* = 0);
     
     /** \brief Add a variable message member (overloaded version for adding
-      *   a non-fixed-size array member)
+      *   a non-dynamic array member)
       */ 
     template <typename T, typename M> static void addMember(
       MessageVariable& member, size_t offset, typename boost::enable_if<
       type_traits::IsArray<M> >::type* = 0, typename boost::disable_if<
-      typename type_traits::ArrayType<M>::IsFixedSize>::type* = 0);
+      typename type_traits::ArrayType<M>::IsDynamic>::type* = 0);
     
     /** \brief Add a variable message member (overloaded version for adding
       *   a non-array member)

@@ -137,5 +137,11 @@ int main(int argc, char **argv) {
   std::cout << v5["string_vector"].getType() << "\n";
   std::cout << "\n";
 
+  MessageVariant v6 = MessageDefinition::create<variant_msgs::Test>().
+    getMessageDataType().createVariant();
+  v6.setValue(v5);
+  std::cout << (v5 == v6) << "\n";
+  std::cout << "\n";
+    
   return 0;
 }

@@ -36,16 +36,22 @@ namespace variant_topic_tools {
     template <typename T> struct DataType<T, typename boost::
         enable_if<IsBuiltin<T> >::type> {
       typedef typename BuiltinType<T>::ValueType ValueType;
+      typedef typename BuiltinType<T>::IsFixedSize IsFixedSize;
+      typedef typename BuiltinType<T>::IsFixedSize IsSimple;
     };
     
     template <typename T> struct DataType<T, typename boost::
         enable_if<IsArray<T> >::type> {
       typedef typename ArrayType<T>::ValueType ValueType;
+      typedef typename ArrayType<T>::IsFixedSize IsFixedSize;
+      typedef typename ArrayType<T>::IsFixedSize IsSimple;
     };    
     
     template <typename T> struct DataType<T, typename boost::
         enable_if<IsMessage<T> >::type> {
       typedef typename MessageType<T>::ValueType ValueType;
+      typedef typename MessageType<T>::IsFixedSize IsFixedSize;
+      typedef typename MessageType<T>::IsFixedSize IsSimple;
     };    
     
     template <typename T, typename Enable = void> struct ToDataType;
@@ -53,17 +59,17 @@ namespace variant_topic_tools {
     template <typename T> struct ToDataType<T, typename boost::
         enable_if<IsBuiltin<typename ToBuiltinType<T>::BuiltinType> >::type> {
       typedef typename ToBuiltinType<T>::BuiltinType DataType;
-    };    
+    };
     
     template <typename T> struct ToDataType<T, typename boost::
         enable_if<IsArray<typename ToArrayType<T>::ArrayType> >::type> {
       typedef typename ToArrayType<T>::ArrayType DataType;
-    };    
+    };
     
     template <typename T> struct ToDataType<T, typename boost::
         enable_if<IsMessage<typename ToMessageType<T>::MessageType> >::type> {
       typedef typename ToMessageType<T>::MessageType DataType;
-    };    
+    };
   };
 };
 

@@ -64,7 +64,9 @@ namespace variant_topic_tools {
       typedef typename ArrayMemberType<T>::ValueType MemberValueType;
       typedef std::vector<MemberValueType> ValueType;
       static const size_t NumMembers = 0;
-      typedef boost::false_type IsFixedSize;
+      typedef boost::true_type IsDynamic;
+      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
+      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
     
     template <typename T, size_t N> struct ArrayType<T[N]> {
@@ -72,7 +74,9 @@ namespace variant_topic_tools {
       typedef typename ArrayMemberType<T>::ValueType MemberValueType;
       typedef boost::array<MemberValueType, N> ValueType;
       static const size_t NumMembers = N;
-      typedef boost::true_type IsFixedSize;
+      typedef boost::false_type IsDynamic;
+      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
+      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
     
     template <typename T> struct ToArrayType {

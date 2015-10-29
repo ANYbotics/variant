@@ -149,7 +149,7 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
     else
       throw InvalidDataTypeException();
   }
-  else if (value.type == dst.type.getTypeInfo()) {
+  else if (value.type == dst.type) {
     if (!dst.value)
       dst.value = dst.type.createVariant().value;
     

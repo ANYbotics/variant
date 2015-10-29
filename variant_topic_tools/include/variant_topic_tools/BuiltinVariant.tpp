@@ -91,7 +91,7 @@ template <typename T>
 bool BuiltinVariant::ValueImplT<T>::isEqual(const Variant::Value& value)
     const {
   return BuiltinVariant::template isEqual<T>(dynamic_cast<const
-    ValueT<T>&>(value).getValue(), this->getValue());
+    ValueImplT<T>&>(value).getValue(), this->getValue());
 }
 
 /*****************************************************************************/

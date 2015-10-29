@@ -66,13 +66,6 @@ const DataType& MessageMember::getType() const {
     return impl->getType();
 }
 
-size_t MessageMember::getSize() const {
-  if (impl)
-    return impl->getSize();
-  else
-    return 0;
-}
-
 bool MessageMember::isVariable() const {
   if (impl)
     return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl);
@@ -83,13 +76,6 @@ bool MessageMember::isVariable() const {
 bool MessageMember::isConstant() const {
   if (impl)
     return boost::dynamic_pointer_cast<MessageConstant::Impl>(impl);
-  else
-    return false;
-}
-
-bool MessageMember::isFixedSize() const {
-  if (impl)
-    return impl->isFixedSize();
   else
     return false;
 }

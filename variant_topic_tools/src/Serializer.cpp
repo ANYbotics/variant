@@ -79,11 +79,20 @@ void Serializer::deserialize(ros::serialization::IStream& stream, Variant&
     throw InvalidSerializerException();
 }
 
-void Serializer::advance(ros::serialization::IStream& stream) {
+void Serializer::advance(ros::serialization::IStream& stream, const Variant&
+    value) {
   if (impl)
-    impl->advance(stream);
+    impl->advance(stream, value);
   else
     throw InvalidSerializerException();
+}
+
+/*****************************************************************************/
+/* Operators                                                                 */
+/*****************************************************************************/
+
+std::ostream& operator<<(std::ostream& stream, const Serializer& serializer) {
+  return stream;
 }
 
 }

@@ -33,6 +33,8 @@ namespace variant_topic_tools {
 
     template <typename T> struct MessageType {
       typedef T ValueType;
+      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
+      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
     
     template <typename T> struct ToMessageType {

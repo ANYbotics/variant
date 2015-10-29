@@ -19,7 +19,7 @@ Topic tools for treating ROS messages as type-erased variants.
 This project provides a partially templated C++ API for treating ROS messages
 as type-erased variants. Similar to the Python API of ROS, it thus renders ROS
 messages and their members accessible without the requirement for including any
-message headers at compile time. The goal of this functionality is to motivate
+message headers at compile time. The goal of this functionality is to encourage
 developers to contribute more C++ packages which are intended to inspect and
 operate on any message type.
 

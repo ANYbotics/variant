@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include "variant_topic_tools/MessageSerializer.h"
+#include "variant_topic_tools/MessageVariant.h"
 
 namespace variant_topic_tools {
 
@@ -27,9 +28,9 @@ namespace variant_topic_tools {
 MessageSerializer::MessageSerializer() {
 }
 
-MessageSerializer::MessageSerializer(const std::vector<Serializer>&
-    memberSerializers) {
-  impl.reset(new ImplV(memberSerializers));
+MessageSerializer::MessageSerializer(const std::vector<MessageVariable>&
+    members) {
+  impl.reset(new ImplV(members));
 }
 
 MessageSerializer::MessageSerializer(const MessageSerializer& src) :
@@ -51,8 +52,10 @@ MessageSerializer::Impl::Impl() {
 MessageSerializer::Impl::~Impl() {
 }
 
-MessageSerializer::ImplV::ImplV(const std::vector<Serializer>&
-    memberSerializers) {
+MessageSerializer::ImplV::ImplV(const std::vector<MessageVariable>& members) {
+  for (size_t i = 0; i < members.size(); ++i)
+    memberSerializers.appendField(members[i].getName(),
+      members[i].getType().createSerializer());
 }
 
 MessageSerializer::ImplV::~ImplV() {
@@ -64,13 +67,28 @@ MessageSerializer::ImplV::~ImplV() {
 
 void MessageSerializer::ImplV::serialize(ros::serialization::OStream& stream,
     const Variant& value) {
+  MessageVariant messageValue = value;
+  
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
+    memberSerializers[i].getValue().serialize(stream, messageValue[i]);
 }
 
 void MessageSerializer::ImplV::deserialize(ros::serialization::IStream& stream,
     Variant& value) {
+  MessageVariant messageValue = value;
+
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i) {
+    Variant member = messageValue[i];
+    memberSerializers[i].getValue().deserialize(stream, member);
+  }
 }
 
-void MessageSerializer::ImplV::advance(ros::serialization::IStream& stream) {
+void MessageSerializer::ImplV::advance(ros::serialization::IStream& stream,
+    const Variant& value) {
+  MessageVariant messageValue = value;
+
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
+    memberSerializers[i].getValue().advance(stream, messageValue[i]);
 }
 
 }

@@ -51,13 +51,6 @@ namespace variant_topic_tools {
       */
     const DataType& getType() const;
     
-    /** \brief Retrieve the size of this message member
-      * 
-      * \note For invalid and constant message members, the returned size
-      *   will be zero.
-      */
-    size_t getSize() const;
-    
     /** \brief True, if this message member is a variable member
       */
     bool isVariable() const;
@@ -65,11 +58,6 @@ namespace variant_topic_tools {
     /** \brief True, if this message member is a constant member
       */
     bool isConstant() const;
-    
-    /** \brief True, if this message member represents a fixed-size
-      *   message member, as opposed to a variable-size message member
-      */ 
-    bool isFixedSize() const;
     
     /** \brief True, if this message member is valid
       */ 
@@ -102,17 +90,6 @@ namespace variant_topic_tools {
         *   declaration)
         */
       virtual const DataType& getType() const = 0;
-      
-      /** \brief Retrieve the size of this message member (abstract
-        *   declaration)
-        */
-      virtual size_t getSize() const = 0;
-      
-      /** \brief True, if this message member represents a fixed-size
-        *   message member, as opposed to a variable-size message member
-        *   (abstract declaration)
-        */ 
-      virtual bool isFixedSize() const = 0;
       
       /** \brief Write the message member to a stream (abstract declaration)
         */

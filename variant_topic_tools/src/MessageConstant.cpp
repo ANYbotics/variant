@@ -91,14 +91,6 @@ const DataType& MessageConstant::Impl::getType() const {
   return value.getType();
 }
 
-size_t MessageConstant::Impl::getSize() const {
-  return 0;
-}
-
-bool MessageConstant::Impl::isFixedSize() const {
-  return true;
-}
-
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/

@@ -93,7 +93,7 @@ void MessageField<T>::write(std::ostream& stream, const std::string& indent)
   stream << indent << name << ": ";
 
   std::stringstream valueStream;
-  valueStream << value;
+  MessageField<T>::template writeValue<T>(valueStream, this->value);
   std::string valueLine;
   size_t numLines = 0;
   
@@ -121,6 +121,19 @@ template <typename T>
 template <typename U> bool MessageField<T>::isValid(const U& value, typename
     boost::disable_if_c<MessageFieldTypeTraits::HasIsValid<U>::value>::type*) {
   return true;
+}
+
+template <typename T>
+template <typename U> void MessageField<T>::writeValue(std::ostream& stream,
+    const U& value, typename boost::enable_if<boost::has_left_shift<std::
+    ostream, const U&> >::type*) {
+  stream << value;
+}
+
+template <typename T>
+template <typename U> void MessageField<T>::writeValue(std::ostream& stream,
+    const U& value, typename boost::disable_if<boost::has_left_shift<std::
+    ostream, const U&> >::type*) {
 }
 
 /*****************************************************************************/

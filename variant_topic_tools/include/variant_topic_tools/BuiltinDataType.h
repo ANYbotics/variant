@@ -113,10 +113,15 @@ namespace variant_topic_tools {
         */
       size_t getSize() const;
       
-      /** \brief True, if this data type represents a fixed-size data type,
-        *   as opposed to a variable-size data type (implementation)
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (implementation)
         */ 
       bool isFixedSize() const;
+      
+      /** \brief True, if this data type represents a simple data type
+        *   (implementation)
+        */ 
+      bool isSimple() const;
       
       /** \brief True, if this built-in data type is numeric (implementation)
         */

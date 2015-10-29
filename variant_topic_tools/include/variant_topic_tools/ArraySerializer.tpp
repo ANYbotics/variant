@@ -56,8 +56,10 @@ void ArraySerializer::ImplT<T>::deserialize(ros::serialization::IStream&
 }
 
 template <typename T>
-void ArraySerializer::ImplT<T>::advance(ros::serialization::IStream& stream) {
-  Serializer::template advance<T>(stream);
+void ArraySerializer::ImplT<T>::advance(ros::serialization::IStream& stream,
+    const Variant& value) {
+  stream.advance(ros::serialization::serializationLength(value.template
+    getValue<T>()));
 }
 
 }

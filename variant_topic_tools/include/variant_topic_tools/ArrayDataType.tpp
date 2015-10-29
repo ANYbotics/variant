@@ -48,6 +48,27 @@ size_t ArrayDataType::ImplT<T>::getNumMembers() const {
   return type_traits::ArrayType<T>::NumMembers;
 }
 
+template <typename T>
+size_t ArrayDataType::ImplT<T>::getSize() const {
+  return type_traits::ArrayType<T>::IsFixedSize::value ?
+    sizeof(typename type_traits::ArrayType<T>::ValueType) : 0;
+}
+
+template <typename T>
+bool ArrayDataType::ImplT<T>::isDynamic() const {
+  return type_traits::ArrayType<T>::IsDynamic::value;
+}
+
+template <typename T>
+bool ArrayDataType::ImplT<T>::isFixedSize() const {
+  return type_traits::ArrayType<T>::IsFixedSize::value;
+}
+
+template <typename T>
+bool ArrayDataType::ImplT<T>::isSimple() const {
+  return type_traits::ArrayType<T>::IsSimple::value;
+}
+
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/

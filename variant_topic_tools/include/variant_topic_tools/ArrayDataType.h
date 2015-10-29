@@ -60,6 +60,10 @@ namespace variant_topic_tools {
       */
     size_t getNumMembers() const;
     
+    /** \brief True, if this array data type represents a dynamic array
+      */
+    bool isDynamic() const;
+    
     /** \brief Assignment operator
       */
     ArrayDataType& operator=(const DataType& src);
@@ -88,17 +92,12 @@ namespace variant_topic_tools {
         */
       virtual size_t getNumMembers() const = 0;
       
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
-      /** \brief True, if this data type represents a fixed-size data type,
-        *   as opposed to a variable-size data type (implementation)
+     /** \brief True, if this array data type represents a dynamic array
+        *   (abstract declaration)
         */ 
-      bool isFixedSize() const;
+      virtual bool isDynamic() const = 0;
       
-      /** \brief The identifier representing this array data type
+       /** \brief The identifier representing this array data type
         */
       mutable std::string identifier;
       
@@ -124,6 +123,26 @@ namespace variant_topic_tools {
         *   (implementation)
         */
       size_t getNumMembers() const;
+      
+      /** \brief Retrieve the size of the instances of this data type
+        *   (implementation)
+        */
+      size_t getSize() const;
+      
+      /** \brief True, if this array data type represents a dynamic array
+        *   (implementation)
+        */ 
+      bool isDynamic() const;
+      
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (implementation)
+        */ 
+      bool isFixedSize() const;
+      
+      /** \brief True, if this data type represents a simple data type
+        *   (implementation)
+        */ 
+      bool isSimple() const;
       
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
@@ -163,6 +182,26 @@ namespace variant_topic_tools {
         */
       size_t getNumMembers() const;
       
+      /** \brief True, if this array data type represents a dynamic array
+        *   (implementation)
+        */ 
+      bool isDynamic() const;
+      
+      /** \brief Retrieve the size of the instances of this data type
+        *   (implementation)
+        */
+      size_t getSize() const;
+      
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (implementation)
+        */ 
+      bool isFixedSize() const;
+      
+      /** \brief True, if this data type represents a simple data type
+        *   (implementation)
+        */ 
+      bool isSimple() const;
+      
       /** \brief Create a serializer for this data type (re-implementation)
         */ 
       Serializer createSerializer(const DataType& type) const;
@@ -183,13 +222,13 @@ namespace variant_topic_tools {
     template <typename T> static ArrayDataType create();
     
     /** \brief Create an array data type (overloaded version for creating
-      *   a non-fixed-size array data type)
+      *   a dynamic array data type)
       */ 
     template <typename T, size_t N> static ArrayDataType create(typename
       boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
     
     /** \brief Create an array data type (overloaded version for creating
-      *   a fixed-size array data type)
+      *   a non-dynamic array data type)
       */ 
     template <typename T, size_t N> static ArrayDataType create(typename
       boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);

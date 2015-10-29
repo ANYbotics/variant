@@ -23,6 +23,7 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 
+#include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
 #include <variant_topic_tools/Serializer.h>
 
@@ -71,7 +72,8 @@ namespace variant_topic_tools {
     public:
       /** \brief Constructor
         */
-      ImplV(const std::vector<Serializer>& memberSerializers);
+      ImplV(const std::vector<MessageVariable>& members =
+        std::vector<MessageVariable>());
       
       /** \brief Destructor
         */
@@ -89,7 +91,11 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (implementation)
         */ 
-      void advance(ros::serialization::IStream& stream);
+      void advance(ros::serialization::IStream& stream, const Variant& value);
+      
+      /** \brief The message member serializers
+        */
+      MessageFieldCollection<Serializer> memberSerializers;
     };
     
     /** \brief Message serializer implementation (templated strong-typed
@@ -99,6 +105,10 @@ namespace variant_topic_tools {
       public Impl {
     public:
       BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+      
+      /** \brief Definition of the value type
+        */
+      typedef typename type_traits::MessageType<T>::ValueType ValueType;
       
       /** \brief Default constructor
         */
@@ -120,13 +130,13 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (implementation)
         */ 
-      void advance(ros::serialization::IStream& stream);
+      void advance(ros::serialization::IStream& stream, const Variant& value);
     };
     
     /** \brief Constructor (overloaded version taking a sequence of member
       *   serializers)
       */ 
-    MessageSerializer(const std::vector<Serializer>& memberSerializers);
+    MessageSerializer(const std::vector<MessageVariable>& members);
     
     
     /** \brief Create a message serializer

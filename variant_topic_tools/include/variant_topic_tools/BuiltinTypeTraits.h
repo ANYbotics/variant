@@ -28,6 +28,7 @@
 #include <boost/type_traits.hpp>
 
 #include <ros/duration.h>
+#include <ros/message_traits.h>
 #include <ros/time.h>
 
 namespace variant_topic_tools {
@@ -52,14 +53,18 @@ namespace variant_topic_tools {
     
     template <typename T, typename D = void> struct BuiltinType {
       typedef T ValueType;
-      typedef typename boost::type_traits::ice_or<
+      typedef boost::type_traits::ice_or<
         boost::is_integral<T>::value,
         boost::is_floating_point<T>::value> IsNumeric;
+      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
+      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
     
     template <typename D> struct BuiltinType<bool, D> {
       typedef uint8_t ValueType;
       typedef boost::true_type IsNumeric;
+      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
+      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
     
     template <typename T> struct ToBuiltinType {

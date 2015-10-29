@@ -108,6 +108,12 @@ namespace variant_topic_tools {
       */ 
     bool isFixedSize() const;
 
+    /** \brief True, if this data type represents a simple data type, i.e.,
+      *   a data type such that an array of its instances can safely be
+      *   shallow copied.
+      */ 
+    bool isSimple() const;
+
     /** \brief True, if this data type is valid
       */ 
     bool isValid() const;
@@ -183,10 +189,15 @@ namespace variant_topic_tools {
         */
       virtual size_t getSize() const = 0;
       
-      /** \brief True, if this data type represents a fixed-size data type,
-        *   as opposed to a variable-size data type (abstract declaration)
+      /** \brief True, if this data type represents a fixed-size data type
+        *   (abstract declaration)
         */ 
       virtual bool isFixedSize() const = 0;
+      
+      /** \brief True, if this data type represents a simple data type
+        *   (abstract declaration)
+        */ 
+      virtual bool isSimple() const = 0;
       
       /** \brief Create a serializer for this data type (abstract declaration)
         */ 

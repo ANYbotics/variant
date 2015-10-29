@@ -52,13 +52,9 @@ namespace variant_topic_tools {
       */ 
     ~ArrayVariant();
         
-    /** \brief True, if this array is a fixed size array
-      */ 
-    bool isFixedSize() const;
-    
     /** \brief Add a member to the array
       * 
-      * \note An attempt to adding a member to a fixed-size array will result
+      * \note An attempt to adding a member to a non-dynamic array will result
       *   in an exception being thrown. Further, the data type of the variant
       *   member to be added must match the member type of this array.
       */ 
@@ -66,14 +62,14 @@ namespace variant_topic_tools {
   
     /** \brief Resize the array
       * 
-      * \note An attempt to resizing a fixed-size array will result in an
+      * \note An attempt to resizing a non-dynamic array will result in an
       *   exception being thrown.
       */ 
     void resize(size_t numMembers);
     
     /** \brief Clear the array
       * 
-      * \note An attempt to clearing a fixed-size array will result in an
+      * \note An attempt to clearing a non-dynamic array will result in an
       *   exception being thrown.
       */ 
     void clear();
@@ -115,11 +111,6 @@ namespace variant_topic_tools {
       Variant getMember(const std::string& name) const;
       
       using CollectionVariant::Value::getMember;
-      
-      /** \brief True, if the array is a fixed size array (abstract
-        *   declaration)
-        */ 
-      virtual bool isFixedSize() const = 0;
       
       /** \brief True, if the variant collection contains the member with the
         *   specified name (implementation)
@@ -176,10 +167,6 @@ namespace variant_topic_tools {
         *   (implementation)
         */
       Variant getMember(size_t index) const;
-      
-      /** \brief True, if the array is a fixed size array (implementation)
-        */ 
-      bool isFixedSize() const;
       
       /** \brief Add a member to the array (implementation)
         */ 
@@ -272,10 +259,6 @@ namespace variant_topic_tools {
         */
       Variant getMember(size_t index) const;
       
-      /** \brief True, if the array is a fixed size array (implementation)
-        */ 
-      bool isFixedSize() const;
-      
       /** \brief Add a member to the array (implementation)
         */ 
       void addMember(const Variant& member);
@@ -313,64 +296,60 @@ namespace variant_topic_tools {
       const DataType& memberType);
 
     /** \brief Initialize an array (overloaded version taking a
-      *   fixed-size array)
+      *   dynamic array)
       */ 
     template <typename T> static void initialize(typename type_traits::
       ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-      type_traits::ArrayType<T>::IsFixedSize>::type* = 0);
+      type_traits::ArrayType<T>::IsDynamic>::type* = 0);
     
     /** \brief Initialize an array (overloaded version taking a
-      *   non-fixed-size array)
+      *   non-dynamic array)
       */ 
     template <typename T> static void initialize(typename type_traits::
       ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-      type_traits::ArrayType<T>::IsFixedSize>::type* = 0);
+      type_traits::ArrayType<T>::IsDynamic>::type* = 0);
     
     /** \brief Add a member to an array (overloaded version taking a
-      *   fixed-size array)
+      *   dynamic array)
       */ 
     template <typename T> static void add(typename type_traits::ArrayType<T>::
       ValueType& array, const typename type_traits::ArrayType<T>::MemberType&
       member, typename boost::enable_if<typename type_traits::ArrayType<T>::
-      IsFixedSize>::type* = 0);
+      IsDynamic>::type* = 0);
     
     /** \brief Add a member to an array (overloaded version taking a
-      *   non-fixed-size array)
+      *   non-dynamic array)
       */ 
     template <typename T> static void add(typename type_traits::ArrayType<T>::
       ValueType& array, const typename type_traits::ArrayType<T>::MemberType&
       member, typename boost::disable_if<typename type_traits::ArrayType<T>::
-      IsFixedSize>::type* = 0);
+      IsDynamic>::type* = 0);
     
-    /** \brief Resize an array (overloaded version taking a
-      *   fixed-size array)
+    /** \brief Resize an array (overloaded version taking a dynamic array)
       */ 
     template <typename T> static void resize(typename type_traits::
       ArrayType<T>::ValueType& array, size_t numMembers, typename
-      boost::enable_if<typename type_traits::ArrayType<T>::IsFixedSize>::
+      boost::enable_if<typename type_traits::ArrayType<T>::IsDynamic>::
       type* = 0);
     
-    /** \brief Resize an array (overloaded version taking a
-      *   non-fixed-size array)
+    /** \brief Resize an array (overloaded version taking a non-dynamic array)
       */ 
     template <typename T> static void resize(typename type_traits::
       ArrayType<T>::ValueType& array, size_t numMembers, typename
-      boost::disable_if<typename type_traits::ArrayType<T>::IsFixedSize>::
+      boost::disable_if<typename type_traits::ArrayType<T>::IsDynamic>::
       type* = 0);
     
-    /** \brief Clear an array (overloaded version taking a
-      *   fixed-size array)
+    /** \brief Clear an array (overloaded version taking a dynamic array)
       */ 
     template <typename T> static void clear(typename type_traits::
       ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-      type_traits::ArrayType<T>::IsFixedSize>::type* = 0);
+      type_traits::ArrayType<T>::IsDynamic>::type* = 0);
     
-    /** \brief Clear an array (overloaded version taking a
-      *   non-fixed-size array)
+    /** \brief Clear an array (overloaded version taking a non-dynamic array)
       */ 
     template <typename T> static void clear(typename type_traits::
       ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-      type_traits::ArrayType<T>::IsFixedSize>::type* = 0);
+      type_traits::ArrayType<T>::IsDynamic>::type* = 0);
   };
 };
 

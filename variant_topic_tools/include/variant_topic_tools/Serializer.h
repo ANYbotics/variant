@@ -70,7 +70,7 @@ namespace variant_topic_tools {
     
     /** \brief Advance an input stream by the length of a serialized value
       */ 
-    void advance(ros::serialization::IStream& stream);
+    void advance(ros::serialization::IStream& stream, const Variant& value);
     
     /** \brief Void pointer conversion
       */
@@ -104,7 +104,8 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (abstract declaration)
         */ 
-      virtual void advance(ros::serialization::IStream& stream) = 0;
+      virtual void advance(ros::serialization::IStream& stream, const
+        Variant& value) = 0;
     };
     
     /** \brief Declaration of the serializer implementation pointer type
@@ -118,23 +119,11 @@ namespace variant_topic_tools {
     /** \brief The serializer's implementation
       */
     ImplPtr impl;
-    
-    /** \brief Advance an input stream by the length of a serialized
-      *   value (overloaded version taking a fixed-size message)
-      */ 
-    template <typename T> static void advance(ros::serialization::IStream&
-      stream, typename boost::enable_if<ros::message_traits::IsFixedSize<
-      typename type_traits::DataType<T>::ValueType> >::type* = 0);
-    
-    /** \brief Advance an input stream by the length of a serialized
-      *   value (overloaded version taking a non-fixed-size message)
-      */ 
-    template <typename T> static void advance(ros::serialization::IStream&
-      stream, typename boost::disable_if<ros::message_traits::IsFixedSize<
-      typename type_traits::DataType<T>::ValueType> >::type* = 0);
   };
+  
+  /** \brief Operator for writing the serializer to a stream
+    */
+  std::ostream& operator<<(std::ostream& stream, const Serializer& serializer);
 };
-
-#include <variant_topic_tools/Serializer.tpp>
 
 #endif

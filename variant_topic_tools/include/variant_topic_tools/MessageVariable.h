@@ -71,16 +71,6 @@ namespace variant_topic_tools {
         */
       const DataType& getType() const;
     
-      /** \brief Retrieve the size of this message member (implementation)
-        */
-      size_t getSize() const;
-      
-      /** \brief True, if this message member represents a fixed-size
-        *   message member, as opposed to a variable-size message member
-        *   (implementation)
-        */ 
-      bool isFixedSize() const;
-      
       /** \brief Write the message member to a stream (implementation)
         */
       void write(std::ostream& stream) const;

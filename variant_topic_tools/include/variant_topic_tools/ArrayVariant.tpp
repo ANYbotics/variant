@@ -121,11 +121,6 @@ Variant ArrayVariant::ValueImplT<T>::getMember(size_t index) const {
     throw NoSuchMemberException(index);  
 }
 
-template <typename T>
-bool ArrayVariant::ValueImplT<T>::isFixedSize() const {
-  return NumMembers;
-}
-
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
@@ -173,52 +168,52 @@ Variant::ValuePtr ArrayVariant::ValueImplT<T>::clone() const {
 
 template <typename T> void ArrayVariant::initialize(typename type_traits::
     ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-    type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  array.assign(typename type_traits::ArrayType<T>::MemberValueType());
+    type_traits::ArrayType<T>::IsDynamic>::type*) {
 }
 
 template <typename T> void ArrayVariant::initialize(typename type_traits::
     ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-    type_traits::ArrayType<T>::IsFixedSize>::type*) {
+    type_traits::ArrayType<T>::IsDynamic>::type*) {
+  array.assign(typename type_traits::ArrayType<T>::MemberValueType());
 }
 
 template <typename T> void ArrayVariant::add(typename type_traits::
     ArrayType<T>::ValueType& array, const typename type_traits::
     ArrayType<T>::MemberType& member, typename boost::enable_if<
-    typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  throw InvalidOperationException("Adding a member to a fixed-size array");
+    typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+  array.push_back(member); 
 }
 
 template <typename T> void ArrayVariant::add(typename type_traits::
     ArrayType<T>::ValueType& array, const typename type_traits::
     ArrayType<T>::MemberType& member, typename boost::disable_if<
-    typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  array.push_back(member); 
+    typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+  throw InvalidOperationException("Adding a member to a non-dynamic array");
 }
 
 template <typename T> void ArrayVariant::resize(typename type_traits::
     ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
-    enable_if<typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  if (numMembers != type_traits::ArrayType<T>::NumMembers)
-    throw InvalidOperationException("Resizing a fixed-size array");
-}
-
-template <typename T> void ArrayVariant::resize(typename type_traits::
-    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
-    disable_if<typename type_traits::ArrayType<T>::IsFixedSize>::type*) {
+    enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   array.resize(numMembers);
+}
+
+template <typename T> void ArrayVariant::resize(typename type_traits::
+    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
+    disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+  if (numMembers != type_traits::ArrayType<T>::NumMembers)
+    throw InvalidOperationException("Resizing a non-dynamic array");
 }
 
 template <typename T> void ArrayVariant::clear(typename type_traits::
     ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-    type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  throw InvalidOperationException("Clearing a fixed-size array");
+    type_traits::ArrayType<T>::IsDynamic>::type*) {
+  array.clear();
 }
 
 template <typename T> void ArrayVariant::clear(typename type_traits::
     ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-    type_traits::ArrayType<T>::IsFixedSize>::type*) {
-  array.clear();
+    type_traits::ArrayType<T>::IsDynamic>::type*) {
+  throw InvalidOperationException("Clearing a non-dynamic array");
 }
 
 }

@@ -38,10 +38,12 @@ TEST(DataType, Array) {
 
   EXPECT_TRUE(a1.isValid());
   EXPECT_TRUE(a1.isArray());
-  EXPECT_TRUE(a1.isFixedSize());
+  EXPECT_FALSE(a1.isDynamic());
+  EXPECT_FALSE(a1.isFixedSize());
   
   EXPECT_TRUE(a2.isValid());
   EXPECT_TRUE(a2.isArray());
+  EXPECT_TRUE(a2.isDynamic());
   EXPECT_FALSE(a2.isFixedSize());
   
   EXPECT_TRUE(registry.getDataType<int32_t[3]>().isArray());

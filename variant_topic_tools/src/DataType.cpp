@@ -122,6 +122,13 @@ bool DataType::isFixedSize() const {
     return true;
 }
 
+bool DataType::isSimple() const {
+  if (impl)
+    return (*impl)->isSimple();
+  else
+    return true;
+}
+
 bool DataType::isValid() const {
   return impl;
 }

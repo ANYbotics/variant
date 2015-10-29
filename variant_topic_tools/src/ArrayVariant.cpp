@@ -77,13 +77,6 @@ ArrayVariant::ValueImplV::~ValueImplV() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-bool ArrayVariant::isFixedSize() const {
-  if (value)
-    return boost::dynamic_pointer_cast<Value>(value)->isFixedSize();
-  else
-    return true;
-}
-
 void ArrayVariant::Value::setValue(const Variant::Value& value) {
   const Value& arrayValue = dynamic_cast<const Value&>(value);
   
@@ -153,10 +146,6 @@ Variant ArrayVariant::ValueImplV::getMember(size_t index) const {
     throw NoSuchMemberException(index);
 }
 
-bool ArrayVariant::ValueImplV::isFixedSize() const {
-  return numMembers;
-}
-
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
@@ -211,7 +200,7 @@ void ArrayVariant::ValueImplV::addMember(const Variant& member) {
         member.getType().getIdentifier());
   }
   else
-    throw InvalidOperationException("Adding a member to a fixed-size array");
+    throw InvalidOperationException("Adding a member to a non-dynamic array");
 }
 
 void ArrayVariant::ValueImplV::resize(size_t numMembers) {
@@ -226,14 +215,14 @@ void ArrayVariant::ValueImplV::resize(size_t numMembers) {
     }
   }
   else
-    throw InvalidOperationException("Resizing a fixed-size array");
+    throw InvalidOperationException("Resizing a non-dynamic array");
 }
 
 void ArrayVariant::ValueImplV::clear() {
   if (!numMembers)
     members.clear();
   else
-    throw InvalidOperationException("Clearing a fixed-size array");
+    throw InvalidOperationException("Clearing a non-dynamic array");
 }
 
 Variant::ValuePtr ArrayVariant::ValueImplV::clone() const {

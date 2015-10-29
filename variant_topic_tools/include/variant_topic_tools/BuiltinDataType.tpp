@@ -45,12 +45,18 @@ const std::type_info& BuiltinDataType::ImplT<T>::getTypeInfo() const {
 
 template <typename T>
 size_t BuiltinDataType::ImplT<T>::getSize() const {
-  return ros::message_traits::template isFixedSize<T>() ? sizeof(T) : 0;
+  return type_traits::BuiltinType<T>::IsFixedSize::value ?
+    sizeof(typename type_traits::BuiltinType<T>::ValueType) : 0;
 }
 
 template <typename T>
 bool BuiltinDataType::ImplT<T>::isFixedSize() const {
-  return ros::message_traits::template isFixedSize<T>();
+  return type_traits::BuiltinType<T>::IsFixedSize::value;
+}
+
+template <typename T>
+bool BuiltinDataType::ImplT<T>::isSimple() const {
+  return type_traits::BuiltinType<T>::IsSimple::value;
 }
 
 template <typename T>

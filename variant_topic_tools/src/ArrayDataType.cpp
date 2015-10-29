@@ -85,25 +85,40 @@ size_t ArrayDataType::getNumMembers() const {
     return 0;
 }
 
+bool ArrayDataType::isDynamic() const {
+  if (impl)
+    return boost::static_pointer_cast<Impl>(*impl)->isDynamic();
+  else
+    return 0;
+}
+
 const std::string& ArrayDataType::Impl::getIdentifier() const {
   if (identifier.empty()) {
-    identifier = memberType.getIdentifier()+(isFixedSize() ?
+    identifier = memberType.getIdentifier()+(getNumMembers() ?
       "["+boost::lexical_cast<std::string>(getNumMembers())+"]" : "[]");
   }
 
   return identifier;
 }
 
-size_t ArrayDataType::Impl::getSize() const {
-  return getNumMembers()*memberType.getSize();
-}
-
-bool ArrayDataType::Impl::isFixedSize() const {
-  return getNumMembers();
-}
-
 size_t ArrayDataType::ImplV::getNumMembers() const {
   return numMembers;
+}
+
+size_t ArrayDataType::ImplV::getSize() const {
+  return numMembers*memberType.getSize();
+}
+
+bool ArrayDataType::ImplV::isDynamic() const {
+  return !numMembers;
+}
+
+bool ArrayDataType::ImplV::isFixedSize() const {
+  return numMembers && memberType.isFixedSize();
+}
+
+bool ArrayDataType::ImplV::isSimple() const {
+  return false;
 }
 
 /*****************************************************************************/
@@ -111,7 +126,7 @@ size_t ArrayDataType::ImplV::getNumMembers() const {
 /*****************************************************************************/
 
 Serializer ArrayDataType::ImplV::createSerializer(const DataType& type) const {
-  return ArraySerializer(memberType.createSerializer(), numMembers);
+  return ArraySerializer(memberType, numMembers);
 }
 
 Variant ArrayDataType::ImplV::createVariant(const DataType& type) const {

@@ -72,6 +72,10 @@ namespace variant_topic_tools {
     public:
       BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
       
+      /** \brief Declaration of the value type
+        */
+      typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
+      
       /** \brief Default constructor
         */
       ImplT();
@@ -92,7 +96,8 @@ namespace variant_topic_tools {
       /** \brief Advance an input stream by the length of a serialized
         *   value (implementation)
         */ 
-      void advance(ros::serialization::IStream& stream);
+      void advance(ros::serialization::IStream& stream, const Variant&
+        value);
     };
     
     /** \brief Create a built-in serializer

@@ -57,8 +57,9 @@ void MessageSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
 
 template <typename T>
 void MessageSerializer::ImplT<T>::advance(ros::serialization::IStream&
-    stream) {
-  Serializer::template advance<T>(stream);
+    stream, const Variant& value) {
+  stream.advance(ros::serialization::serializationLength(value.template
+    getValue<T>()));
 }
 
 }

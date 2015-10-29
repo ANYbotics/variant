@@ -61,11 +61,6 @@ const std::type_info& MessageDataType::ImplT<T>::getTypeInfo() const {
 }
 
 template <typename T>
-size_t MessageDataType::ImplT<T>::getSize() const {
-  return ros::message_traits::template isFixedSize<T>() ? sizeof(T) : 0;
-}
-
-template <typename T>
 const std::string& MessageDataType::ImplT<T>::getMD5Sum() const {
   static std::string md5Sum(ros::message_traits::template md5sum<T>());
   return md5Sum;
@@ -78,13 +73,19 @@ const std::string& MessageDataType::ImplT<T>::getDefinition() const {
 }
 
 template <typename T>
-bool MessageDataType::ImplT<T>::isSimple() const {
-  return ros::message_traits::template isSimple<T>();
+size_t MessageDataType::ImplT<T>::getSize() const {
+  return type_traits::MessageType<T>::IsFixedSize::value ?
+    sizeof(typename type_traits::MessageType<T>::ValueType) : 0;
 }
 
 template <typename T>
 bool MessageDataType::ImplT<T>::isFixedSize() const {
-  return ros::message_traits::template isFixedSize<T>();
+  return type_traits::MessageType<T>::IsFixedSize::value;
+}
+
+template <typename T>
+bool MessageDataType::ImplT<T>::isSimple() const {
+  return type_traits::MessageType<T>::IsSimple::value;
 }
 
 /*****************************************************************************/
@@ -152,22 +153,7 @@ template <typename M> void MessageDataType::ImplT<T>::next(const M& member) {
 template <typename T, typename M> void MessageDataType::addMember(
     MessageVariable& member, size_t offset, typename boost::enable_if<
     type_traits::IsArray<M> >::type*, typename boost::enable_if<typename
-    type_traits::ArrayType<M>::IsFixedSize>::type*) {
-  BOOST_ASSERT(member.getType().isArray());
-  
-  ArrayDataType arrayType(member.getType());
-    
-  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
-    member = MessageVariable::template create<T, bool[type_traits::
-      ArrayType<M>::NumMembers]>(member.getName(), offset);
-  else
-    member = MessageVariable::template create<T, M>(member.getName(), offset);
-}
-
-template <typename T, typename M> void MessageDataType::addMember(
-    MessageVariable& member, size_t offset, typename boost::enable_if<
-    type_traits::IsArray<M> >::type*, typename boost::disable_if<typename
-    type_traits::ArrayType<M>::IsFixedSize>::type*) {
+    type_traits::ArrayType<M>::IsDynamic>::type*) {
   BOOST_ASSERT(member.getType().isArray());
   
   ArrayDataType arrayType(member.getType());
@@ -175,6 +161,21 @@ template <typename T, typename M> void MessageDataType::addMember(
   if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
     member = MessageVariable::template create<T, bool[]>(member.getName(),
       offset);
+  else
+    member = MessageVariable::template create<T, M>(member.getName(), offset);
+}
+
+template <typename T, typename M> void MessageDataType::addMember(
+    MessageVariable& member, size_t offset, typename boost::enable_if<
+    type_traits::IsArray<M> >::type*, typename boost::disable_if<typename
+    type_traits::ArrayType<M>::IsDynamic>::type*) {
+  BOOST_ASSERT(member.getType().isArray());
+  
+  ArrayDataType arrayType(member.getType());
+    
+  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
+    member = MessageVariable::template create<T, bool[type_traits::
+      ArrayType<M>::NumMembers]>(member.getName(), offset);
   else
     member = MessageVariable::template create<T, M>(member.getName(), offset);
 }
