@@ -65,7 +65,17 @@ void callback(const ros::MessageEvent<variant_topic_tools::Message>&
   if (!messageDefinition.isValid()) {
     messageDefinition.setMessageType(message->getType());
     
-    std::cout << messageDefinition << "\n";
+    std::cout << "Topic: " << message->getHeader().getTopic() << "\n";
+    std::cout << "Publisher: " << message->getHeader().getPublisher() << "\n";
+    std::cout << "Latched: " << (message->getHeader().isLatched() ?
+      "yes" : "no") << "\n";
+    std::cout << "---\n";
+    std::cout << "Type: " << message->getType().getDataType() << "\n";
+    std::cout << "MD5 Sum: " << message->getType().getMD5Sum() << "\n";
+    std::cout << "Definition:\n";    
+    std::cout << "---\n";
+    std::cout << messageDefinition;
+    std::cout << "---\n";
     
     ros::shutdown();
   }
@@ -73,7 +83,7 @@ void callback(const ros::MessageEvent<variant_topic_tools::Message>&
 
 int main(int argc, char **argv) {
   if (argc < 2) {
-    printf("\nusage: info INVARIANT_TOPIC\n\n");
+    printf("\nusage: info TOPIC\n\n");
     return 1;
   }
   

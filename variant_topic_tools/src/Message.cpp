@@ -28,11 +28,7 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Message::Message(const MessageHeader& header, const MessageType& type, const
-    std::vector<uint8_t>& data) :
-  header(header),
-  type(type),
-  data(data) {
+Message::Message() {
 }
 
 Message::Message(const Message& src) :
@@ -82,6 +78,10 @@ std::vector<uint8_t>& Message::getData() {
 
 const std::vector<uint8_t>& Message::getData() const {
   return data;
+}
+
+void Message::setSize(size_t size) {
+  data.resize(size);
 }
 
 size_t Message::getSize() const {

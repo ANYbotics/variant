@@ -54,8 +54,9 @@ DataType::DataType(const std::type_info& typeInfo) {
   impl = dataType.impl;
 }
 
-DataType::DataType(const DataType& src) :
-  impl(src.impl) {
+DataType::DataType(const DataType& src) {
+  if (src.impl)
+    impl.reset(new boost::shared_ptr<Impl>(*src.impl));
 }
 
 DataType::~DataType() {
@@ -178,6 +179,8 @@ Variant DataType::createVariant() const {
 DataType& DataType::operator=(const DataType& src) {
   if (impl && src.impl)
     *impl = *src.impl;
+  else if (src.impl)
+    impl.reset(new boost::shared_ptr<Impl>(*src.impl));
   else
     impl = src.impl;
   

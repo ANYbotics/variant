@@ -21,10 +21,13 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 
+#include <variant_msgs/Test.h>
+
 #include <variant_topic_tools/ArrayDataType.h>
 #include <variant_topic_tools/BuiltinDataType.h>
 #include <variant_topic_tools/DataTypeRegistry.h>
 #include <variant_topic_tools/MessageDataType.h>
+#include <variant_topic_tools/MessageDefinition.h>
 
 using namespace variant_topic_tools;
 
@@ -82,10 +85,13 @@ TEST(DataType, Message) {
     "float64[] data\n");
   MessageDataType m5 = registry.addMessageDataType("my_msgs/Array",
     "float64[3] data\n");
+  MessageDataType m6 = MessageDefinition::create<variant_msgs::Test>().
+    getMessageDataType();
   
   EXPECT_TRUE(m1.isValid());
   EXPECT_TRUE(m1.isMessage());
   EXPECT_TRUE(m1.hasTypeInfo());
+  EXPECT_FALSE(m1.hasHeader());
   EXPECT_EQ(typeid(std_msgs::Bool), m1.getTypeInfo());
   EXPECT_TRUE(m2.isValid());
   EXPECT_TRUE(m2.isMessage());
@@ -99,6 +105,12 @@ TEST(DataType, Message) {
   EXPECT_TRUE(m5.isValid());
   EXPECT_TRUE(m5.isMessage());
   EXPECT_FALSE(m5.hasTypeInfo());
+  EXPECT_TRUE(m6.isValid());
+  EXPECT_TRUE(m6.isMessage());
+  EXPECT_FALSE(m5.hasTypeInfo());
+  EXPECT_TRUE(m6.hasHeader());
+  EXPECT_EQ(ros::message_traits::md5sum<variant_msgs::Test>(),
+    m6.getMD5Sum());
   
   registry.clear();
 }

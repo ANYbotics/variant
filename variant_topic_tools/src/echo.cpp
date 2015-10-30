@@ -18,19 +18,15 @@
 
 #include <ros/ros.h>
 
-#include <variant_topic_tools/Message.h>
-#include <variant_topic_tools/MessageDefinition.h>
+#include <variant_topic_tools/Subscriber.h>
 
 ros::NodeHandlePtr nodeHandle;
 
-ros::Subscriber subscriber;
+variant_topic_tools::Subscriber subscriber;
 std::string subscriberTopic;
 size_t subscriberQueueSize = 100;
 
-variant_topic_tools::MessageDefinition messageDefinition;
-
-void callback(const ros::MessageEvent<variant_topic_tools::Message>&
-  messageEvent);
+void callback(const variant_topic_tools::MessageVariant& variant);
 
 bool getTopicBase(const std::string& topic, std::string& topicBase) {
   std::string tmp = topic;
@@ -53,22 +49,18 @@ bool getTopicBase(const std::string& topic, std::string& topicBase) {
 }
 
 void subscribe() {
-  subscriber = nodeHandle->subscribe(subscriberTopic, subscriberQueueSize,
-    &callback);
+  variant_topic_tools::MessageType type;
+  subscriber = type.subscribe(*nodeHandle, subscriberTopic,
+    subscriberQueueSize, &callback);
 }
 
-void callback(const ros::MessageEvent<variant_topic_tools::Message>&
-    messageEvent) {
-  boost::shared_ptr<const variant_topic_tools::Message> message =
-    messageEvent.getConstMessage();
-
-  if (!messageDefinition.isValid())
-    messageDefinition.setMessageType(message->getType());
+void callback(const variant_topic_tools::MessageVariant& variant) {
+  std::cout << variant << "\n---\n";
 }
 
 int main(int argc, char **argv) {
   if (argc < 2) {
-    printf("\nusage: echo INVARIANT_TOPIC\n\n");
+    printf("\nusage: echo TOPIC\n\n");
     return 1;
   }
   

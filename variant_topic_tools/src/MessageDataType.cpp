@@ -129,13 +129,16 @@ MessageDataType::ImplV::ImplV(const std::string& identifier,
     stream << variableMembers[i] << "\n";
   
   definition = stream.str();
+  
+  recalculateMD5Sum();
 }
 
 MessageDataType::ImplV::ImplV(const std::string& identifier, const
     std::string& definition) :
   Impl(definition),
   identifier(identifier),
-  definition(definition) {
+  definition(definition) {  
+  recalculateMD5Sum();
 }
 
 MessageDataType::ImplV::~ImplV() {
@@ -145,13 +148,11 @@ MessageDataType::ImplV::~ImplV() {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-const std::string& MessageDataType::getMD5Sum() const {
-  if (!impl) {
-    static std::string md5Sum;
-    return md5Sum;
-  }
-  else
+std::string MessageDataType::getMD5Sum() const {
+  if (impl)
     return boost::static_pointer_cast<Impl>(*impl)->getMD5Sum();
+  else
+    return std::string("*");
 }
 
 const std::string& MessageDataType::getDefinition() const {
@@ -210,13 +211,22 @@ const MessageVariable& MessageDataType::getVariableMember(size_t index) const {
     throw NoSuchMemberException(index);
 }
 
+bool MessageDataType::hasHeader() const {
+  if (impl)
+    return (boost::static_pointer_cast<Impl>(*impl)->variableMembers.
+        hasField("header") &&
+      (boost::static_pointer_cast<Impl>(*impl)->variableMembers["header"].
+        getValue().getType().getIdentifier() == "std_msgs/Header"));
+  else
+    return false;
+}
+
 const std::string& MessageDataType::ImplV::getIdentifier() const {
   return identifier;
 }
 
-const std::string& MessageDataType::ImplV::getMD5Sum() const {
-  static std::string md5Sum("*");
-  return md5Sum;
+std::string MessageDataType::ImplV::getMD5Sum() const {
+  return md5Sum.toString();
 }
 
 const std::string& MessageDataType::ImplV::getDefinition() const {
@@ -312,6 +322,8 @@ void MessageDataType::ImplV::addConstantMember(const MessageConstant&
   stream << member << "\n";
 
   definition += stream.str();
+  
+  recalculateMD5Sum();
 }
 
 void MessageDataType::ImplV::addVariableMember(const MessageVariable&
@@ -322,6 +334,48 @@ void MessageDataType::ImplV::addVariableMember(const MessageVariable&
   stream << member << "\n";
 
   definition += stream.str();
+  
+  recalculateMD5Sum();
+}
+
+void MessageDataType::ImplV::recalculateMD5Sum() {
+  std::ostringstream stream;
+  
+  for (size_t i = 0; i < constantMembers.getNumFields(); ++i) {
+    const MessageConstant& constantMember = constantMembers[i].getValue();
+    
+    stream << constantMember.getType().getIdentifier() << " " <<
+      constantMember.getName() << "=" << constantMember.getValue() << "\n";
+  }
+  
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
+    const MessageVariable& variableMember = variableMembers[i].getValue();
+    
+    DataType memberType = variableMember.getType();
+    DataType bareMemberType = memberType;
+    
+    while (bareMemberType.isArray()) {
+      ArrayDataType arrayMemberType = bareMemberType;
+      bareMemberType = arrayMemberType.getMemberType();
+    }
+    
+    if (bareMemberType.isBuiltin()) {
+      stream << memberType.getIdentifier() << " " <<
+        variableMember.getName() << "\n";
+    }
+    else if (bareMemberType.isMessage()) {
+      MessageDataType messageMemberType = bareMemberType;
+      stream << messageMemberType.getMD5Sum() << " " <<
+        variableMember.getName() << "\n";
+    }
+  }
+  
+  std::string md5SumText = stream.str();
+  if (!md5SumText.empty())
+    md5SumText.erase(md5SumText.size()-1);
+  
+  md5Sum.clear();  
+  md5Sum.update(md5SumText);
 }
 
 /*****************************************************************************/

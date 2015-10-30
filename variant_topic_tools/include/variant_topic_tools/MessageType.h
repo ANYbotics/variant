@@ -23,6 +23,8 @@
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 
+#include <ros/ros.h>
+
 #include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
@@ -92,6 +94,18 @@ namespace variant_topic_tools {
     /** \brief Write the message type to a stream
       */
     void write(std::ostream& stream) const;
+    
+    /** \brief Advertise this message type
+      */
+    Publisher advertise(ros::NodeHandle& nodeHandle, const
+      std::string& topic, size_t queueSize, bool latch = false,
+      const ros::SubscriberStatusCallback& connectCallback =
+      ros::SubscriberStatusCallback());
+    
+    /** \brief Subscribe to this message type
+      */
+    Subscriber subscribe(ros::NodeHandle& nodeHandle, const std::string&
+      topic, size_t queueSize, const SubscriberCallback& callback);
     
     /** \brief True, if this message type equals another message type
       */

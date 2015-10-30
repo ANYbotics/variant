@@ -34,6 +34,8 @@ using namespace variant_topic_tools;
 TEST(Variant, Builtin) {
   BuiltinVariant v1 = DataType("float64").createVariant();
   BuiltinVariant v2 = DataType("bool").createVariant();
+  BuiltinVariant v3 = DataType("duration").createVariant();
+  BuiltinVariant v4 = DataType("time").createVariant();
   
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
@@ -64,6 +66,10 @@ TEST(Variant, Builtin) {
   
   EXPECT_EQ(typeid(uint8_t), v2.getValueTypeInfo());
   EXPECT_EQ(0.0, v2.getNumericValue());
+  
+  EXPECT_EQ(0.0, v3.getNumericValue());
+  
+  EXPECT_EQ(0.0, v4.getNumericValue());
 }
 
 TEST(Variant, Array) {

@@ -74,32 +74,26 @@ namespace variant_topic_tools {
   /** \brief Forward declaration of the message definition
     */
   class MessageDefinition;
-  /** \brief Forward declaration of the message definition pointer type
-    */
-  typedef boost::shared_ptr<MessageDefinition> MessageDefinitionPtr;
-  /** \brief Forward declaration of the message definition weak pointer type
-    */
-  typedef boost::weak_ptr<MessageDefinition> MessageDefinitionWPtr;
   
   /** \brief Forward declaration of the serializer
     */
   class Serializer;
-  /** \brief Forward declaration of the serializer pointer type
+  
+  /** \brief Forward declaration of the array serializer
     */
-  typedef boost::shared_ptr<Serializer> SerializerPtr;
-  /** \brief Forward declaration of the serializer weak pointer type
+  class ArraySerializer;
+  
+  /** \brief Forward declaration of the built-in serializer
     */
-  typedef boost::weak_ptr<Serializer> SerializerWPtr;
+  class BuiltinSerializer;
+  
+  /** \brief Forward declaration of the message serializer
+    */
+  class MessageSerializer;
   
   /** \brief Forward declaration of the variant
     */
   class Variant;
-  /** \brief Forward declaration of the variant pointer type
-    */
-  typedef boost::shared_ptr<Variant> VariantPtr;
-  /** \brief Forward declaration of the variant weak pointer type
-    */
-  typedef boost::weak_ptr<Variant> VariantWPtr;
   
   /** \brief Forward declaration of the array variant
     */
@@ -116,6 +110,18 @@ namespace variant_topic_tools {
   /** \brief Forward declaration of the message variant
     */
   class MessageVariant;
+  
+  /** \brief Forward declaration of the publisher
+    */
+  class Publisher;
+  
+  /** \brief Forward declaration of the subscriber
+    */
+  class Subscriber;
+  
+  /** \brief Definition of the subscriber callback type
+    */
+  typedef boost::function<void(const MessageVariant&)> SubscriberCallback;
 };
 
 #endif

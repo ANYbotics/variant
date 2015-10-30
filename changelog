@@ -1,6 +1,14 @@
+ros-variant (0.1-24) unstable; urgency=low
+
+  * Code cleanups
+  * Added variant publisher and subscriber
+  * Added MD5 sum calculation for variant message types
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 30 Oct 2015 13:27:00 +0200
+
 ros-variant (0.1-23) unstable; urgency=low
 
-  * Updated READM
+  * Updated README
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 13:09:00 +0200
 

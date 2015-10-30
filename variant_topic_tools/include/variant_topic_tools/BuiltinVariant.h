@@ -157,11 +157,22 @@ namespace variant_topic_tools {
     template <typename T> static BuiltinVariant create(const DataType& type);
     
     /** \brief Retrieve the built-in variant's numeric value (overloaded
-      *   version taking a numeric value)
+      *   version taking a ROS duration or ROS time)
+      */
+    template <typename T> static double getNumericValue(const T& value,
+      typename boost::enable_if<boost::type_traits::ice_or<boost::is_base_of<
+      ros::Duration, T>::value, boost::is_base_of<ros::Time, T>::value> >::
+      type* = 0);
+      
+    /** \brief Retrieve the built-in variant's numeric value (overloaded
+      *   version taking a numeric value other than a ROS duration or a
+      *   ROS time)
       */
     template <typename T> static double getNumericValue(const T& value,
       typename boost::enable_if<typename type_traits::BuiltinType<T>::
-      IsNumeric>::type* = 0);
+      IsNumeric>::type* = 0, typename boost::disable_if<boost::type_traits::
+      ice_or<boost::is_base_of<ros::Duration, T>::value, boost::is_base_of<
+      ros::Time, T>::value> >::type* = 0);
       
     /** \brief Retrieve the built-in variant's numeric value (overloaded
       *   version taking a non-numeric value)

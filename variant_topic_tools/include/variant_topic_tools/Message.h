@@ -44,9 +44,7 @@ namespace variant_topic_tools {
   public:
     /** \brief Default constructor
       */ 
-    Message(const MessageHeader& header = MessageHeader(), const
-      MessageType& type = MessageType(), const std::vector<uint8_t>&
-      data = std::vector<uint8_t>());
+    Message();
     
     /** \brief Constructor (templated version taking a message
       */ 
@@ -95,7 +93,11 @@ namespace variant_topic_tools {
       */
     const std::vector<uint8_t>& getData() const;
     
-    /** \brief Access the message size
+    /** \brief Set the message size
+      */
+    void setSize(size_t size);
+
+    /** \brief Retrieve the message size
       */
     size_t getSize() const;
 
@@ -110,7 +112,7 @@ namespace variant_topic_tools {
     /** \brief Attempt to deserialize this message into a variant
       */
     void deserialize(MessageVariant& variant) const;
-      
+    
     /** \brief Attempt to convert the message to a variant message
       */
     boost::shared_ptr<variant_msgs::Variant> toVariantMessage() const;

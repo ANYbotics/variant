@@ -18,16 +18,19 @@
 
 #include <ros/ros.h>
 
-#include <variant_msgs/Test.h>
-
-#include <boost/variant.hpp>
+#include <variant_topic_tools/Publisher.h>
 
 ros::NodeHandlePtr nodeHandle;
 
-ros::Publisher publisher;
+variant_topic_tools::Publisher publisher;
 std::string publisherTopic;
+std::string publisherType;
+double publisherRate = 0.0;
 size_t publisherQueueSize = 100;
-double publisherRate = 10.0;
+ros::Timer publisherTimer;
+
+variant_topic_tools::MessageDefinition messageDefinition;
+variant_topic_tools::MessageType messageType;
 
 bool getTopicBase(const std::string& topic, std::string& topicBase) {
   std::string tmp = topic;
@@ -49,30 +52,30 @@ bool getTopicBase(const std::string& topic, std::string& topicBase) {
   return true;
 }
 
-void advertise() {
-  publisher = nodeHandle->advertise<variant_msgs::Test>(publisherTopic,
-    publisherQueueSize);
+void publishOnce() {
+  if (!messageDefinition.isValid())
+    messageDefinition.load(publisherType);
+  
+  if (!messageType.isValid())
+    messageType = messageDefinition.getMessageDataType();
+    
+  if (!publisher)
+    publisher = messageType.advertise(*nodeHandle, publisherTopic,
+      publisherQueueSize, true);
+  
+  variant_topic_tools::MessageVariant variant = messageDefinition.
+    getMessageDataType().createVariant();
+    
+  publisher.publish(variant);
 }
 
-void callback(const ros::TimerEvent& timerEvent) {
-  variant_msgs::Test message;
-  
-  message.builtin_string = "builtin_string";
-  message.string.data = "string";
-  
-  publisher.publish(message);
+void publish(const ros::TimerEvent& event) {
+  publishOnce();
 }
-
-template <typename T> class get_as : public boost::static_visitor<T> {
-public:
-  template <typename U> T operator()(U& operand) const {
-    return operand;
-  };
-};
 
 int main(int argc, char **argv) {
-  if (argc < 2) {
-    printf("\nusage: pub_test TEST_TOPIC [RATE]\n\n");
+  if (argc < 3) {
+    printf("\nusage: echo TOPIC TYPE [RATE]\n\n");
     return 1;
   }
   
@@ -81,21 +84,28 @@ int main(int argc, char **argv) {
     return 1;
   }
   
-  if (argc == 3)
-    publisherRate = atof(argv[2]);
-
-  ros::init(argc, argv, publisherTopic+"_pub_test",
+  ros::init(argc, argv, publisherTopic+"_publish",
     ros::init_options::AnonymousName);
   
-  publisherTopic = argv[1];
-  
   nodeHandle.reset(new ros::NodeHandle("~"));
-
-  advertise();
-  ros::Timer timer = nodeHandle->createTimer(
-    ros::Rate(publisherRate).expectedCycleTime(), &callback);
   
-  ros::spin();
+  publisherTopic = argv[1];
+  publisherType = argv[2]; 
+  if (argc > 3)
+    publisherRate = boost::lexical_cast<double>(argv[3]);
+  
+  if (publisherRate > 0.0) {
+    publisherTimer = nodeHandle->createTimer(ros::Rate(publisherRate).
+      expectedCycleTime(), &publish);
+  }
+  else
+    publishOnce();
+ 
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
+  ros::waitForShutdown();
+  
+  publisherTimer.stop();
   
   return 0;
 }

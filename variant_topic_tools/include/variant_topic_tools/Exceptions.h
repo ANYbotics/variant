@@ -153,6 +153,17 @@ namespace variant_topic_tools {
     InvalidMessageTypeException(const std::string& invalidMessageType);
   };
   
+  /** \brief Exception thrown in case of a message type mismatch
+    */ 
+  class MessageTypeMismatchException :
+    public ros::Exception {
+  public:
+    /** \brief Constructor
+      */
+    MessageTypeMismatchException(const std::string& expectedMessageType,
+      const std::string& providedMessageType);
+  };
+  
   /** \brief Exception thrown in case of an error to parse the message
     *   definition
     */ 

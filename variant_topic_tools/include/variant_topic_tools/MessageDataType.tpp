@@ -61,9 +61,8 @@ const std::type_info& MessageDataType::ImplT<T>::getTypeInfo() const {
 }
 
 template <typename T>
-const std::string& MessageDataType::ImplT<T>::getMD5Sum() const {
-  static std::string md5Sum(ros::message_traits::template md5sum<T>());
-  return md5Sum;
+std::string MessageDataType::ImplT<T>::getMD5Sum() const {
+  return ros::message_traits::template md5sum<T>();
 }
 
 template <typename T>

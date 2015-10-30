@@ -87,7 +87,13 @@ InvalidMessageTypeException::InvalidMessageTypeException(const std::string&
     invalidMessageType) :
   ros::Exception("Message type ["+invalidMessageType+"] is invalid") {
 }
-  
+
+MessageTypeMismatchException::MessageTypeMismatchException(const std::string&
+    expectedMessageType, const std::string& providedMessageType) :
+  ros::Exception("Provided message type ["+providedMessageType+
+    "] mismatches expected message type ["+expectedMessageType+"]") {
+}
+
 DefinitionParseException::DefinitionParseException(const std::string&
     dataType, const std::string& line, const std::string& what) :
   ros::Exception("Error parsing the definition for ["+dataType+"]: "+

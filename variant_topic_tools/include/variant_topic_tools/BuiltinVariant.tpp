@@ -122,9 +122,18 @@ void BuiltinVariant::ValueImplT<T>::read(std::istream& stream) {
   BuiltinVariant::template read<T>(stream, *this->value);
 }
 
+template <typename T> double BuiltinVariant::getNumericValue(const T& value,
+    typename boost::enable_if<boost::type_traits::ice_or<boost::is_base_of<
+    ros::Duration, T>::value, boost::is_base_of<ros::Time, T>::value> >::
+    type*) {
+  return value.toSec();
+}
+  
 template <typename T> double BuiltinVariant::getNumericValue(const T&
     value, typename boost::enable_if<typename type_traits::BuiltinType<T>::
-    IsNumeric>::type*) {
+    IsNumeric>::type*, typename boost::disable_if<boost::type_traits::
+    ice_or<boost::is_base_of<ros::Duration, T>::value, boost::is_base_of<
+    ros::Time, T>::value> >::type*) {
   return value;
 }
 
@@ -174,10 +183,10 @@ template <typename T> void BuiltinVariant::read(std::istream& stream, typename
     boost::is_same<T, bool> >::type*) {
   typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
   
-  std::string stringValue;
-  stream >> stringValue;
+  std::string streamValue;
+  stream >> streamValue;
   
-  value = (stringValue == "true") ? ValueType(1) : ValueType(0);
+  value = (streamValue == "true") ? ValueType(1) : ValueType(0);
 }
 
 template <typename T> void BuiltinVariant::read(std::istream& stream, typename
@@ -185,7 +194,12 @@ template <typename T> void BuiltinVariant::read(std::istream& stream, typename
     boost::is_same<T, bool> >::type*, typename boost::enable_if<boost::
     has_right_shift<std::istream, typename type_traits::BuiltinType<T>::
     ValueType&> >::type*) {
-  stream >> value;
+  typedef typename type_traits::BuiltinType<T>::StreamType StreamType;
+  
+  StreamType streamValue;
+  stream >> streamValue;
+  
+  value = streamValue;
 }
 
 template <typename T> void BuiltinVariant::read(std::istream& stream, typename
@@ -208,7 +222,10 @@ template <typename T> void BuiltinVariant::write(std::ostream& stream, const
     disable_if<boost::is_same<T, bool> >::type*, typename boost::
     enable_if<boost::has_left_shift<std::ostream, const typename type_traits::
     BuiltinType<T>::ValueType&> >::type*) {
-  stream << value;
+  typedef typename type_traits::BuiltinType<T>::StreamType StreamType;
+  
+  StreamType streamValue = value;;
+  stream << streamValue;
 }
 
 template <typename T> void BuiltinVariant::write(std::ostream& stream, const

@@ -104,7 +104,7 @@ void callback(const ros::MessageEvent<variant_topic_tools::Message>&
 
 int main(int argc, char **argv) {
   if (argc < 2) {
-    printf("\nusage: relay INVARIANT_TOPIC [VARIANT_TOPIC]\n\n");
+    printf("\nusage: relay TOPIC [VARIANT_TOPIC]\n\n");
     return 1;
   }
   

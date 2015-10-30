@@ -49,33 +49,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a cpp executable
-add_executable(
-  concept_test
-  src/concept_test.cpp
-)
-add_executable(
-  pub_test
-  src/pub_test.cpp
-)
-add_executable(
-  serialize_test
-  src/serialize_test.cpp
-)
-
-target_link_libraries(
-  concept_test
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(
-  pub_test
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(
-  serialize_test
-  ${catkin_LIBRARIES}
-)
-
 ###########
 ## Tests ##
 ###########

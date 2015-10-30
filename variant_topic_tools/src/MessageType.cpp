@@ -28,6 +28,8 @@
 #include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
 #include "variant_topic_tools/MessageType.h"
+#include "variant_topic_tools/Publisher.h"
+#include "variant_topic_tools/Subscriber.h"
 
 namespace variant_topic_tools {
 
@@ -193,7 +195,30 @@ void MessageType::clear() {
 void MessageType::write(std::ostream& stream) const {
   stream << dataType;
 }
-      
+
+Publisher MessageType::advertise(ros::NodeHandle& nodeHandle,
+    const std::string& topic, size_t queueSize, bool latch, const
+    ros::SubscriberStatusCallback& connectCallback) {
+  Publisher publisher;
+  
+  if (isValid())
+    publisher.impl.reset(new Publisher::Impl(nodeHandle, *this, topic,
+      queueSize, latch, connectCallback));
+
+  return publisher;
+}
+
+Subscriber MessageType::subscribe(ros::NodeHandle& nodeHandle, const
+    std::string& topic, size_t queueSize, const SubscriberCallback&
+    callback) {
+  Subscriber subscriber;
+  
+  subscriber.impl.reset(new Subscriber::Impl(nodeHandle, *this, topic,
+    queueSize, callback));
+
+  return subscriber;
+}
+  
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/

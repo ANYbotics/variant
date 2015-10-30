@@ -25,6 +25,7 @@
 
 #include <variant_topic_tools/DataType.h>
 #include <variant_topic_tools/DataTypeTraits.h>
+#include <variant_topic_tools/MD5Sum.h>
 #include <variant_topic_tools/MessageFieldCollection.h>
 #include <variant_topic_tools/MessageTypeTraits.h>
 
@@ -55,7 +56,7 @@ namespace variant_topic_tools {
   
     /** \brief Retrieve the MD5 sum of this message data type
       */
-    const std::string& getMD5Sum() const;
+    std::string getMD5Sum() const;
     
     /** \brief Retrieve the definition this message data type
       */
@@ -86,6 +87,10 @@ namespace variant_topic_tools {
     /** \brief Access a variable member of the message data type by index
       */
     const MessageVariable& getVariableMember(size_t index) const;
+    
+    /** \brief True, if this message data type has a header
+      */
+    bool hasHeader() const;
     
     /** \brief Add a constant member to this message data type (overloaded
       *   version taking a message constant)
@@ -153,7 +158,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve the MD5 sum of this message data type (abstract
         *   declaration)
         */
-      virtual const std::string& getMD5Sum() const = 0;
+      virtual std::string getMD5Sum() const = 0;
       
       /** \brief Retrieve the definition this message data type (abstract
         *   declaration)
@@ -208,7 +213,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve the MD5 sum of this message data type
         *   (implementation)
         */
-      const std::string& getMD5Sum() const;
+      std::string getMD5Sum() const;
       
       /** \brief Retrieve the definition this message data type
         *   (implementation)
@@ -248,13 +253,21 @@ namespace variant_topic_tools {
         */
       void addVariableMember(const MessageVariable& member);
       
+      /** \brief Re-calculate the MD5 sum of this message data type
+        */
+      void recalculateMD5Sum();
+      
       /** \brief The identifier representing this message data type
         */
       std::string identifier;
       
+      /** \brief The MD5 sum of this message data type
+        */
+      MD5Sum md5Sum;
+      
       /** \brief The definition of this message data type
         */
-      std::string definition;
+      std::string definition;      
     };
     
     /** \brief Message data type implementation (templated strong-typed
@@ -286,7 +299,7 @@ namespace variant_topic_tools {
       /** \brief Retrieve the MD5 sum of this message data type
         *   (implementation)
         */
-      const std::string& getMD5Sum() const;
+      std::string getMD5Sum() const;
       
       /** \brief Retrieve the definition this message data type
         *   (implementation)

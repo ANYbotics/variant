@@ -72,8 +72,10 @@ add_library(variant_topic_tools
   src/MessageType.cpp
   src/MessageVariable.cpp
   src/MessageVariant.cpp
+  src/Publisher.cpp
   src/Serialization.cpp
   src/Serializer.cpp
+  src/Subscriber.cpp
   src/Variant.cpp
 )
 
@@ -84,6 +86,10 @@ add_executable(
 add_executable(
   info
   src/info.cpp
+)
+add_executable(
+  publish
+  src/publish.cpp
 )
 add_executable(
   relay
@@ -103,6 +109,11 @@ target_link_libraries(
 )
 target_link_libraries(
   info
+  variant_topic_tools
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(
+  publish
   variant_topic_tools
   ${catkin_LIBRARIES}
 )
