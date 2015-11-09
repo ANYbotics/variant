@@ -16,29 +16,54 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <gtest/gtest.h>
+/** \file MessageTypeParser.h
+  * \brief Header file providing the MessageTypeParser class interface
+  */
 
-#include <geometry_msgs/PoseStamped.h>
+#ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_PARSER_H
+#define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_PARSER_H
 
-#include <variant_msgs/Test.h>
+#include <boost/regex.hpp>
 
-#include <variant_topic_tools/DataTypeRegistry.h>
-#include <variant_topic_tools/MessageType.h>
+#include <ros/ros.h>
 
-using namespace variant_topic_tools;
+namespace variant_topic_tools {
+  /** \brief Message definition parser
+    */
+  class MessageTypeParser {
+  public:
+    /** \brief Match any message type expression
+      */
+    static bool matchType(const std::string& expression, std::string&
+      package, std::string& type);
+    
+  private:
+    /** \brief Regular expression for matching a package
+      */
+    static const boost::regex packageExpression;
+    
+    /** \brief Regular expression for matching a message type
+      */
+    static const boost::regex typeExpression;
+    
+    /** \brief Regular expression for matching a message type without
+      *   package prefix
+      */
+    static const boost::regex plainTypeExpression;
+    
+    /** \brief Regular expression for matching a message type with
+      *   package prefix
+      */
+    static const boost::regex packageTypeExpression;
+    
+    /** \brief Default constructor
+      */ 
+    MessageTypeParser();
+    
+    /** \brief Destructor
+      */ 
+    ~MessageTypeParser();    
+  };  
+};
 
-TEST(MessageType, Load) {
-  DataTypeRegistry registry;
-  
-  MessageType t1, t2, t3;
-  
-  EXPECT_NO_THROW(t1.load("variant_msgs/Test"));
-  EXPECT_EQ(ros::message_traits::definition<variant_msgs::Test>(),
-    t1.getDefinition());
-  EXPECT_ANY_THROW(t2.load("variant_msgs/Undefined"));  
-  EXPECT_NO_THROW(t3.load("geometry_msgs/PoseStamped"));
-  EXPECT_EQ(ros::message_traits::definition<geometry_msgs::PoseStamped>(),
-    t3.getDefinition());
-  
-  registry.clear();
-}
+#endif

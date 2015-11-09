@@ -16,6 +16,7 @@ find_package(catkin REQUIRED
   COMPONENTS
     cmake_modules
     std_msgs
+    geometry_msgs
     roscpp
     variant_msgs
     variant_topic_tools
@@ -35,6 +36,7 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     std_msgs
+    geometry_msgs
     variant_msgs
     variant_topic_tools
 )
@@ -62,6 +64,7 @@ catkin_add_gtest(variant_topic_test
   test/MessageDefinitionParserTest.cpp
   test/MessageFieldCollectionTest.cpp
   test/MessageTest.cpp
+  test/MessageTypeParserTest.cpp
   test/MessageTypeTest.cpp
   test/PointerTest.cpp
   test/SerializerTest.cpp

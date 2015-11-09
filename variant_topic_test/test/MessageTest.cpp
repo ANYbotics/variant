@@ -20,20 +20,25 @@
 
 #include <std_msgs/Bool.h>
 
+#include <geometry_msgs/PoseStamped.h>
+
 #include <variant_msgs/Test.h>
 
+#include <variant_topic_tools/DataTypeRegistry.h>
 #include <variant_topic_tools/Message.h>
 #include <variant_topic_tools/MessageVariant.h>
 
 using namespace variant_topic_tools;
 
 TEST(Message, Conversion) {
+  DataTypeRegistry registry;
+  
   variant_msgs::Test m1;
   m1.builtin_int = 42;
   m1.builtin_string = "Test";
   Message m2 = m1;
   variant_msgs::Test::Ptr m3 = m2.toMessage<variant_msgs::Test>();
-  
+    
   EXPECT_EQ(ros::message_traits::datatype<variant_msgs::Test>(),
     m2.getType().getDataType());
   EXPECT_EQ(ros::message_traits::md5sum<variant_msgs::Test>(),
@@ -43,9 +48,22 @@ TEST(Message, Conversion) {
   EXPECT_EQ(m1.builtin_int, m3->builtin_int);
   EXPECT_EQ(m1.builtin_string, m3->builtin_string);
   EXPECT_ANY_THROW(m2.toMessage<std_msgs::Bool>());
+  
+  geometry_msgs::PoseStamped m4;
+  Message m5 = m4;
+  EXPECT_EQ(ros::message_traits::datatype<geometry_msgs::PoseStamped>(),
+    m5.getType().getDataType());
+  EXPECT_EQ(ros::message_traits::md5sum<geometry_msgs::PoseStamped>(),
+    m5.getType().getMD5Sum());
+  EXPECT_EQ(ros::message_traits::definition<geometry_msgs::PoseStamped>(),
+    m5.getType().getDefinition());
+  
+  registry.clear();
 }
 
 TEST(Message, Serialization) {
+  DataTypeRegistry registry;
+  
   variant_msgs::Test m1, m2;
   m1.builtin_int = 42;
   m1.builtin_string = "Test";
@@ -62,4 +80,6 @@ TEST(Message, Serialization) {
   EXPECT_NO_THROW(m2 = *m3.toMessage<variant_msgs::Test>());
   EXPECT_EQ(m1.builtin_int, m2.builtin_int);
   EXPECT_EQ(m1.builtin_string, m2.builtin_string);
+  
+  registry.clear();
 }

@@ -70,6 +70,7 @@ add_library(variant_topic_tools
   src/MessageSerializer.cpp
   src/MessageTraits.cpp
   src/MessageType.cpp
+  src/MessageTypeParser.cpp
   src/MessageVariable.cpp
   src/MessageVariant.cpp
   src/Publisher.cpp

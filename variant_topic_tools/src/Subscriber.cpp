@@ -129,7 +129,7 @@ void Subscriber::Impl::eventCallback(const ros::MessageEvent<Message const>&
       
       serializer.deserialize(stream, variant);
       
-      callback(variant);
+      callback(variant, event.getReceiptTime());
     }
     else
       throw MD5SumMismatchException(type.getMD5Sum(),

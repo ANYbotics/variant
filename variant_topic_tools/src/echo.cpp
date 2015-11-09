@@ -26,7 +26,8 @@ variant_topic_tools::Subscriber subscriber;
 std::string subscriberTopic;
 size_t subscriberQueueSize = 100;
 
-void callback(const variant_topic_tools::MessageVariant& variant);
+void callback(const variant_topic_tools::MessageVariant& variant, const
+  ros::Time& receiptTime);
 
 bool getTopicBase(const std::string& topic, std::string& topicBase) {
   std::string tmp = topic;
@@ -54,7 +55,8 @@ void subscribe() {
     subscriberQueueSize, &callback);
 }
 
-void callback(const variant_topic_tools::MessageVariant& variant) {
+void callback(const variant_topic_tools::MessageVariant& variant, const
+    ros::Time& receiptTime) {
   std::cout << variant << "\n---\n";
 }
 

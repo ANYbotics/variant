@@ -121,7 +121,8 @@ namespace variant_topic_tools {
   
   /** \brief Definition of the subscriber callback type
     */
-  typedef boost::function<void(const MessageVariant&)> SubscriberCallback;
+  typedef boost::function<void(const MessageVariant&, const ros::Time&)>
+    SubscriberCallback;
 };
 
 #endif

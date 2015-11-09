@@ -24,6 +24,7 @@
 #include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
 #include "variant_topic_tools/MessageMember.h"
+#include "variant_topic_tools/MessageTypeParser.h"
 #include "variant_topic_tools/MessageVariable.h"
 #include "variant_topic_tools/MessageVariant.h"
 
@@ -76,9 +77,14 @@ MessageDataType::Impl::Impl(const MessageFieldCollection<MessageConstant>&
       throw InvalidMessageMemberException();
 }
 
-MessageDataType::Impl::Impl(const std::string& definition) {
+MessageDataType::Impl::Impl(const std::string& identifier, const std::string&
+    definition) {
   BOOST_ASSERT(!definition.empty());
   
+  std::string package, plainType;
+  if (!MessageTypeParser::matchType(identifier, package, plainType))
+    throw InvalidMessageTypeException(identifier);
+    
   DataTypeRegistry registry;
   std::istringstream stream(definition);
   std::string line;
@@ -88,8 +94,38 @@ MessageDataType::Impl::Impl(const std::string& definition) {
     
     if (MessageDefinitionParser::matchVariable(line, memberName,
         memberType)) {
-      if (memberType == "Header")
-        memberType = "std_msgs/Header";
+      std::string bareMemberType, memberPackage, plainMemberType;
+      bool isArrayMember = false;
+      size_t memberSize;
+    
+      if (MessageDefinitionParser::matchArray(line, memberName,
+          bareMemberType, memberSize))
+        isArrayMember = true;
+      else
+        bareMemberType = memberType;
+      
+      if (!MessageTypeParser::matchType(bareMemberType, memberPackage,
+          plainMemberType))
+        throw InvalidMessageTypeException(bareMemberType);
+    
+      if (!registry.getDataType(bareMemberType).isBuiltin()) {
+        if (memberPackage.empty()) {
+          if (plainMemberType == "Header")
+            memberPackage = "std_msgs";
+          else
+            memberPackage = package;
+          
+          if (isArrayMember) {
+            if (memberSize)
+              memberType = memberPackage+"/"+plainMemberType+"["+
+                boost::lexical_cast<std::string>(memberSize)+"]";
+            else
+              memberType = memberPackage+"/"+plainMemberType+"[]";
+          }
+          else
+            memberType = memberPackage+"/"+plainMemberType;
+        }
+      }
       
       if (registry.getDataType(memberType).isValid()) {
         MessageVariable member(memberName, memberType);
@@ -135,7 +171,7 @@ MessageDataType::ImplV::ImplV(const std::string& identifier,
 
 MessageDataType::ImplV::ImplV(const std::string& identifier, const
     std::string& definition) :
-  Impl(definition),
+  Impl(identifier, definition),
   identifier(identifier),
   definition(definition) {  
   recalculateMD5Sum();

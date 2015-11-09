@@ -79,7 +79,7 @@ namespace variant_topic_tools {
       */
     static const boost::regex commentExpression;
     
-    /** \brief Regular expression for matching a message type separato
+    /** \brief Regular expression for matching a message type separator
       */
     static const boost::regex separatorExpression;
     

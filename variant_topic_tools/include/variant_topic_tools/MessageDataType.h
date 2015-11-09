@@ -149,7 +149,7 @@ namespace variant_topic_tools {
       
       /** \brief Constructor (overloaded version taking a definition)
         */
-      Impl(const std::string& definition);
+      Impl(const std::string& identifier, const std::string& definition);
       
       /** \brief Destructor
         */

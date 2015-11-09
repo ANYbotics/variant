@@ -1,3 +1,10 @@
+ros-variant (0.1-25) unstable; urgency=low
+
+  * Added type name resolution for member definitions neglecting package names
+  * Added receipt time to variant subscriber callback
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 09 Nov 2015 15:18:00 +0200
+
 ros-variant (0.1-24) unstable; urgency=low
 
   * Code cleanups

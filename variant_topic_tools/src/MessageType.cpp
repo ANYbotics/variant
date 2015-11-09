@@ -28,6 +28,7 @@
 #include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
 #include "variant_topic_tools/MessageType.h"
+#include "variant_topic_tools/MessageTypeParser.h"
 #include "variant_topic_tools/Publisher.h"
 #include "variant_topic_tools/Subscriber.h"
 
@@ -99,41 +100,40 @@ bool MessageType::isValid() const {
 void MessageType::load(const std::string& messageDataType) {
   clear();
   
+  std::string messagePackage, messagePlainType;
+  if (!MessageTypeParser::matchType(messageDataType, messagePackage,
+      messagePlainType))
+    throw InvalidMessageTypeException(messageDataType);
+    
   DataTypeRegistry registry;
   std::set<std::string> requiredTypes;
-  std::list<std::string> requiredTypesInOrder;
+  std::list<std::string> requiredPlainTypesInOrder;
+  std::list<std::string> requiredPackagesInOrder;
   
   requiredTypes.insert(messageDataType);
-  requiredTypesInOrder.push_back(messageDataType);
+  requiredPlainTypesInOrder.push_back(messagePlainType);
+  requiredPackagesInOrder.push_back(messagePackage);
   
-  while (!requiredTypesInOrder.empty()) {
-    std::string package, type;
-    std::string currentType = requiredTypesInOrder.front();
+  while (!requiredPlainTypesInOrder.empty()) {
+    std::string package, plainType;
+    std::string currentType = requiredPlainTypesInOrder.front();
+    std::string currentPackage = requiredPackagesInOrder.front();
     
-    size_t i = currentType.find_first_of('/');
-    
-    if ((i > 0) && (i != std::string::npos)) {
-      package = currentType.substr(0, i);
-      type = currentType.substr(i+1);
-    }
-    else
-      type = currentType;
+    if (!MessageTypeParser::matchType(currentType, package, plainType))
+      throw InvalidMessageTypeException(currentType);
     
     if (package.empty()) {
-      if (type == "Header")
+      if (plainType == "Header")
         package = "std_msgs";
       else
-        throw InvalidMessageTypeException(currentType);
+        package = currentPackage;
     }
-    
-    if (type.empty())
-      throw InvalidDataTypeException();
     
     std::string packagePath = ros::package::getPath(package);
     if (packagePath.empty())
       throw PackageNotFoundException(package);
     
-    std::string messageFilename(packagePath+"/msg/"+type+".msg");
+    std::string messageFilename(packagePath+"/msg/"+plainType+".msg");
     std::ifstream messageFile(messageFilename.c_str());
     std::string messageDefinition;
 
@@ -159,27 +159,43 @@ void MessageType::load(const std::string& messageDataType) {
         size_t memberSize;
         
         if (MessageDefinitionParser::matchArray(line, memberName, memberType,
-            memberSize) ||  MessageDefinitionParser::match(line, memberName,
+            memberSize) || MessageDefinitionParser::match(line, memberName,
             memberType)) {
-          if (memberType == "Header")
-            memberType = "std_msgs/Header";
+          std::string memberPackage, plainMemberType;
+        
+          if (!MessageTypeParser::matchType(memberType, memberPackage,
+              plainMemberType))
+            throw InvalidMessageTypeException(memberType);
           
-          if (!registry.getDataType(memberType).isBuiltin() &&
-              requiredTypes.find(memberType) == requiredTypes.end()) {
-            requiredTypes.insert(memberType);
-            requiredTypesInOrder.push_back(memberType);
+          if (!registry.getDataType(memberType).isBuiltin()) {
+            if (memberPackage.empty()) {
+              if (plainMemberType == "Header")
+                memberPackage = "std_msgs";
+              else
+                memberPackage = currentPackage;
+              
+              memberType = memberPackage+"/"+plainMemberType;
+            }
+            
+            if (requiredTypes.find(memberType) == requiredTypes.end()) {
+              requiredTypes.insert(memberType);
+              requiredPlainTypesInOrder.push_back(plainMemberType);
+              requiredPackagesInOrder.push_back(memberPackage);
+            
+            }          
           }
         }
       }
       
       if (!definition.empty()) {
         definition += "\n"+std::string(80, '=')+"\n";
-        definition += "MSG: "+currentType+"\n";
+        definition += "MSG: "+currentPackage+"/"+currentType+"\n";
       }
       definition += messageDefinition;
     }
     
-    requiredTypesInOrder.pop_front();
+    requiredPlainTypesInOrder.pop_front();
+    requiredPackagesInOrder.pop_front();
   }
   
   if (!definition.empty())

@@ -34,7 +34,8 @@ namespace variant_topic_tools {
 
 template <typename T>
 MessageDataType::ImplT<T>::ImplT() :
-  Impl(ros::message_traits::template definition<T>()),
+  Impl(ros::message_traits::template datatype<T>(),
+    ros::message_traits::template definition<T>()),
   memberIndex(0) {
   ros::serialization::serialize(*this, this->message);
   
