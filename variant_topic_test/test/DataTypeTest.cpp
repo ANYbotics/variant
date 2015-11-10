@@ -93,6 +93,12 @@ TEST(DataType, Message) {
   EXPECT_TRUE(m1.hasTypeInfo());
   EXPECT_FALSE(m1.hasHeader());
   EXPECT_EQ(typeid(std_msgs::Bool), m1.getTypeInfo());
+  EXPECT_TRUE(m1.hasMember("data"));
+  EXPECT_FALSE(m1.hasConstantMember("data"));
+  EXPECT_TRUE(m1.hasVariableMember("data"));
+  EXPECT_NO_THROW(m1.getMember("data"));
+  EXPECT_ANY_THROW(m1.getConstantMember("data"));
+  EXPECT_NO_THROW(m1.getVariableMember("data"));
   EXPECT_TRUE(m2.isValid());
   EXPECT_TRUE(m2.isMessage());
   EXPECT_FALSE(m2.hasTypeInfo());

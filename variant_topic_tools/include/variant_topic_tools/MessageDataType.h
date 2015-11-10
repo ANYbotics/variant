@@ -76,17 +76,44 @@ namespace variant_topic_tools {
       */
     size_t getNumVariableMembers() const;
     
+    /** \brief Access a member of the message data type by name
+      */
+    const MessageMember& getMember(const std::string& name) const;
+    
     /** \brief Access a member of the message data type by index
       */
     const MessageMember& getMember(size_t index) const;
+    
+    /** \brief Access a constant member of the message data type by name
+      */
+    const MessageConstant& getConstantMember(const std::string& name) const;
     
     /** \brief Access a constant member of the message data type by index
       */
     const MessageConstant& getConstantMember(size_t index) const;
     
+    /** \brief Access a variable member of the message data type by name
+      */
+    const MessageVariable& getVariableMember(const std::string& name) const;
+    
     /** \brief Access a variable member of the message data type by index
       */
     const MessageVariable& getVariableMember(size_t index) const;
+    
+    /** \brief True, if the message data type contains the member with the
+      *   specified name
+      */
+    bool hasMember(const std::string& name) const;
+    
+    /** \brief True, if the message data type contains the constant member
+      *   with the specified name
+      */
+    bool hasConstantMember(const std::string& name) const;
+    
+    /** \brief True, if the message data type contains the variable member
+      *   with the specified name
+      */
+    bool hasVariableMember(const std::string& name) const;
     
     /** \brief True, if this message data type has a header
       */

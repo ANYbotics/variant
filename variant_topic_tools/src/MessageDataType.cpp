@@ -220,6 +220,18 @@ size_t MessageDataType::getNumVariableMembers() const {
     return 0;
 }
 
+const MessageMember& MessageDataType::getMember(const std::string& name)
+    const {
+  if (hasConstantMember(name))
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].
+      getValue();
+  else if (hasVariableMember(name))
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].
+      getValue();
+  else
+    throw NoSuchMemberException(name);
+}
+
 const MessageMember& MessageDataType::getMember(size_t index) const {
   if (index < getNumConstantMembers())
     return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].
@@ -231,6 +243,15 @@ const MessageMember& MessageDataType::getMember(size_t index) const {
     throw NoSuchMemberException(index);
 }
 
+const MessageConstant& MessageDataType::getConstantMember(const std::string&
+    name) const {
+  if (hasConstantMember(name))
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].
+      getValue();
+  else
+    throw NoSuchMemberException(name);
+}
+
 const MessageConstant& MessageDataType::getConstantMember(size_t index) const {
   if (index < getNumConstantMembers())
     return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].
@@ -239,12 +260,41 @@ const MessageConstant& MessageDataType::getConstantMember(size_t index) const {
     throw NoSuchMemberException(index);
 }
 
+const MessageVariable& MessageDataType::getVariableMember(const std::string&
+    name) const {
+  if (hasVariableMember(name))
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].
+      getValue();
+  else
+    throw NoSuchMemberException(name);
+}
+
 const MessageVariable& MessageDataType::getVariableMember(size_t index) const {
   if (index < getNumVariableMembers())
     return boost::static_pointer_cast<Impl>(*impl)->variableMembers[index].
       getValue();
   else
     throw NoSuchMemberException(index);
+}
+
+bool MessageDataType::hasMember(const std::string& name) const {
+  return hasConstantMember(name) || hasVariableMember(name);
+}
+
+bool MessageDataType::hasConstantMember(const std::string& name) const {
+  if (impl)
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers.
+      hasField(name);
+  else
+    return false;
+}
+
+bool MessageDataType::hasVariableMember(const std::string& name) const {
+  if (impl)
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers.
+      hasField(name);
+  else
+    return false;
 }
 
 bool MessageDataType::hasHeader() const {

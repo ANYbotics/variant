@@ -1,3 +1,9 @@
+ros-variant (0.1-26) unstable; urgency=low
+
+  * Added message data type member access by name
+
+ -- Ralf Kaestner <ralf.kaestner@gmail.com>  Tue, 10 Nov 2015 08:39:00 +0200
+
 ros-variant (0.1-25) unstable; urgency=low
 
   * Added type name resolution for member definitions neglecting package names
