@@ -19,11 +19,14 @@
 #include <list>
 #include <set>
 
+#include <boost/unordered_map.hpp>
+
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageDataType.h"
 #include "variant_topic_tools/MessageDefinition.h"
 #include "variant_topic_tools/MessageDefinitionParser.h"
+#include "variant_topic_tools/MessageTypeParser.h"
 
 namespace variant_topic_tools {
 
@@ -62,18 +65,85 @@ void MessageDefinition::setMessageType(const MessageType& messageType) {
     
     if (!dataType.isValid()) {
       DataTypeRegistry registry;
+      
       std::vector<MessageType> messageTypes;
-
+      boost::unordered_map<std::string, size_t> definedTypes;
+      boost::unordered_map<size_t, std::set<size_t> > requiredTypes;
+        
       MessageDefinitionParser::parse(messageType.getDataType(),
         messageType.getDefinition(), messageTypes);
       
-      for (size_t i = messageTypes.size(); i > 0; --i) {
-        if (!registry.getDataType(messageTypes[i-1].getDataType()).isValid())
-          registry.addMessageDataType(messageTypes[i-1].getDataType(),
-            messageTypes[i-1].getDefinition());
+      for (size_t i = 0; i < messageTypes.size(); ++i)
+        definedTypes[messageTypes[i].getDataType()] = i;
+      
+      for (size_t i = 0; i < messageTypes.size(); ++i) {
+        std::string package, plainType;
+        
+        if (!MessageTypeParser::matchType(messageTypes[i].getDataType(),
+            package, plainType))
+          throw InvalidMessageTypeException(messageTypes[i].getDataType());
+        
+        std::istringstream stream(messageTypes[i].getDefinition());
+        std::string line;
+        
+        while (std::getline(stream, line)) {
+          std::string memberName, memberType;
+          size_t memberSize;
+          
+          if (MessageDefinitionParser::matchArray(line, memberName, memberType,
+              memberSize) || MessageDefinitionParser::match(line, memberName,
+              memberType)) {
+            std::string memberPackage, plainMemberType;
+          
+            if (!MessageTypeParser::matchType(memberType, memberPackage,
+                plainMemberType))
+              throw InvalidMessageTypeException(memberType);
+            
+            if (memberPackage.empty()) {
+              if (plainMemberType == "Header")
+                memberPackage = "std_msgs";
+              else
+                memberPackage = package;
+              
+              memberType = memberPackage+"/"+plainMemberType;
+            }
+            
+            boost::unordered_map<std::string, size_t>::iterator it =
+              definedTypes.find(memberType);
+
+            if (it != definedTypes.end())
+              requiredTypes[i].insert(it->second);
+          }
+        }
+      }
+      
+      std::list<size_t> typesToBeDefined;
+      typesToBeDefined.push_back(definedTypes[messageType.getDataType()]);
+      
+      while (!typesToBeDefined.empty()) {
+        size_t i = typesToBeDefined.back();
+        const std::set<size_t>& currentRequiredTypes = requiredTypes[i];
+        bool allRequiredTypesDefined = true;
+        
+        for (std::set<size_t>::const_iterator it = currentRequiredTypes.
+            begin(); it != currentRequiredTypes.end(); ++it) {
+          if (!registry.getDataType(messageTypes[*it].getDataType()).
+              isValid()) {
+            typesToBeDefined.push_back(*it);
+            allRequiredTypesDefined = false;
+          
+            break;
+          }          
+        }
+        
+        if (allRequiredTypesDefined) {
+          registry.addMessageDataType(messageTypes[i].getDataType(),
+            messageTypes[i].getDefinition());
+          typesToBeDefined.pop_back();
+        }
       }
     }
-
+    
     messageDataType = MessageDataType(messageType.getDataType());
     fill(messageDataType, *this);
   }

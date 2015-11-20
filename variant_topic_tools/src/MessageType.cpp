@@ -16,10 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <algorithm>
 #include <fstream>
 #include <list>
 #include <set>
 #include <sstream>
+
+#include <boost/unordered_map.hpp>
 
 #include <ros/package.h>
 
@@ -106,27 +109,26 @@ void MessageType::load(const std::string& messageDataType) {
     throw InvalidMessageTypeException(messageDataType);
     
   DataTypeRegistry registry;
+  boost::unordered_map<std::string, std::string> definitions;
+  std::list<std::string> typesInOrder;  
   std::set<std::string> requiredTypes;
-  std::list<std::string> requiredPlainTypesInOrder;
-  std::list<std::string> requiredPackagesInOrder;
-  
+
   requiredTypes.insert(messageDataType);
-  requiredPlainTypesInOrder.push_back(messagePlainType);
-  requiredPackagesInOrder.push_back(messagePackage);
+  typesInOrder.push_back(messageDataType);
   
-  while (!requiredPlainTypesInOrder.empty()) {
+  std::list<std::string>::iterator it = typesInOrder.begin();
+  
+  while (it != typesInOrder.end()) {
     std::string package, plainType;
-    std::string currentType = requiredPlainTypesInOrder.front();
-    std::string currentPackage = requiredPackagesInOrder.front();
     
-    if (!MessageTypeParser::matchType(currentType, package, plainType))
-      throw InvalidMessageTypeException(currentType);
+    if (!MessageTypeParser::matchType(*it, package, plainType))
+      throw InvalidMessageTypeException(*it);
     
     if (package.empty()) {
       if (plainType == "Header")
         package = "std_msgs";
       else
-        package = currentPackage;
+        throw InvalidMessageTypeException(*it);
     }
     
     std::string packagePath = ros::package::getPath(package);
@@ -172,30 +174,32 @@ void MessageType::load(const std::string& messageDataType) {
               if (plainMemberType == "Header")
                 memberPackage = "std_msgs";
               else
-                memberPackage = currentPackage;
+                memberPackage = package;
               
               memberType = memberPackage+"/"+plainMemberType;
             }
             
             if (requiredTypes.find(memberType) == requiredTypes.end()) {
               requiredTypes.insert(memberType);
-              requiredPlainTypesInOrder.push_back(plainMemberType);
-              requiredPackagesInOrder.push_back(memberPackage);
-            
-            }          
+              typesInOrder.push_back(memberType);
+            }
           }
         }
       }
-      
-      if (!definition.empty()) {
-        definition += "\n"+std::string(80, '=')+"\n";
-        definition += "MSG: "+currentPackage+"/"+currentType+"\n";
-      }
-      definition += messageDefinition;
     }
     
-    requiredPlainTypesInOrder.pop_front();
-    requiredPackagesInOrder.pop_front();
+    definitions[*it] = messageDefinition;
+    ++it;
+  }
+  
+  for (std::list<std::string>::const_iterator it = typesInOrder.begin();
+      it != typesInOrder.end(); ++it) {
+    if (!definition.empty()) {
+      definition += "\n"+std::string(80, '=')+"\n";
+      definition += "MSG: "+*it+"\n";
+    }
+    
+    definition += definitions[*it];
   }
   
   if (!definition.empty())
