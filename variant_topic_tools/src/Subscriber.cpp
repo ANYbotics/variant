@@ -80,7 +80,7 @@ size_t Subscriber::getNumPublishers() const {
 }
 
 bool Subscriber::Impl::isValid() const {
-  return type.isValid() && dataType && serializer && subscriber;
+  return subscriber;
 }
 
 /*****************************************************************************/
@@ -93,10 +93,11 @@ void Subscriber::shutdown() {
 }
 
 void Subscriber::Impl::shutdown() {
+  subscriber = ros::Subscriber();
+  
   type = MessageType();
   dataType = DataType();
   serializer = MessageSerializer();
-  subscriber = ros::Subscriber();
 }
 
 void Subscriber::Impl::eventCallback(const ros::MessageEvent<Message const>&
@@ -119,17 +120,20 @@ void Subscriber::Impl::eventCallback(const ros::MessageEvent<Message const>&
           MessageDefinition definition(type);
           dataType = definition.getMessageDataType();
         }
-        
-        serializer = dataType.createSerializer();
       }
+        
+      if (dataType && !serializer)
+        serializer = dataType.createSerializer();
 
-      MessageVariant variant = dataType.createVariant();
-      ros::serialization::IStream stream(const_cast<uint8_t*>(
-        message->getData().data()), message->getSize());
-      
-      serializer.deserialize(stream, variant);
-      
-      callback(variant, event.getReceiptTime());
+      if (serializer) {
+        MessageVariant variant = dataType.createVariant();
+        ros::serialization::IStream stream(const_cast<uint8_t*>(
+          message->getData().data()), message->getSize());
+        
+        serializer.deserialize(stream, variant);
+        
+        callback(variant, event.getReceiptTime());
+      }
     }
     else
       throw MD5SumMismatchException(type.getMD5Sum(),
