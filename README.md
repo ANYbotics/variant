@@ -45,9 +45,8 @@ The build dependencies of this project are available from the standard
 package repositories of recent Ubuntu and ROS releases. To install them,
 simply use the command
 
-```
+```shell
 sudo apt-get install ros-ROS_DISTRO-roscpp, ros-ROS_DISTRO-std-msgs
-
 ```
 
 #### Building with catkin (recommended for ROS developers)
@@ -57,33 +56,33 @@ may attempt to build this project using catkin as follows:
 
 * Create the directory structure for your catkin workspace by issuing
 
-  ```
+  ```shell
   mkdir -p CATKIN_WS_DIR/src
   ```
 
 * Assuming that your ROS environment has been set up properly, initialize the
   catkin workspace using the command
 
-  ```
+  ```shell
   catkin_init_workspace CATKIN_WS_DIR/src
   ```
 
 * Individually link the directories containing the project's package source
   trees into your catkin workspace source directory through
 
-  ```
+  ```shell
   ln -sf PROJECT_DIR/roscpp_nodewrap* CATKIN_WS_DIR/src
   ```
 
 * Switch into the catkin workspace directory by 
 
-  ```
+  ```shell
   cd CATKIN_WS_DIR
   ```
 
 * In the catkin workspace directory, run 
 
-  ```
+  ```shell
   catkin_make
   ```
 
