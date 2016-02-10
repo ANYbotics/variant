@@ -23,13 +23,13 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-ArrayMemberPointer<T>::ArrayMemberPointer(ValueType* array, size_t index) {
+ArrayMemberPointer<T>::ArrayMemberPointer(ValueType* array, int index) {
   this->impl.reset(new Impl(Pointer<ValueType>(array), index));
 }
 
 template <typename T>
 ArrayMemberPointer<T>::ArrayMemberPointer(const Pointer<ValueType>& array,
-    size_t index) {
+    int index) {
   this->impl.reset(new Impl(array, index));
 }
 
@@ -76,9 +76,9 @@ const Pointer<typename ArrayMemberPointer<T>::ValueType>&
     ArrayMemberPointer<T>::getArray() const {
   return boost::static_pointer_cast<Impl>(this->impl)->array;
 }
-    
+
 template <typename T>
-void ArrayMemberPointer<T>::setIndex(size_t index) {
+void ArrayMemberPointer<T>::setIndex(int index) {
   boost::static_pointer_cast<Impl>(this->impl)->index = index;
 }
 

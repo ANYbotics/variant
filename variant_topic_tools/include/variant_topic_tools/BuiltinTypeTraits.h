@@ -26,6 +26,7 @@
 #include <string>
 
 #include <boost/type_traits.hpp>
+#include <boost/type_traits/ice.hpp>
 
 #include <ros/duration.h>
 #include <ros/message_traits.h>
@@ -38,19 +39,19 @@ namespace variant_topic_tools {
         boost::is_integral<T>::value,
         boost::is_floating_point<T>::value> {
     };
-    
+
     template <typename D> struct IsBuiltin<std::string, D> :
       public boost::true_type {
     };
-    
+
     template <typename D> struct IsBuiltin<ros::Duration, D> :
       public boost::true_type {
     };
-    
+
     template <typename D> struct IsBuiltin<ros::Time, D> :
       public boost::true_type {
     };
-    
+
     template <typename T, typename D = void> struct BuiltinType {
       typedef T ValueType;
       typedef T StreamType;
@@ -60,7 +61,7 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename D> struct BuiltinType<uint8_t, D> {
       typedef uint8_t ValueType;
       typedef uint32_t StreamType;
@@ -68,7 +69,7 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename D> struct BuiltinType<int8_t, D> {
       typedef int8_t ValueType;
       typedef int32_t StreamType;
@@ -76,7 +77,7 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename D> struct BuiltinType<bool, D> {
       typedef uint8_t ValueType;
       typedef std::string StreamType;
@@ -84,7 +85,7 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename D> struct BuiltinType<ros::Duration, D> {
       typedef ros::Duration ValueType;
       typedef ros::Duration StreamType;
@@ -92,7 +93,7 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename D> struct BuiltinType<ros::Time, D> {
       typedef ros::Time ValueType;
       typedef ros::Time StreamType;
@@ -100,11 +101,11 @@ namespace variant_topic_tools {
       typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
       typedef ros::message_traits::IsSimple<ValueType> IsSimple;
     };
-    
+
     template <typename T> struct ToBuiltinType {
       typedef T BuiltinType;
     };
-    
+
     template <size_t N> struct ToBuiltinType<char[N]> {
       typedef std::string BuiltinType;
     };

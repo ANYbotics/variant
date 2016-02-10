@@ -33,58 +33,58 @@ namespace variant_topic_tools {
     public Pointer<typename type_traits::ArrayType<T>::MemberValueType> {
   public:
     BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
-    
+
     /** \brief Definition of the array value type
       */
     typedef typename type_traits::ArrayType<T>::ValueType ValueType;
-    
+
     /** \brief Definition of the array member type
       */
     typedef typename type_traits::ArrayType<T>::MemberValueType
       MemberValueType;
-    
+
     /** \brief Definition of the number of array members
       */
     static const size_t NumMembers = type_traits::ArrayType<T>::NumMembers;
-      
+
     /** \brief Default constructor
-      */ 
-    ArrayMemberPointer(ValueType* array = 0, size_t index = 0);
-    
+      */
+    ArrayMemberPointer(ValueType* array = 0, int index = 0);
+
     /** \brief Constructor (overloaded version taking an array pointer
       *   and an index)
-      */ 
-    ArrayMemberPointer(const Pointer<ValueType>& array, size_t index);
-    
+      */
+    ArrayMemberPointer(const Pointer<ValueType>& array, int index);
+
     /** \brief Copy constructor
-      */ 
+      */
     ArrayMemberPointer(const ArrayMemberPointer<T>& src);
-    
+
     /** \brief Copy constructor (overloaded version taking a pointer)
-      */ 
+      */
     ArrayMemberPointer(const Pointer<MemberValueType>& src);
-    
+
     /** \brief Destructor
-      */ 
+      */
     ~ArrayMemberPointer();
 
     /** \brief Set the array
       */
     void setArray(const Pointer<ValueType>& array);
-    
+
     /** \brief Retrieve the array
       */
     const Pointer<ValueType>& getArray() const;
-    
+
     /** \brief Set the array member index
       */
-    void setIndex(size_t index);
-    
+    void setIndex(int index);
+
     /** \brief Retrieve the array member index
       */
     size_t getIndex() const;
-    
-  protected:    
+
+  protected:
     /** \brief Array member pointer implementation
       */
     class Impl :
@@ -94,22 +94,22 @@ namespace variant_topic_tools {
         */
       Impl(const Pointer<ValueType>& array = Pointer<ValueType>(), size_t
         index = 0);
-      
+
       /** \brief Destructor
         */
       virtual ~Impl();
-      
+
       /** \brief Retrieve the stored pointer (implementation)
         */
       MemberValueType* get() const;
-      
+
       /** \brief The shared array
-        */ 
+        */
       Pointer<ValueType> array;
-      
+
       /** \brief The member index
-        */ 
-      size_t index;
+        */
+      int index;
     };
   };
 };

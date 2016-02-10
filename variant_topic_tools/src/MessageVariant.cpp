@@ -74,7 +74,7 @@ MessageVariant::ValueImplV::~ValueImplV() {
 
 void MessageVariant::Value::setValue(const Variant::Value& value) {
   const Value& messageValue = dynamic_cast<const Value&>(value);
-  
+
   for (size_t i = 0; i < getNumMembers(); ++i)
     setMember(i, messageValue.getMember(i));
 }
@@ -83,7 +83,7 @@ size_t MessageVariant::ValueImplV::getNumMembers() const {
   return members.getNumFields();
 }
 
-void MessageVariant::ValueImplV::setMember(size_t index, const Variant&
+void MessageVariant::ValueImplV::setMember(int index, const Variant&
     member) {
   members.getField(index).setValue(member);
 }
@@ -93,7 +93,7 @@ void MessageVariant::ValueImplV::setMember(const std::string& name, const
   members.getField(name).setValue(member);
 }
 
-Variant MessageVariant::ValueImplV::getMember(size_t index) const {
+Variant MessageVariant::ValueImplV::getMember(int index) const {
   return members.getField(index).getValue();
 }
 
@@ -101,7 +101,7 @@ Variant MessageVariant::ValueImplV::getMember(const std::string& name) const {
   return members.getField(name).getValue();
 }
 
-const std::string& MessageVariant::ValueImplV::getMemberName(size_t index)
+const std::string& MessageVariant::ValueImplV::getMemberName(int index)
     const {
   return members.getField(index).getName();
 }
@@ -114,19 +114,19 @@ bool MessageVariant::ValueImplV::hasMember(const std::string& name) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void MessageVariant::Value::writeMember(std::ostream& stream, size_t index)
+void MessageVariant::Value::writeMember(std::ostream& stream, int index)
     const {
   Variant member = getMember(index);
-  
+
   if (!member.getType().isBuiltin()) {
     stream << getMemberName(index) << ":";
-  
-    std::stringstream memberStream;    
+
+    std::stringstream memberStream;
     std::string line;
-    
+
     memberStream << member;
 
-    while (std::getline(memberStream, line))      
+    while (std::getline(memberStream, line))
       stream << "\n  " << line;
   }
   else
@@ -140,11 +140,11 @@ Variant::ValuePtr MessageVariant::ValueImplV::clone() const {
 Serializer MessageVariant::ValueImplV::createSerializer(const DataType& type)
     const {
   MessageFieldCollection<Serializer> memberSerializers;
-  
+
   for (size_t i = 0; i < members.getNumFields(); ++i)
     memberSerializers.appendField(members[i].getName(),
       members[i].getValue().createSerializer());
-  
+
   return MessageSerializer(memberSerializers);
 }
 

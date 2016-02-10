@@ -146,20 +146,6 @@ Serializer Variant::createSerializer() const {
 /* Operators                                                                 */
 /*****************************************************************************/
 
-bool Variant::operator==(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return value->isEqual(*variant.value);
-  else
-    return false;
-}
-    
-bool Variant::operator!=(const Variant& variant) const {
-  if ((type == variant.type) && value && variant.value)
-    return !value->isEqual(*variant.value);
-  else
-    return true;
-}
-
 std::istream& operator>>(std::istream& stream, Variant& variant) {
   variant.read(stream);
   return stream;

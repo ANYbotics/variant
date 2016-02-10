@@ -46,13 +46,13 @@ template <typename T> void Variant::setValue(const T& value) {
   Variant::template setValue<T>(*this, value);
 }
 
-template <typename T> typename type_traits::DataType<T>::ValueType& 
+template <typename T> typename type_traits::DataType<T>::ValueType&
     Variant::getValue() {
   typedef typename type_traits::DataType<T>::ValueType ValueType;
-  
+
   if (!this->type.isValid()) {
     this->type = DataType(typeid(T));
-    
+
     if (this->type.isValid()) {
       this->value = this->type.createVariant().value;
       return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
@@ -64,7 +64,7 @@ template <typename T> typename type_traits::DataType<T>::ValueType&
   else if (typeid(T) == this->type.getTypeInfo()) {
     if (!this->value)
       this->value = this->type.createVariant().value;
-    
+
     return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
       getValue();
   }
@@ -76,14 +76,14 @@ template <typename T> typename type_traits::DataType<T>::ValueType&
 template <typename T> const typename type_traits::DataType<T>::ValueType&
     Variant::getValue() const {
   typedef typename type_traits::DataType<T>::ValueType ValueType;
-  
+
   if (this->type.isValid()) {
     if (typeid(T) == this->type.getTypeInfo()) {
       if (!this->value) {
         static typename type_traits::DataType<T>::ValueType value;
         return value;
       }
-      else 
+      else
         return boost::dynamic_pointer_cast<ValueT<ValueType> >(this->value)->
           getValue();
     }
@@ -112,14 +112,14 @@ void Variant::ValueT<T>::setValue(const T& value) {
 template <typename T> void Variant::set(Variant& variant, const
     Pointer<typename type_traits::DataType<T>::ValueType>& value) {
   typedef typename type_traits::DataType<T>::ValueType ValueType;
-  
+
   if (!variant.type.isValid()) {
     variant.type = DataType(typeid(T));
-    
+
     if (variant.type.isValid()) {
       variant.value = variant.type.createVariant().value;
       boost::dynamic_pointer_cast<ValueT<ValueType> >(variant.value)->
-        set(value);      
+        set(value);
     }
     else
       throw InvalidDataTypeException();
@@ -127,9 +127,9 @@ template <typename T> void Variant::set(Variant& variant, const
   else if (typeid(T) == variant.type.getTypeInfo()) {
     if (!variant.value)
       variant.value = variant.type.createVariant().value;
-    
+
     boost::dynamic_pointer_cast<ValueT<ValueType> >(variant.value)->
-      set(value);      
+      set(value);
   }
   else
     throw DataTypeMismatchException(variant.type.getIdentifier(),
@@ -140,7 +140,7 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
     typename boost::enable_if<boost::is_base_of<Variant, T> >::type*) {
   if (!dst.type.isValid()) {
     dst.type = value.type;
-    
+
     if (dst.type.isValid()) {
       dst.value = dst.type.createVariant().value;
       if (value.value)
@@ -152,7 +152,7 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
   else if (value.type == dst.type) {
     if (!dst.value)
       dst.value = dst.type.createVariant().value;
-    
+
     if (value.value)
       dst.value->setValue(*value.value);
   }
@@ -165,10 +165,10 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
     typename boost::disable_if<boost::is_base_of<Variant, T> >::type*) {
   typedef typename type_traits::ToDataType<T>::DataType Type;
   typedef typename type_traits::DataType<Type>::ValueType ValueType;
-  
+
   if (!dst.type.isValid()) {
     dst.type = DataType(typeid(Type));
-    
+
     if (dst.type.isValid()) {
       dst.value = dst.type.createVariant().value;
       boost::dynamic_pointer_cast<ValueT<ValueType> >(dst.value)->
@@ -180,7 +180,7 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
   else if (typeid(Type) == dst.type.getTypeInfo()) {
     if (!dst.value)
       dst.value = dst.type.createVariant().value;
-    
+
     boost::dynamic_pointer_cast<ValueT<ValueType> >(dst.value)->
       setValue(value);
   }
@@ -188,7 +188,26 @@ template <typename T> void Variant::setValue(Variant& dst, const T& value,
     throw DataTypeMismatchException(dst.type.getIdentifier(),
       DataType(typeid(Type)).getIdentifier());
 }
-    
+
+template <typename T> bool Variant::isEqual(const Variant& variant, const
+    T& value, typename boost::enable_if<boost::is_base_of<Variant, T> >::
+    type*) {
+  if ((variant.type == value.type) && variant.value && value.value)
+    return variant.value->isEqual(*value.value);
+  else
+    return false;
+}
+
+template <typename T> bool Variant::isEqual(const Variant& variant, const
+    T& value, typename boost::disable_if<boost::is_base_of<Variant, T> >::
+    type*) {
+  if ((variant.type.getTypeInfo() == typeid(value)) && variant.value)
+    return (boost::dynamic_pointer_cast<ValueT<T> >(variant.value)->
+      getValue() == value);
+  else
+    return false;
+}
+
 template <typename T> void Variant::assign(Variant& dst, const T& src,
     typename boost::enable_if<boost::is_base_of<Variant, T> >::type*) {
   dst.type = src.type;
@@ -211,6 +230,14 @@ template <typename T> Variant& Variant::operator=(const T& src) {
 
 template <typename T> Variant::operator T() const {
   return this->template getValue<T>();
+}
+
+template <typename T> bool Variant::operator==(const T& value) const {
+  return Variant::template isEqual<T>(*this, value);
+}
+
+template <typename T> bool Variant::operator!=(const T& value) const {
+  return !Variant::template isEqual<T>(*this, value);
 }
 
 }

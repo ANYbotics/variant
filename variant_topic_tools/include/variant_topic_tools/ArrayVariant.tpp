@@ -59,7 +59,7 @@ typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
   }
-  
+
   return *this->array;
 }
 
@@ -69,12 +69,12 @@ const typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
   if (!this->array) {
     static ValueType array = ValueType();
     static bool initialized = false;
-    
+
     if (!initialized) {
       ArrayVariant::template initialize<T>(array);
       initialized = true;
     }
-    
+
     return array;
   }
   else
@@ -90,36 +90,36 @@ size_t ArrayVariant::ValueImplT<T>::getNumMembers() const {
 }
 
 template <typename T>
-void ArrayVariant::ValueImplT<T>::setMember(size_t index, const Variant&
+void ArrayVariant::ValueImplT<T>::setMember(int index, const Variant&
     member) {
   if (!this->array) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
   }
-  
-  if (index < this->array->size())
+
+  if ((index >= 0) && (index < this->array->size()))
     (*this->array)[index] = member.template getValue<MemberType>();
   else
     throw NoSuchMemberException(index);
 }
 
 template <typename T>
-Variant ArrayVariant::ValueImplT<T>::getMember(size_t index) const {
+Variant ArrayVariant::ValueImplT<T>::getMember(int index) const {
   if (!this->array) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
   }
-  
-  if (index < this->array->size()) {
+
+  if ((index >= 0) && (index < this->array->size())) {
     Variant member = this->memberType.createVariant();
 
     Variant::template set<MemberType>(member, ArrayMemberPointer<T>(
       this->array, index));
-    
+
     return member;
   }
   else
-    throw NoSuchMemberException(index);  
+    throw NoSuchMemberException(index);
 }
 
 /*****************************************************************************/
@@ -129,10 +129,10 @@ Variant ArrayVariant::ValueImplT<T>::getMember(size_t index) const {
 template <typename T> ArrayVariant ArrayVariant::create(const
     DataType& type, const DataType& memberType) {
   ArrayVariant variant;
-  
+
   variant.type = type;
   variant.value.reset(new ValueImplT<T>(memberType));
-  
+
   return variant;
 }
 
@@ -142,7 +142,7 @@ void ArrayVariant::ValueImplT<T>::addMember(const Variant& member) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
   }
-  
+
   ArrayVariant::template add<T>(*this->array, member);
 }
 
@@ -152,7 +152,7 @@ void ArrayVariant::ValueImplT<T>::resize(size_t numMembers) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
   }
-  
+
   ArrayVariant::template resize<T>(*this->array, numMembers);
 }
 
@@ -188,7 +188,7 @@ template <typename T> void ArrayVariant::add(typename type_traits::
     ArrayType<T>::ValueType& array, const typename type_traits::
     ArrayType<T>::MemberType& member, typename boost::enable_if<
     typename type_traits::ArrayType<T>::IsDynamic>::type*) {
-  array.push_back(member); 
+  array.push_back(member);
 }
 
 template <typename T> void ArrayVariant::add(typename type_traits::

@@ -27,7 +27,7 @@
 
 namespace variant_topic_tools {
   /** \brief Exception thrown in case of a null pointer operation
-    */ 
+    */
   class NullPointerException :
     public ros::Exception {
   public:
@@ -35,9 +35,9 @@ namespace variant_topic_tools {
       */
     NullPointerException();
   };
-  
+
   /** \brief Exception thrown in case of an invalid operation
-    */ 
+    */
   class InvalidOperationException :
     public ros::Exception {
   public:
@@ -45,9 +45,9 @@ namespace variant_topic_tools {
       */
     InvalidOperationException(const std::string& what);
   };
-  
+
   /** \brief Exception thrown in case of an invalid data type
-    */ 
+    */
   class InvalidDataTypeException :
     public ros::Exception {
   public:
@@ -55,10 +55,10 @@ namespace variant_topic_tools {
       */
     InvalidDataTypeException();
   };
-  
+
   /** \brief Exception thrown in case of an attempted modification of
     *   an immutable data type
-    */ 
+    */
   class ImmutableDataTypeException :
     public ros::Exception {
   public:
@@ -66,9 +66,9 @@ namespace variant_topic_tools {
       */
     ImmutableDataTypeException();
   };
-  
+
   /** \brief Exception thrown in case of a non-existent data type
-    */ 
+    */
   class NoSuchDataTypeException :
     public ros::Exception {
   public:
@@ -76,9 +76,9 @@ namespace variant_topic_tools {
       */
     NoSuchDataTypeException(const std::string& identifier);
   };
-  
+
   /** \brief Exception thrown in case of an ambiguous data type identifier
-    */ 
+    */
   class AmbiguousDataTypeIdentifierException :
     public ros::Exception {
   public:
@@ -86,9 +86,9 @@ namespace variant_topic_tools {
       */
     AmbiguousDataTypeIdentifierException(const std::string& identifier);
   };
-  
+
   /** \brief Exception thrown in case of a data type mismatch
-    */ 
+    */
   class DataTypeMismatchException :
     public ros::Exception {
   public:
@@ -97,9 +97,9 @@ namespace variant_topic_tools {
     DataTypeMismatchException(const std::string& expectedDataType, const
       std::string& providedDataType);
   };
-  
+
   /** \brief Exception thrown in case of an ambiguous member name
-    */ 
+    */
   class AmbiguousMemberNameException :
     public ros::Exception {
   public:
@@ -107,23 +107,23 @@ namespace variant_topic_tools {
       */
     AmbiguousMemberNameException(const std::string& name);
   };
-  
+
   /** \brief Exception thrown in case of a non-existent member
-    */ 
+    */
   class NoSuchMemberException :
     public ros::Exception {
   public:
     /** \brief Constructor (overloaded version taking a field index)
       */
-    NoSuchMemberException(size_t index);
-    
+    NoSuchMemberException(int index);
+
     /** \brief Constructor (overloaded version taking a field name)
       */
     NoSuchMemberException(const std::string& name);
   };
-  
+
   /** \brief Exception thrown in case of an invalid message member
-    */ 
+    */
   class InvalidMessageMemberException :
     public ros::Exception {
   public:
@@ -131,9 +131,9 @@ namespace variant_topic_tools {
       */
     InvalidMessageMemberException();
   };
-  
+
   /** \brief Exception thrown in case of a message MD5 sum mismatch
-    */ 
+    */
   class MD5SumMismatchException :
     public ros::Exception {
   public:
@@ -142,9 +142,9 @@ namespace variant_topic_tools {
     MD5SumMismatchException(const std::string& expectedMD5Sum, const
       std::string& providedMD5Sum);
   };
-  
+
   /** \brief Exception thrown in case of an invalid message type
-    */ 
+    */
   class InvalidMessageTypeException :
     public ros::Exception {
   public:
@@ -152,9 +152,9 @@ namespace variant_topic_tools {
       */
     InvalidMessageTypeException(const std::string& invalidMessageType);
   };
-  
+
   /** \brief Exception thrown in case of a message type mismatch
-    */ 
+    */
   class MessageTypeMismatchException :
     public ros::Exception {
   public:
@@ -163,10 +163,10 @@ namespace variant_topic_tools {
     MessageTypeMismatchException(const std::string& expectedMessageType,
       const std::string& providedMessageType);
   };
-  
+
   /** \brief Exception thrown in case of an error to parse the message
     *   definition
-    */ 
+    */
   class DefinitionParseException :
     public ros::Exception {
   public:
@@ -175,9 +175,9 @@ namespace variant_topic_tools {
     DefinitionParseException(const std::string& dataType, const std::string&
       line, const std::string& what);
   };
-  
+
   /** \brief Exception thrown in case of a package not being found
-    */ 
+    */
   class PackageNotFoundException :
     public ros::Exception {
   public:
@@ -185,9 +185,9 @@ namespace variant_topic_tools {
       */
     PackageNotFoundException(const std::string& package);
   };
-  
+
   /** \brief Exception thrown in case of an error to open a file
-    */ 
+    */
   class FileOpenException :
     public ros::Exception {
   public:
@@ -195,9 +195,9 @@ namespace variant_topic_tools {
       */
     FileOpenException(const std::string& filename);
   };
-  
+
   /** \brief Exception thrown in case of an invalid serializer
-    */ 
+    */
   class InvalidSerializerException :
     public ros::Exception {
   public:

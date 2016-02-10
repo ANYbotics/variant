@@ -64,7 +64,7 @@ AmbiguousMemberNameException::AmbiguousMemberNameException(
   ros::Exception("Member name ["+name+"] is used ambiguously") {
 }
 
-NoSuchMemberException::NoSuchMemberException(size_t index) :
+NoSuchMemberException::NoSuchMemberException(int index) :
   ros::Exception("Member with index ["+boost::lexical_cast<std::string>(index)+
     "] does not exist") {
 }

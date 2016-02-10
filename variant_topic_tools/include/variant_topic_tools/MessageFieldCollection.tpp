@@ -50,17 +50,17 @@ size_t MessageFieldCollection<T>::getNumFields() const {
 }
 
 template <typename T>
-MessageField<T>& MessageFieldCollection<T>::getField(size_t index) {
-  if (index < this->fieldsInOrder.size())
+MessageField<T>& MessageFieldCollection<T>::getField(int index) {
+  if ((index >= 0) && (index < this->fieldsInOrder.size()))
     return *(this->fieldsInOrder[index]);
   else
     throw NoSuchMemberException(index);
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::getField(size_t index)
+const MessageField<T>& MessageFieldCollection<T>::getField(int index)
     const {
-  if (index < this->fieldsInOrder.size())
+  if ((index >= 0) && (index < this->fieldsInOrder.size()))
     return *(this->fieldsInOrder[index]);
   else
     throw NoSuchMemberException(index);
@@ -82,24 +82,24 @@ template <typename T>
 MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name,
     size_t pos) const {
   pos = name.find_first_not_of('/', pos);
-  
+
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
-    
+
     if (i != std::string::npos) {
       typename boost::unordered_map<std::string, MessageFieldPtr>::
         const_iterator it = this->fieldsByName.find(name.substr(pos, i-pos));
-        
+
       if (it != this->fieldsByName.end())
         return it->second->getField(name, i+1);
     }
     else {
       typename boost::unordered_map<std::string, MessageFieldPtr>::
         const_iterator it = this->fieldsByName.find(name.substr(pos));
-      
+
       if (it != this->fieldsByName.end())
         return *(it->second);
-    }      
+    }
   }
 
   throw NoSuchMemberException(name);
@@ -114,25 +114,27 @@ template <typename T>
 bool MessageFieldCollection<T>::hasField(const std::string& name, size_t pos)
     const {
   pos = name.find_first_not_of('/', pos);
-  
+
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
-    
+
     if (i != std::string::npos) {
       typename boost::unordered_map<std::string, MessageFieldPtr>::
         const_iterator it = this->fieldsByName.find(name.substr(
         pos, i-pos));
-        
+
       return ((it != this->fieldsByName.end()) &&
         it->second->hasField(name, i+1));
     }
     else {
       typename boost::unordered_map<std::string, MessageFieldPtr>::
         const_iterator it = this->fieldsByName.find(name.substr(pos));
-      
+
       return (it != this->fieldsByName.end());
-    }      
+    }
   }
+
+  return false;
 }
 
 template <typename T>
@@ -147,10 +149,10 @@ bool MessageFieldCollection<T>::isEmpty() const {
 template <typename T>
 void MessageFieldCollection<T>::appendField(const MessageField<T>& field) {
   BOOST_ASSERT(field.getName().find('/') == std::string::npos);
-  
+
   typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator
     it = this->fieldsByName.find(field.getName());
-    
+
   if (it == this->fieldsByName.end()) {
     this->fieldsInOrder.push_back(MessageFieldPtr(new MessageField<T>(field)));
     this->fieldsByName.insert(std::make_pair(field.getName(),
@@ -196,12 +198,12 @@ void MessageFieldCollection<T>::write(std::ostream& stream, const std::string&
 /*****************************************************************************/
 
 template <typename T>
-MessageField<T>& MessageFieldCollection<T>::operator[](size_t index) {
+MessageField<T>& MessageFieldCollection<T>::operator[](int index) {
   return this->getField(index);
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::operator[](size_t index)
+const MessageField<T>& MessageFieldCollection<T>::operator[](int index)
     const {
   return this->getField(index);
 }
@@ -232,7 +234,7 @@ bool MessageFieldCollection<T>::operator==(const MessageFieldCollection<T>&
     for (size_t i = 0; i < this->fieldsInOrder.size(); ++i)
       if (*this->fieldsInOrder[i] != *collection.fieldsInOrder[i])
         return false;
-      
+
     return true;
   }
   else

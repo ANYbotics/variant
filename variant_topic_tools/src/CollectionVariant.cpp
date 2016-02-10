@@ -64,7 +64,7 @@ size_t CollectionVariant::getNumMembers() const {
     return 0;
 }
 
-void CollectionVariant::setMember(size_t index, const Variant& member) {
+void CollectionVariant::setMember(int index, const Variant& member) {
   if (value)
     boost::dynamic_pointer_cast<Value>(value)->setMember(index, member);
   else
@@ -79,7 +79,7 @@ void CollectionVariant::setMember(const std::string& name, const Variant&
     throw NoSuchMemberException(name);
 }
 
-Variant CollectionVariant::getMember(size_t index) const {
+Variant CollectionVariant::getMember(int index) const {
   if (value)
     return boost::dynamic_pointer_cast<Value>(value)->getMember(index);
   else
@@ -110,17 +110,17 @@ bool CollectionVariant::isEmpty() const {
 void CollectionVariant::Value::setMember(const std::string& name, const
     Variant& member, size_t pos) {
   pos = name.find_first_not_of('/', pos);
-  
+
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
-    
+
     if (i != std::string::npos) {
       Variant currentMember = getMember(name.substr(pos, i-pos));
-        
+
       if (currentMember.isCollection()) {
         CollectionVariant collectionMember = currentMember;
         collectionMember.setMember(name.substr(i+1), member);
-        
+
         return;
       }
     }
@@ -136,13 +136,13 @@ void CollectionVariant::Value::setMember(const std::string& name, const
 Variant CollectionVariant::Value::getMember(const std::string& name,
     size_t pos) const {
   pos = name.find_first_not_of('/', pos);
-  
+
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
-    
+
     if (i != std::string::npos) {
       Variant currentMember = getMember(name.substr(pos, i-pos));
-        
+
       if (currentMember.isCollection()) {
         CollectionVariant collectionMember = currentMember;
         return collectionMember.getMember(name.substr(i+1));
@@ -158,13 +158,13 @@ Variant CollectionVariant::Value::getMember(const std::string& name,
 bool CollectionVariant::Value::hasMember(const std::string& name, size_t pos)
     const {
   pos = name.find_first_not_of('/', pos);
-  
+
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
-    
+
     if (i != std::string::npos) {
       Variant currentMember = getMember(name.substr(pos, i-pos));
-      
+
       if (currentMember.isCollection()) {
         CollectionVariant collectionMember = currentMember;
         return collectionMember.hasMember(name.substr(i+1));
@@ -179,12 +179,12 @@ bool CollectionVariant::Value::hasMember(const std::string& name, size_t pos)
 
 bool CollectionVariant::Value::isEqual(const Variant::Value& value) const {
   const Value& collectionValue = dynamic_cast<const Value&>(value);
-  
+
   if (getNumMembers() == collectionValue.getNumMembers()) {
     for (size_t i = 0; i < getNumMembers(); ++i)
       if (getMember(i) != collectionValue.getMember(i))
         return false;
-      
+
     return true;
   }
   else
@@ -204,19 +204,19 @@ void CollectionVariant::Value::write(std::ostream& stream) const {
     if (i)
       stream << "\n";
     writeMember(stream, i);
-  }  
+  }
 }
 
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
 
-Variant CollectionVariant::operator[](size_t index) const {
+Variant CollectionVariant::operator[](int index) const {
   return getMember(index);
 }
 
-Variant CollectionVariant::operator[](const std::string& name) const {
-  return getMember(name);
+Variant CollectionVariant::operator[](const char* name) const {
+  return getMember(std::string(name));
 }
 
 }

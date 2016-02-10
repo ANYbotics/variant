@@ -80,50 +80,50 @@ ArrayVariant::ValueImplV::~ValueImplV() {
 
 void ArrayVariant::Value::setValue(const Variant::Value& value) {
   const Value& arrayValue = dynamic_cast<const Value&>(value);
-  
+
   resize(arrayValue.getNumMembers());
-  
+
   for (size_t i = 0; i < getNumMembers(); ++i)
     setMember(i, arrayValue.getMember(i));
 }
 
 void ArrayVariant::Value::setMember(const std::string& name, const Variant&
     member) {
-  size_t index;
-  
+  int index;
+
   try {
-    index = boost::lexical_cast<size_t>(name);
+    index = boost::lexical_cast<int>(name);
   }
   catch (...) {
     throw NoSuchMemberException(name);
   }
-    
+
   return setMember(index, member);
 }
 
 Variant ArrayVariant::Value::getMember(const std::string& name) const {
-  size_t index;
-  
+  int index;
+
   try {
-    index = boost::lexical_cast<size_t>(name);
+    index = boost::lexical_cast<int>(name);
   }
   catch (...) {
     throw NoSuchMemberException(name);
   }
-    
+
   return getMember(index);
 }
 
 bool ArrayVariant::Value::hasMember(const std::string& name) const {
-  size_t index;
-  
+  int index;
+
   try {
-    index = boost::lexical_cast<size_t>(name);
+    index = boost::lexical_cast<int>(name);
   }
   catch (...) {
     return false;
   }
-  
+
   return (index < getNumMembers());
 }
 
@@ -132,7 +132,7 @@ size_t ArrayVariant::ValueImplV::getNumMembers() const {
   return members.size();
 }
 
-void ArrayVariant::ValueImplV::setMember(size_t index, const Variant&
+void ArrayVariant::ValueImplV::setMember(int index, const Variant&
     member) {
   if (index < members.size())
     members[index] = member;
@@ -140,7 +140,7 @@ void ArrayVariant::ValueImplV::setMember(size_t index, const Variant&
     throw NoSuchMemberException(index);
 }
 
-Variant ArrayVariant::ValueImplV::getMember(size_t index) const {
+Variant ArrayVariant::ValueImplV::getMember(int index) const {
   if (index < members.size())
     return members[index];
   else
@@ -174,20 +174,20 @@ void ArrayVariant::clear() {
     boost::dynamic_pointer_cast<Value>(value)->clear();
 }
 
-void ArrayVariant::Value::writeMember(std::ostream& stream, size_t index)
+void ArrayVariant::Value::writeMember(std::ostream& stream, int index)
     const {
   if (!getMember(index).getType().isBuiltin()) {
     stream << boost::lexical_cast<std::string>(index) << ":";
-    
+
     std::stringstream memberStream;
     std::string line;
-    
+
     memberStream << getMember(index);
-        
+
     while (std::getline(memberStream, line))
       stream << "\n  " << line;
   }
-  else    
+  else
     stream << boost::lexical_cast<std::string>(index) << ": " <<
       getMember(index);
 }
@@ -208,9 +208,9 @@ void ArrayVariant::ValueImplV::resize(size_t numMembers) {
   if (!this->numMembers || (numMembers == this->numMembers)) {
     if (numMembers != members.size()) {
       size_t i = members.size();
-      
+
       members.resize(numMembers);
-      
+
       for ( ; i < members.size(); ++i)
         members[i] = memberType.createVariant();
     }

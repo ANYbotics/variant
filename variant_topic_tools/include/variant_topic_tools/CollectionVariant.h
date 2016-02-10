@@ -27,69 +27,69 @@
 
 namespace variant_topic_tools {
   /** \brief Collection variant type
-    */  
+    */
   class CollectionVariant :
     public Variant {
   friend class Variant;
   public:
     /** \brief Default constructor
-      */ 
+      */
     CollectionVariant();
-    
+
     /** \brief Copy constructor
-      */ 
+      */
     CollectionVariant(const CollectionVariant& src);
-    
+
     /** \brief Copy constructor (overloaded version taking a variant)
-      */ 
+      */
     CollectionVariant(const Variant& src);
-    
+
     /** \brief Destructor
-      */ 
+      */
     ~CollectionVariant();
-        
+
     /** \brief Retrieve the number of members of the collection
       */
     size_t getNumMembers() const;
-    
+
     /** \brief Set a member of the collection by index
       */
-    void setMember(size_t index, const Variant& member);
-    
+    void setMember(int index, const Variant& member);
+
     /** \brief Set a member of the collection by name
       */
     void setMember(const std::string& name, const Variant& member);
-    
+
     /** \brief Retrieve a member of the collection by index
       */
-    Variant getMember(size_t index) const;
-    
+    Variant getMember(int index) const;
+
     /** \brief Retrieve a member of the collection by name
       */
     Variant getMember(const std::string& name) const;
-    
+
     /** \brief Retrieve a member value of the collection by index
       *   (non-const version)
       */
-    template <typename T> T& getValue(size_t index);
-    
+    template <typename T> T& getValue(int index);
+
     /** \brief Retrieve a member value of the collection by index
       *   (const version)
       */
-    template <typename T> const T& getValue(size_t index) const;
-    
+    template <typename T> const T& getValue(int index) const;
+
     /** \brief Retrieve a member value of the collection by name
       *   (non-const version)
       */
     template <typename T> T& getValue(const std::string& name);
-    
+
     /** \brief Retrieve a member value of the collection by name
       *   (const version)
       */
     template <typename T> const T& getValue(const std::string& name) const;
-    
+
     using Variant::getValue;
-    
+
     /** \brief True, if the collection contains the member with the
       *   specified name
       */
@@ -98,17 +98,17 @@ namespace variant_topic_tools {
     /** \brief True, if the collection is empty
       */
     bool isEmpty() const;
-    
+
     /** \brief Operator for retrieving the members of the collection
       *   by index
       */
-    Variant operator[](size_t index) const;
-    
+    Variant operator[](int index) const;
+
     /** \brief Operator for retrieving the members of the collection
-      *   by name
+      *   by name (overloaded version taking a char array name)
       */
-    Variant operator[](const std::string& name) const;
-    
+    Variant operator[](const char* name) const;
+
   protected:
     /** \brief Collection variant value (abstract base)
       */
@@ -116,80 +116,80 @@ namespace variant_topic_tools {
       public virtual Variant::Value {
     public:
       /** \brief Default constructor
-        */ 
+        */
       Value();
-      
+
       /** \brief Destructor
-        */ 
+        */
       virtual ~Value();
-              
+
       /** \brief Retrieve the number of members of the collection
         *   (abstract declaration)
         */
       virtual size_t getNumMembers() const = 0;
-      
+
       /** \brief Set a member of the collection by index (abstract
         *   declaration)
         */
-      virtual void setMember(size_t index, const Variant& member) = 0;
-      
+      virtual void setMember(int index, const Variant& member) = 0;
+
       /** \brief Set a member of the collection by name (abstract
         *   declaration)
         */
       virtual void setMember(const std::string& name, const Variant&
         member) = 0;
-    
+
       /** \brief Recursively set a member of the collection by name
         */
       void setMember(const std::string& name, const Variant& member,
         size_t pos);
-    
+
       /** \brief Retrieve a member of the collection by index
         *   (abstract declaration)
         */
-      virtual Variant getMember(size_t index) const = 0;
-      
+      virtual Variant getMember(int index) const = 0;
+
       /** \brief Retrieve a member of the collection by name
         *   (abstract declaration)
         */
       virtual Variant getMember(const std::string& name) const = 0;
-      
+
       /** \brief Recursively retrieve a member of the collection
         *   by name
         */
       Variant getMember(const std::string& name, size_t pos) const;
-    
+
       /** \brief True, if the collection contains the member with the
         *   specified name (abstract declaration)
         */
       virtual bool hasMember(const std::string& name) const = 0;
-      
+
       /** \brief True, if the collection or any of its members contains
         *   the member with the specified name
         */
       bool hasMember(const std::string& name, size_t pos) const;
-    
+
       /** \brief True, if this variant value equals another variant value
         *   (implementation)
         */
       bool isEqual(const Variant::Value& value) const;
-      
+
       /** \brief Read the variant from a stream (implementation)
         */
       void read(std::istream& stream);
-    
+
       /** \brief Write the collection member with the specified index
         *   to a stream (abstract declaration)
         */
-      virtual void writeMember(std::ostream& stream, size_t index) const = 0;
-      
+      virtual void writeMember(std::ostream& stream, int index) const = 0;
+
       /** \brief Write this variant value to a stream (implementation)
         */
-      void write(std::ostream& stream) const;      
+      void write(std::ostream& stream) const;
     };
-    
+
     /** \brief Constructor (overloaded version taking a data type)
-      */ 
+      */
     CollectionVariant(const DataType& type);
   };
 };

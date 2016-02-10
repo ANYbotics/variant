@@ -52,13 +52,13 @@ template <typename T>
 void MessageVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
   this->message = value;
 }
-      
+
 template <typename T>
 typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::
     ValueImplT<T>::getValue() {
   if (!this->message)
     this->message = Pointer<ValueType>(new ValueType());
-  
+
   return *this->message;
 }
 
@@ -79,7 +79,7 @@ size_t MessageVariant::ValueImplT<T>::getNumMembers() const {
 }
 
 template <typename T>
-void MessageVariant::ValueImplT<T>::setMember(size_t index, const Variant&
+void MessageVariant::ValueImplT<T>::setMember(int index, const Variant&
     member) {
   this->getMember(index).setValue(member);
 }
@@ -91,10 +91,10 @@ void MessageVariant::ValueImplT<T>::setMember(const std::string& name,
 }
 
 template <typename T>
-Variant MessageVariant::ValueImplT<T>::getMember(size_t index) const {
+Variant MessageVariant::ValueImplT<T>::getMember(int index) const {
   if (!this->message)
     this->message = Pointer<ValueType>(new ValueType());
-  
+
   return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
     this->members[index].getValue().impl)->createVariant(this->message);
 }
@@ -104,14 +104,14 @@ Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name)
     const {
   if (!this->message)
     this->message = Pointer<ValueType>(new ValueType());
-  
+
   return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
     this->members[name].getValue().impl)->createVariant(this->message);
 }
 
 template <typename T>
-const std::string& MessageVariant::ValueImplT<T>::getMemberName(size_t
-    index) const {
+const std::string& MessageVariant::ValueImplT<T>::getMemberName(
+    int index) const {
   return this->members.getField(index).getName();
 }
 
@@ -128,10 +128,10 @@ bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
 template <typename T> MessageVariant MessageVariant::create(const DataType&
     type, const MessageFieldCollection<MessageVariable>& members) {
   MessageVariant variant;
-  
+
   variant.type = type;
   variant.value.reset(new ValueImplT<T>(members));
-    
+
   return variant;
 }
 

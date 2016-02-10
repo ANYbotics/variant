@@ -43,10 +43,10 @@ TEST(Serializer, Array) {
   std::vector<int> a2(3);
   a2[0] = 0; a2[1] = 1; a2[2] = 2;
   Variant v1, v2;
-  
+
   Serializer s1 = registry.getDataType<int[3]>().createSerializer();
   Serializer s2 = registry.getDataType<int[]>().createSerializer();
-  
+
   s1.serialize(o1, a1);
   EXPECT_EQ(d1.size()-ros::serialization::serializationLength(a1),
     o1.getLength());
@@ -59,7 +59,7 @@ TEST(Serializer, Array) {
   EXPECT_EQ(a2[0], v2.getValue<int[]>()[0]);
   EXPECT_EQ(a2[1], v2.getValue<int[]>()[1]);
   EXPECT_EQ(a2[2], v2.getValue<int[]>()[2]);
-  
+
   registry.clear();
 }
 
@@ -69,15 +69,15 @@ TEST(Serializer, Builtin) {
   std::vector<uint8_t> d1(1024);
   ros::serialization::OStream o1(d1.data(), d1.size());
   ros::serialization::IStream i1(d1.data(), d1.size());
-  
+
   int b1 = 42;
   double b2 = 42.0;
   Variant v1, v2;
-  
+
   Serializer s1 = registry.getDataType<int>().createSerializer();
   Serializer s2 = registry.getDataType<double>().createSerializer();
   Serializer s3 = registry.getDataType<bool>().createSerializer();
-  
+
   s1.serialize(o1, b1);
   EXPECT_EQ(d1.size()-sizeof(b1), o1.getLength());
   s1.deserialize(i1, v1);
@@ -113,12 +113,12 @@ TEST(Serializer, Message) {
   m3.builtin_int_vector[1] = 1;
   m3.builtin_int_vector[2] = 2;
   Variant v1, v2, v3;
-  
+
   Serializer s1 = registry.getDataType<std_msgs::Bool>().createSerializer();
   Serializer s2 = registry.getDataType<std_msgs::String>().createSerializer();
   Serializer s3 = registry.getDataType<variant_msgs::Test>().
     createSerializer();
-  
+
   s1.serialize(o1, m1);
   EXPECT_EQ(d1.size()-ros::serialization::serializationLength(m1),
     o1.getLength());
@@ -146,7 +146,7 @@ TEST(Serializer, Message) {
     v3.getValue<variant_msgs::Test>().builtin_int_vector[1]);
   EXPECT_EQ(m3.builtin_int_vector[2],
     v3.getValue<variant_msgs::Test>().builtin_int_vector[2]);
-  
+
   registry.clear();
 }
 
@@ -164,17 +164,17 @@ TEST(Serializer, VariantArray) {
   a1[0] = 0; a1[1] = 1; a1[2] = 2;
   std::vector<int> a2(3);
   a2[0] = 0; a2[1] = 1; a2[2] = 2;
-  
+
   ArrayVariant v1 = registry.getDataType("int32[3]").createVariant();
   v1[0] = a1[0]; v1[1] = a1[1]; v1[2] = a1[2];
   ArrayVariant v2 = registry.getDataType("int32[3]").createVariant();
   ArrayVariant v3 = registry.getDataType("int32[]").createVariant();
   v3 += a2[0]; v3 += a2[1]; v3 += a2[2];
   ArrayVariant v4 = registry.getDataType("int32[]").createVariant();
-  
+
   Serializer s1 = v1.createSerializer();
   Serializer s2 = v3.createSerializer();
-  
+
   s1.serialize(o1, v1);
   EXPECT_EQ(d1.size()-v1.getType().getSize(), o1.getLength());
   s1.deserialize(i1, v2);
@@ -189,7 +189,7 @@ TEST(Serializer, VariantArray) {
   EXPECT_EQ(v1[0].getValue<int>(), a1[0]);
   EXPECT_EQ(v1[1].getValue<int>(), a1[1]);
   EXPECT_EQ(v1[2].getValue<int>(), a1[2]);
-  
+
   s2.serialize(o1, v3);
   s2.deserialize(i1, v4);
   EXPECT_EQ(v3, v4);
@@ -205,7 +205,7 @@ TEST(Serializer, VariantArray) {
   EXPECT_EQ(v3[0].getValue<int>(), a2[0]);
   EXPECT_EQ(v3[1].getValue<int>(), a2[1]);
   EXPECT_EQ(v3[2].getValue<int>(), a2[2]);
-  
+
   registry.clear();
 }
 
@@ -232,7 +232,7 @@ TEST(Serializer, VariantMessage) {
   m1.builtin_int_vector[0] = 0;
   m1.builtin_int_vector[1] = 1;
   m1.builtin_int_vector[2] = 2;
-  
+
   MessageDataType t1 = MessageDefinition::create<variant_msgs::Test>().
     getMessageDataType();
   MessageVariant v1 = t1.createVariant();
@@ -248,9 +248,9 @@ TEST(Serializer, VariantMessage) {
   v1["builtin_int_vector/1"] = m1.builtin_int_vector[1];
   v1["builtin_int_vector/2"] = m1.builtin_int_vector[2];
   MessageVariant v2 = t1.createVariant();
-  
+
   Serializer s1 = v1.createSerializer();
-    
+
   s1.serialize(o1, v1);
   s1.deserialize(i1, v2);
   EXPECT_EQ(v1, v2);
@@ -295,6 +295,6 @@ TEST(Serializer, VariantMessage) {
     m1.builtin_int_vector[1]);
   EXPECT_EQ(v1["builtin_int_vector/2"].getValue<int>(),
     m1.builtin_int_vector[2]);
-  
+
   registry.clear();
 }

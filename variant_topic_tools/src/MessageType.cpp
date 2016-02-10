@@ -102,83 +102,83 @@ bool MessageType::isValid() const {
 
 void MessageType::load(const std::string& messageDataType) {
   clear();
-  
+
   std::string messagePackage, messagePlainType;
   if (!MessageTypeParser::matchType(messageDataType, messagePackage,
       messagePlainType))
     throw InvalidMessageTypeException(messageDataType);
-    
+
   DataTypeRegistry registry;
   boost::unordered_map<std::string, std::string> definitions;
-  std::list<std::string> typesInOrder;  
+  std::list<std::string> typesInOrder;
   std::set<std::string> requiredTypes;
 
   requiredTypes.insert(messageDataType);
   typesInOrder.push_back(messageDataType);
-  
+
   std::list<std::string>::iterator it = typesInOrder.begin();
-  
+
   while (it != typesInOrder.end()) {
     std::string package, plainType;
-    
+
     if (!MessageTypeParser::matchType(*it, package, plainType))
       throw InvalidMessageTypeException(*it);
-    
+
     if (package.empty()) {
       if (plainType == "Header")
         package = "std_msgs";
       else
         throw InvalidMessageTypeException(*it);
     }
-    
+
     std::string packagePath = ros::package::getPath(package);
     if (packagePath.empty())
       throw PackageNotFoundException(package);
-    
+
     std::string messageFilename(packagePath+"/msg/"+plainType+".msg");
     std::ifstream messageFile(messageFilename.c_str());
     std::string messageDefinition;
 
     if (messageFile.is_open()) {
-      messageFile.seekg(0, std::ios::end);   
+      messageFile.seekg(0, std::ios::end);
       messageDefinition.reserve(messageFile.tellg());
       messageFile.seekg(0, std::ios::beg);
-      
+
       messageDefinition.assign((std::istreambuf_iterator<char>(messageFile)),
         std::istreambuf_iterator<char>());
     }
     else
       throw FileOpenException(messageFilename);
-    
+
     messageFile.close();
-    
+
     if (!messageDefinition.empty()) {
       std::istringstream stream(messageDefinition);
       std::string line;
-      
+
       while (std::getline(stream, line)) {
         std::string memberName, memberType;
         size_t memberSize;
-        
+
         if (MessageDefinitionParser::matchArray(line, memberName, memberType,
             memberSize) || MessageDefinitionParser::match(line, memberName,
             memberType)) {
           std::string memberPackage, plainMemberType;
-        
+
           if (!MessageTypeParser::matchType(memberType, memberPackage,
               plainMemberType))
             throw InvalidMessageTypeException(memberType);
-          
+
           if (!registry.getDataType(memberType).isBuiltin()) {
             if (memberPackage.empty()) {
               if (plainMemberType == "Header")
                 memberPackage = "std_msgs";
               else
                 memberPackage = package;
-              
+
               memberType = memberPackage+"/"+plainMemberType;
             }
-            
+
             if (requiredTypes.find(memberType) == requiredTypes.end()) {
               requiredTypes.insert(memberType);
               typesInOrder.push_back(memberType);
@@ -187,21 +187,21 @@ void MessageType::load(const std::string& messageDataType) {
         }
       }
     }
-    
+
     definitions[*it] = messageDefinition;
     ++it;
   }
-  
+
   for (std::list<std::string>::const_iterator it = typesInOrder.begin();
       it != typesInOrder.end(); ++it) {
     if (!definition.empty()) {
       definition += "\n"+std::string(80, '=')+"\n";
       definition += "MSG: "+*it+"\n";
     }
-    
+
     definition += definitions[*it];
   }
-  
+
   if (!definition.empty())
     dataType = messageDataType;
 }
@@ -220,7 +220,7 @@ Publisher MessageType::advertise(ros::NodeHandle& nodeHandle,
     const std::string& topic, size_t queueSize, bool latch, const
     ros::SubscriberStatusCallback& connectCallback) {
   Publisher publisher;
-  
+
   if (isValid())
     publisher.impl.reset(new Publisher::Impl(nodeHandle, *this, topic,
       queueSize, latch, connectCallback));
@@ -232,13 +232,13 @@ Subscriber MessageType::subscribe(ros::NodeHandle& nodeHandle, const
     std::string& topic, size_t queueSize, const SubscriberCallback&
     callback) {
   Subscriber subscriber;
-  
+
   subscriber.impl.reset(new Subscriber::Impl(nodeHandle, *this, topic,
     queueSize, callback));
 
   return subscriber;
 }
-  
+
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
@@ -254,6 +254,7 @@ bool MessageType::operator!=(const MessageType& type) const {
 std::ostream& operator<<(std::ostream& stream, const MessageType&
     messageType) {
   messageType.write(stream);
+  return stream;
 }
 
 }
