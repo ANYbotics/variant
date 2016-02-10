@@ -10,7 +10,7 @@ Topic tools for treating ROS messages as type-erased variants.
 
 **Licsense:** GNU Lesser General Public License (LGPL)
 
-**Operating system(s):** Debian-based Linux
+**Operating system(s):** Debian-based Linux, Mac OS X
 
 **Package PPA:** Not available
 
