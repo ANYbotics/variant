@@ -2,8 +2,8 @@
 Changelog for package variant_topic_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2016-05-12)
+------------------
 * Fixes related to OS X clang compatibility
 * Added message data type member access by name
 * * Added type name resolution for member definitions neglecting package names

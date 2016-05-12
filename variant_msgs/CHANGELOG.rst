@@ -2,8 +2,8 @@
 Changelog for package variant_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2016-05-12)
+------------------
 * Message variant tests successful
 * Refined traits, code cleanups
 * * Created test package

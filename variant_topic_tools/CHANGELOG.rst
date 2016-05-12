@@ -2,8 +2,8 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2016-05-12)
+------------------
 * Fixes related to OS X clang compatibility
 * Fixed some issues of subscriber
 * Fixed bug in MessageDefinition::setMessageType() which was caused by a wrong order of defining the required message types of a message type
