@@ -1,36 +1,36 @@
-ros-variant (0.1-29) unstable; urgency=low
+variant (0.1-29) unstable; urgency=low
 
   * Fixes related to OS X clang compatibility
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 10 Feb 2016 07:01:00 +0200
 
-ros-variant (0.1-28) unstable; urgency=low
+variant (0.1-28) unstable; urgency=low
 
   * Fixed some issues of subscriber
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 09 Dec 2015 14:53:00 +0200
 
-ros-variant (0.1-27) unstable; urgency=low
+variant (0.1-27) unstable; urgency=low
 
   * Fixed bug in MessageDefinition::setMessageType() which was caused by a
     wrong order of defining the required message types of a message type
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Fri, 20 Nov 2015 08:30:00 +0200
 
-ros-variant (0.1-26) unstable; urgency=low
+variant (0.1-26) unstable; urgency=low
 
   * Added message data type member access by name
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Tue, 10 Nov 2015 08:39:00 +0200
 
-ros-variant (0.1-25) unstable; urgency=low
+variant (0.1-25) unstable; urgency=low
 
   * Added type name resolution for member definitions neglecting package names
   * Added receipt time to variant subscriber callback
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 09 Nov 2015 15:18:00 +0200
 
-ros-variant (0.1-24) unstable; urgency=low
+variant (0.1-24) unstable; urgency=low
 
   * Code cleanups
   * Added variant publisher and subscriber
@@ -38,141 +38,141 @@ ros-variant (0.1-24) unstable; urgency=low
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 30 Oct 2015 13:27:00 +0200
 
-ros-variant (0.1-23) unstable; urgency=low
+variant (0.1-23) unstable; urgency=low
 
   * Updated README
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 13:09:00 +0200
 
-ros-variant (0.1-22) unstable; urgency=low
+variant (0.1-22) unstable; urgency=low
 
   * Added convenience serialization methods to message class
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 13:05:00 +0200
 
-ros-variant (0.1-21) unstable; urgency=low
+variant (0.1-21) unstable; urgency=low
 
   * Added method for serializer creation to variants
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 09:41:00 +0200
 
-ros-variant (0.1-20) unstable; urgency=low
+variant (0.1-20) unstable; urgency=low
 
   * Basic serializer testing
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 29 Oct 2015 07:34:00 +0200
 
-ros-variant (0.1-19) unstable; urgency=low
+variant (0.1-19) unstable; urgency=low
 
   * Added numeric value access for built-in types
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 28 Oct 2015 07:03:00 +0200
 
-ros-variant (0.1-18) unstable; urgency=low
+variant (0.1-18) unstable; urgency=low
 
   * Adapted README
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Tue, 27 Oct 2015 16:26:00 +0200
 
-ros-variant (0.1-17) unstable; urgency=low
+variant (0.1-17) unstable; urgency=low
 
   * Message variant tests successful
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Tue, 27 Oct 2015 16:13:00 +0200
 
-ros-variant (0.1-16) unstable; urgency=low
+variant (0.1-16) unstable; urgency=low
 
   * Message data type now separates constant and variable members
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 11:10:52 +0200
 
-ros-variant (0.1-15) unstable; urgency=low
+variant (0.1-15) unstable; urgency=low
 
   * Reverted templated variant value to represent actual value type
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 09:54:51 +0200
 
-ros-variant (0.1-14) unstable; urgency=low
+variant (0.1-14) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 19 Oct 2015 07:41:39 +0200
 
-ros-variant (0.1-13) unstable; urgency=low
+variant (0.1-13) unstable; urgency=low
 
   * Another progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Fri, 16 Oct 2015 15:45:00 +0200
 
-ros-variant (0.1-12) unstable; urgency=low
+variant (0.1-12) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Fri, 16 Oct 2015 13:03:12 +0200
 
-ros-variant (0.1-11) unstable; urgency=low
+variant (0.1-11) unstable; urgency=low
 
   * Refined traits, code cleanups
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 08 Oct 2015 14:02:55 +0200
 
-ros-variant (0.1-10) unstable; urgency=low
+variant (0.1-10) unstable; urgency=low
 
   * Removed SharedVariant and friend-relationship between Variant and
     CollectionVariant
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 05 Oct 2015 16:03:59 +0200
 
-ros-variant (0.1-9) unstable; urgency=low
+variant (0.1-9) unstable; urgency=low
 
   * Renamed some classes, code cleanups
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 05 Oct 2015 07:51:54 +0200
 
-ros-variant (0.1-8) unstable; urgency=low
+variant (0.1-8) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 01 Oct 2015 10:16:04 +0200
 
-ros-variant (0.1-7) unstable; urgency=low
+variant (0.1-7) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 20 Aug 2015 17:59:39 +0200
 
-ros-variant (0.1-6) unstable; urgency=low
+variant (0.1-6) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 17 Aug 2015 07:05:01 +0200
 
-ros-variant (0.1-5) unstable; urgency=low
+variant (0.1-5) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Wed, 12 Aug 2015 12:56:26 +0200
 
-ros-variant (0.1-4) unstable; urgency=low
+variant (0.1-4) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Mon, 10 Aug 2015 07:54:58 +0200
 
-ros-variant (0.1-3) unstable; urgency=low
+variant (0.1-3) unstable; urgency=low
 
   * Created test package
   * Moved test binaries to test package
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 09:57:09 +0200
 
-ros-variant (0.1-2) unstable; urgency=low
+variant (0.1-2) unstable; urgency=low
 
   * Progress commit
 
  -- Ralf Kaestner <ralf.kaestner@gmail.com>  Thu, 06 Aug 2015 06:47:21 +0200
 
-ros-variant (0.1-1) unstable; urgency=low
+variant (0.1-1) unstable; urgency=low
 
   * Initial commit
 

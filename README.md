@@ -1,4 +1,4 @@
-# ros-variant
+# variant
 
 ## Synopsis
 
