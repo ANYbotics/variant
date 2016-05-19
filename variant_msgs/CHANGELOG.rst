@@ -2,6 +2,11 @@
 Changelog for package variant_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update readme with build status
+* Contributors: Samuel Bachmann
+
 0.1.1 (2016-05-12)
 ------------------
 * Message variant tests successful
