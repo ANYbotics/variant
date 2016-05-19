@@ -2,8 +2,8 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2016-05-19)
+------------------
 * update readme with build status
 * remove cmake_modules dependency
 * Contributors: Samuel Bachmann
