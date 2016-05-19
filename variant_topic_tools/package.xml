@@ -6,6 +6,7 @@
   </description>
   <author>Ralf Kaestner</author>
   <maintainer email="ralf.kaestner@gmail.com">Ralf Kaestner</maintainer>
+  <maintainer email="samuel.bachmann@gmail.com">Samuel Bachmann</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url>http://github.com/ethz-asl/ros-topic-variant</url>
   

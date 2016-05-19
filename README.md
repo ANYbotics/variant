@@ -104,3 +104,20 @@ reported through the project's issue page.
 
 For additional information of the Robot Operating System (ROS), please refer
 to the official [ROS documentation](http://wiki.ros.org).
+
+## Build Status
+
+### Devel Job Status
+
+| | Indigo  |
+| --- | --- |
+| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Idev__variant__ubuntu_trusty_amd64)](http://build.ros.org/job/Idev__variant__ubuntu_trusty_amd64/) |
+
+### Release Job Status
+
+| | Indigo |
+| --- | --- |
+| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant__ubuntu_trusty_amd64__binary/) |
+| variant_msgs | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary/) |
+| variant_topic_test | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary/) |
+| variant_topic_tools | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary/) |
