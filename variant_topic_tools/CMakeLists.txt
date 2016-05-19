@@ -12,7 +12,6 @@ project(variant_topic_tools)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED
   COMPONENTS
-    cmake_modules
     roscpp
     roslib
     variant_msgs
