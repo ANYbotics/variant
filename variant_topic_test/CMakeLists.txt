@@ -55,7 +55,7 @@ include_directories(
 ###########
 
 catkin_add_gtest(variant_topic_test
-  test/variant_topic_test
+  test/variant_topic_test.cpp
   test/DataTypeTest.cpp
   test/DataTypeRegistryTest.cpp
   test/MD5SumTest.cpp
