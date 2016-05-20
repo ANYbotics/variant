@@ -2,6 +2,12 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add executables to install
+* add install commands
+* Contributors: Samuel Bachmann
+
 0.1.2 (2016-05-19)
 ------------------
 * update readme with build status
