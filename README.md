@@ -109,15 +109,15 @@ to the official [ROS documentation](http://wiki.ros.org).
 
 ### Devel Job Status
 
-| | Indigo  |
-| --- | --- |
-| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Idev__variant__ubuntu_trusty_amd64)](http://build.ros.org/job/Idev__variant__ubuntu_trusty_amd64/) |
+| | Indigo  | Jade | Kinetic |
+| --- | --- | --- | --- |
+| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Idev__variant__ubuntu_trusty_amd64)](http://build.ros.org/job/Idev__variant__ubuntu_trusty_amd64/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Jdev__variant__ubuntu_trusty_amd64)](http://build.ros.org/job/Jdev__variant__ubuntu_trusty_amd64/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Kdev__variant__ubuntu_xenial_amd64)](http://build.ros.org/job/Kdev__variant__ubuntu_xenial_amd64/) |
 
 ### Release Job Status
 
-| | Indigo |
-| --- | --- |
-| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant__ubuntu_trusty_amd64__binary/) |
-| variant_msgs | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary/) |
-| variant_topic_test | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary/) |
-| variant_topic_tools | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary/) |
+| | Indigo | Jade | Kinetic |
+| --- | --- | --- | --- |
+| variant | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Jbin_uT64__variant__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Jbin_uT64__variant__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Kbin_uT64__variant__ubuntu_xenial_amd64__binary)](http://build.ros.org/job/Kbin_uT64__variant__ubuntu_xenial_amd64__binary/) |
+| variant_msgs | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_msgs__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Jbin_uT64__variant_msgs__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Jbin_uT64__variant_msgs__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Kbin_uT64__variant_msgs__ubuntu_xenial_amd64__binary)](http://build.ros.org/job/Kbin_uT64__variant_msgs__ubuntu_xenial_amd64__binary/) |
+| variant_topic_test | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Jbin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Jbin_uT64__variant_topic_test__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Kbin_uT64__variant_topic_test__ubuntu_xenial_amd64__binary)](http://build.ros.org/job/Kbin_uT64__variant_topic_test__ubuntu_xenial_amd64__binary/) |
+| variant_topic_tools | [![Build Status](http://build.ros.org/buildStatus/icon?job=Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Ibin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Jbin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary)](http://build.ros.org/job/Jbin_uT64__variant_topic_tools__ubuntu_trusty_amd64__binary/) | [![Build Status](http://build.ros.org/buildStatus/icon?job=Kbin_uT64__variant_topic_tools__ubuntu_xenial_amd64__binary)](http://build.ros.org/job/Kbin_uT64__variant_topic_tools__ubuntu_xenial_amd64__binary/) |
