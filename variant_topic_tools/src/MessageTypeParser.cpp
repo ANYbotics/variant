@@ -25,10 +25,10 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 const boost::regex MessageTypeParser::packageExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
 
 const boost::regex MessageTypeParser::typeExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
   
 const boost::regex MessageTypeParser::plainTypeExpression =
   boost::regex("("+typeExpression.str()+")");
