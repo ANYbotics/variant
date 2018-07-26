@@ -97,21 +97,21 @@ size_t DataType::getSize() const {
 
 bool DataType::isArray() const {
   if (impl)
-    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl);
+    return boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl) != 0;
   else
     return false;
 }
 
 bool DataType::isBuiltin() const {
   if (impl)
-    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl);
+    return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl) != 0;
   else
     return false;
 }
 
 bool DataType::isMessage() const {
   if (impl)
-    return boost::dynamic_pointer_cast<MessageDataType::Impl>(*impl);
+    return boost::dynamic_pointer_cast<MessageDataType::Impl>(*impl) != 0;
   else
     return false;
 }
@@ -131,7 +131,7 @@ bool DataType::isSimple() const {
 }
 
 bool DataType::isValid() const {
-  return impl;
+  return impl != 0;
 }
 
 bool DataType::hasTypeInfo() const {
