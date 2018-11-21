@@ -59,7 +59,7 @@ size_t Serializer::getSerializedLength(const Variant& value) const {
 }
 
 bool Serializer::isValid() const {
-  return impl;
+  return impl != nullptr;
 }
 
 /*****************************************************************************/

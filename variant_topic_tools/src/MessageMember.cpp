@@ -68,20 +68,20 @@ const DataType& MessageMember::getType() const {
 
 bool MessageMember::isVariable() const {
   if (impl)
-    return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl);
+    return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl) != nullptr;
   else
     return false;
 }
 
 bool MessageMember::isConstant() const {
   if (impl)
-    return boost::dynamic_pointer_cast<MessageConstant::Impl>(impl);
+    return boost::dynamic_pointer_cast<MessageConstant::Impl>(impl) != nullptr;
   else
     return false;
 }
 
 bool MessageMember::isValid() const {
-  return impl;
+  return impl != nullptr;
 }
 
 /*****************************************************************************/
