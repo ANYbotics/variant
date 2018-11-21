@@ -2,6 +2,9 @@
 Changelog for package variant_topic_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.3 (2016-05-20)
 ------------------
 * fix missing file extension
