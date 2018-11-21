@@ -2,8 +2,8 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.4 (2018-11-21)
+------------------
 * fix build issue in ROS Melodic (cannot convert boost::shared_ptr to bool)
 * Fix for package and topic names containing zeros
 * Contributors: Fabian H, Samuel Bachmann, Zezao Lu
