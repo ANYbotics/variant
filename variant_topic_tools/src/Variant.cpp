@@ -66,28 +66,28 @@ bool Variant::hasType() const {
 
 bool Variant::isArray() const {
   if (value)
-    return boost::dynamic_pointer_cast<ArrayVariant::Value>(value);
+    return boost::dynamic_pointer_cast<ArrayVariant::Value>(value) != nullptr;
   else
     return false;
 }
 
 bool Variant::isBuiltin() const {
   if (value)
-    return boost::dynamic_pointer_cast<BuiltinVariant::Value>(value);
+    return boost::dynamic_pointer_cast<BuiltinVariant::Value>(value) != nullptr;
   else
     return false;
 }
 
 bool Variant::isCollection() const {
   if (value)
-    return boost::dynamic_pointer_cast<CollectionVariant::Value>(value);
+    return boost::dynamic_pointer_cast<CollectionVariant::Value>(value) != nullptr;
   else
     return false;
 }
 
 bool Variant::isMessage() const {
   if (value)
-    return boost::dynamic_pointer_cast<MessageVariant::Value>(value);
+    return boost::dynamic_pointer_cast<MessageVariant::Value>(value) != nullptr;
   else
     return false;
 }
