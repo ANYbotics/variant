@@ -2,6 +2,9 @@
 Changelog for package variant_topic_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.4 (2018-11-21)
 ------------------
 
