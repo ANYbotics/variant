@@ -2,8 +2,8 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.5 (2018-11-23)
+------------------
 * fix cmake
 * Contributors: Samuel Bachmann
 
