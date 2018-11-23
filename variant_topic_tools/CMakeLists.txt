@@ -9,6 +9,8 @@ project(variant_topic_tools)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 # set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
+add_definitions(-std=c++11)
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED
   COMPONENTS
