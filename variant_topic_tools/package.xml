@@ -6,16 +6,16 @@
   </description>
   <author>Ralf Kaestner</author>
   <maintainer email="ralf.kaestner@gmail.com">Ralf Kaestner</maintainer>
-  <maintainer email="samuel.bachmann@gmail.com">Samuel Bachmann</maintainer>
+  <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url>http://github.com/ethz-asl/ros-topic-variant</url>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
-  
+
   <build_depend>roscpp</build_depend>
   <build_depend>roslib</build_depend>
   <build_depend>variant_msgs</build_depend>
-  
+
   <run_depend>roscpp</run_depend>
   <run_depend>roslib</run_depend>
   <run_depend>variant_msgs</run_depend>
