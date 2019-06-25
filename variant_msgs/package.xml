@@ -10,7 +10,7 @@
   <maintainer email="ralf.kaestner@gmail.com">Ralf Kaestner</maintainer>
   <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
-  <url>http://github.com/ethz-asl/ros-topic-variant</url>
+  <url>http://github.com/anybotics/variant</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
