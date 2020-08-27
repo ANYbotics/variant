@@ -4,7 +4,7 @@
   <description>Topic tools for treating messages as variant types.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
   <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
-  <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
+  <maintainer email="rdiethelm@anybotics.com">Remo Diethelm</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url>http://github.com/anybotics/variant</url>
 
@@ -18,6 +18,8 @@
   <run_depend>roslib</run_depend>
   <run_depend>variant_msgs</run_depend>
 
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>std_msgs</test_depend>
   <test_depend>gtest</test_depend>
 <!--   <test_depend>cmake_code_coverage</test_depend> -->
 

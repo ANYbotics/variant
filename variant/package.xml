@@ -5,13 +5,12 @@
   <description>Meta-package for the universal variant library.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
   <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
-  <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
+  <maintainer email="rdiethelm@anybotics.com">Remo Diethelm</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url type="website">http://github.com/anybotics/variant</url>
   <url type="bugtracker">http://github.com/anybotics/variant/issues</url>
   <buildtool_depend>catkin</buildtool_depend>
   <exec_depend>variant_msgs</exec_depend>
-  <exec_depend>variant_topic_test</exec_depend>
   <exec_depend>variant_topic_tools</exec_depend>
   <export>
     <metapackage />
