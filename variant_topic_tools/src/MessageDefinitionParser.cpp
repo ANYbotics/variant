@@ -33,13 +33,13 @@ const boost::regex MessageDefinitionParser::separatorExpression =
   boost::regex("^==+$");
 
 const boost::regex MessageDefinitionParser::messageTypeExpression =
-  boost::regex("^\\h*MSG:\\h*([a-zA-Z][a-zA-Z1-9_/]*).*$");
+  boost::regex("^\\h*MSG:\\h*([a-zA-Z][a-zA-Z0-9_/]*).*$");
 
 const boost::regex MessageDefinitionParser::memberNameExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
 
 const boost::regex MessageDefinitionParser::memberTypeExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_/]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_/]*");
 
 const boost::regex MessageDefinitionParser::memberArrayTypeExpression =
   boost::regex("("+memberTypeExpression.str()+")\\[([0-9]*)\\]");
