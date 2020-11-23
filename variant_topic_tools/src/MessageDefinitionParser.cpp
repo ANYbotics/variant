@@ -21,25 +21,25 @@
 #include "variant_topic_tools/MessageDefinitionParser.h"
 
 namespace variant_topic_tools {
-  
+
 /*****************************************************************************/
 /* Static initializers                                                       */
 /*****************************************************************************/
 
 const boost::regex MessageDefinitionParser::commentExpression =
   boost::regex("#.*$");
-  
+
 const boost::regex MessageDefinitionParser::separatorExpression =
   boost::regex("^==+$");
 
 const boost::regex MessageDefinitionParser::messageTypeExpression =
-  boost::regex("^\\h*MSG:\\h*([a-zA-Z][a-zA-Z1-9_/]*).*$");
+  boost::regex("^\\h*MSG:\\h*([a-zA-Z][a-zA-Z0-9_/]*).*$");
 
 const boost::regex MessageDefinitionParser::memberNameExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
 
 const boost::regex MessageDefinitionParser::memberTypeExpression =
-  boost::regex("[a-zA-Z][a-zA-Z1-9_/]*");
+  boost::regex("[a-zA-Z][a-zA-Z0-9_/]*");
 
 const boost::regex MessageDefinitionParser::memberArrayTypeExpression =
   boost::regex("("+memberTypeExpression.str()+")\\[([0-9]*)\\]");
@@ -84,23 +84,23 @@ MessageDefinitionParser::~MessageDefinitionParser() {
 
 size_t MessageDefinitionParser::parse(const std::string& messageDataType, const
     std::string& messageDefinition, std::vector<MessageType>& messageTypes) {
-  messageTypes.clear();  
-  
+  messageTypes.clear();
+
   std::istringstream stream(messageDefinition);
   std::string currentMessageType = messageDataType;
   std::string currentMessageDefinition;
-  std::string line;  
-  
+  std::string line;
+
   while (std::getline(stream, line)) {
     boost::smatch match;
-    
+
     if (boost::regex_match(line, match, messageTypeExpression)) {
       if (!currentMessageDefinition.empty())
-        messageTypes.push_back(MessageType(currentMessageType, "*", 
+        messageTypes.push_back(MessageType(currentMessageType, "*",
           currentMessageDefinition));
-      
+
       currentMessageType = std::string(match[1].first, match[1].second);
-      currentMessageDefinition.clear();      
+      currentMessageDefinition.clear();
     }
     else if (!boost::regex_match(line, match, separatorExpression)) {
       if (!currentMessageDefinition.empty())
@@ -112,7 +112,7 @@ size_t MessageDefinitionParser::parse(const std::string& messageDataType, const
   if (!currentMessageDefinition.empty())
     messageTypes.push_back(MessageType(currentMessageType, "*",
       currentMessageDefinition));
-    
+
   return messageTypes.size();
 }
 
@@ -124,10 +124,10 @@ bool MessageDefinitionParser::matchType(const std::string& expression) {
 bool MessageDefinitionParser::matchArrayType(const std::string& expression,
     std::string& memberType, size_t& size) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, memberArrayTypeExpression)) {
     memberType = std::string(match[1].first, match[1].second);
-    
+
     if (match[2].first != match[2].second)
       size = boost::lexical_cast<size_t>(
         std::string(match[2].first, match[2].second));
@@ -143,12 +143,12 @@ bool MessageDefinitionParser::matchArrayType(const std::string& expression,
 bool MessageDefinitionParser::match(const std::string& expression, std::string&
     name, std::string& type) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, memberExpression)) {
     name = std::string(match[3].first, match[3].second);
     type = std::string(match[1].first, match[1].second)+
       std::string(match[2].first, match[2].second);
-    
+
     return true;
   }
   else
@@ -158,13 +158,13 @@ bool MessageDefinitionParser::match(const std::string& expression, std::string&
 bool MessageDefinitionParser::matchConstant(const std::string& expression,
     std::string& name, std::string& type, std::string& value) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, constantStringMemberExpression) ||
       (boost::regex_match(expression, match, constantMemberExpression))) {
     name = std::string(match[2].first, match[2].second);
     type = std::string(match[1].first, match[1].second);
     value = std::string(match[3].first, match[3].second);
-    
+
     return true;
   }
   else
@@ -174,12 +174,12 @@ bool MessageDefinitionParser::matchConstant(const std::string& expression,
 bool MessageDefinitionParser::matchVariable(const std::string& expression,
     std::string& name, std::string& type) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, variableMemberExpression)) {
     name = std::string(match[3].first, match[3].second);
     type = std::string(match[1].first, match[1].second)+
       std::string(match[2].first, match[2].second);
-    
+
     return true;
   }
   else
@@ -189,17 +189,17 @@ bool MessageDefinitionParser::matchVariable(const std::string& expression,
 bool MessageDefinitionParser::matchArray(const std::string& expression,
     std::string& name, std::string& memberType, size_t& size) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, arrayMemberExpression)) {
     name = std::string(match[3].first, match[3].second);
     memberType = std::string(match[1].first, match[1].second);
-    
+
     if (match[2].first != match[2].second)
       size = boost::lexical_cast<size_t>(
         std::string(match[2].first, match[2].second));
     else
       size = 0;
-    
+
     return true;
   }
   else
@@ -208,7 +208,7 @@ bool MessageDefinitionParser::matchArray(const std::string& expression,
 
 bool MessageDefinitionParser::matchSeparator(const std::string& expression) {
   boost::smatch match;
-  
+
   return boost::regex_match(expression, match, separatorExpression);
 }
 
