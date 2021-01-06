@@ -2,6 +2,11 @@
 Changelog for package variant_topic_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.6 (2021-01-06)
+------------------
+* Allow 0 in message definition
+* Contributors: Kenji Miyake
+
 0.1.5 (2018-11-23)
 ------------------
 * fix cmake
