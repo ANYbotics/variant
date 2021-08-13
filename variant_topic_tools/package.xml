@@ -1,6 +1,6 @@
 <package>
   <name>variant_topic_tools</name>
-  <version>0.1.6</version>
+  <version>0.1.7</version>
   <description>Topic tools for treating messages as variant types.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
   <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
