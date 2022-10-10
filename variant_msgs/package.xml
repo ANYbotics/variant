@@ -1,6 +1,6 @@
 <package>
   <name>variant_msgs</name>
-  <version>0.1.14</version>
+  <version>0.1.15</version>
   <description>Variant messages are designed to accommodate the information content of any invariant message. They are truly generic and can freely be converted to and from specific message objects.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
   <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
