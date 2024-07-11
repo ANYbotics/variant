@@ -1,5 +1,5 @@
 # Test message for the variant topic tools
-Header header
+std_msgs/Header header
 uint8 byte_constant = 42
 int32 builtin_int
 bool builtin_boolean
