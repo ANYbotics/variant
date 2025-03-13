@@ -19,14 +19,13 @@
 #include "variant_topic_tools/MessageTraits.h"
 
 namespace ros {
-  namespace message_traits {
+namespace message_traits {
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-const char* MD5Sum<variant_topic_tools::Message>::value(const
-    variant_topic_tools::Message& message) {
+const char* MD5Sum<variant_topic_tools::Message>::value(const variant_topic_tools::Message& message) {
   return message.getType().getMD5Sum().c_str();
 }
 
@@ -34,8 +33,7 @@ const char* MD5Sum<variant_topic_tools::Message>::value() {
   return "*";
 }
 
-const char* DataType<variant_topic_tools::Message>::value(const
-    variant_topic_tools::Message& message) {
+const char* DataType<variant_topic_tools::Message>::value(const variant_topic_tools::Message& message) {
   return message.getType().getDataType().c_str();
 }
 
@@ -43,10 +41,9 @@ const char* DataType<variant_topic_tools::Message>::value() {
   return "*";
 }
 
-const char* Definition<variant_topic_tools::Message>::value(const
-    variant_topic_tools::Message& message) {
-  return message.getType().getDefinition().c_str();      
+const char* Definition<variant_topic_tools::Message>::value(const variant_topic_tools::Message& message) {
+  return message.getType().getDefinition().c_str();
 }
 
-  }
-}
+}  // namespace message_traits
+}  // namespace ros

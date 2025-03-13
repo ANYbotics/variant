@@ -26,13 +26,10 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-BuiltinDataType::ImplT<T>::ImplT(const std::string& identifier) :
-  BuiltinDataType::Impl(identifier) {
-}
+BuiltinDataType::ImplT<T>::ImplT(const std::string& identifier) : BuiltinDataType::Impl(identifier) {}
 
 template <typename T>
-BuiltinDataType::ImplT<T>::~ImplT() {
-}
+BuiltinDataType::ImplT<T>::~ImplT() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -45,8 +42,7 @@ const std::type_info& BuiltinDataType::ImplT<T>::getTypeInfo() const {
 
 template <typename T>
 size_t BuiltinDataType::ImplT<T>::getSize() const {
-  return type_traits::BuiltinType<T>::IsFixedSize::value ?
-    sizeof(typename type_traits::BuiltinType<T>::ValueType) : 0;
+  return type_traits::BuiltinType<T>::IsFixedSize::value ? sizeof(typename type_traits::BuiltinType<T>::ValueType) : 0;
 }
 
 template <typename T>
@@ -68,19 +64,17 @@ bool BuiltinDataType::ImplT<T>::isNumeric() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> BuiltinDataType BuiltinDataType::create(const
-    std::string& identifier) {
+template <typename T>
+BuiltinDataType BuiltinDataType::create(const std::string& identifier) {
   BuiltinDataType dataType;
-  
-  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplT<T>(identifier)));
-  
+
+  dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>(identifier)));
+
   return dataType;
 }
 
 template <typename T>
-Serializer BuiltinDataType::ImplT<T>::createSerializer(const DataType& type)
-    const {
+Serializer BuiltinDataType::ImplT<T>::createSerializer(const DataType& type) const {
   return BuiltinSerializer::template create<T>();
 }
 
@@ -89,4 +83,4 @@ Variant BuiltinDataType::ImplT<T>::createVariant(const DataType& type) const {
   return BuiltinVariant::template create<T>(type);
 }
 
-}
+}  // namespace variant_topic_tools

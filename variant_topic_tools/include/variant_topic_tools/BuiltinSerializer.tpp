@@ -25,20 +25,17 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-BuiltinSerializer::ImplT<T>::ImplT() {
-}
+BuiltinSerializer::ImplT<T>::ImplT() {}
 
 template <typename T>
-BuiltinSerializer::ImplT<T>::~ImplT() {
-}
+BuiltinSerializer::ImplT<T>::~ImplT() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 template <typename T>
-size_t BuiltinSerializer::ImplT<T>::getSerializedLength(const Variant& value)
-    const {
+size_t BuiltinSerializer::ImplT<T>::getSerializedLength(const Variant& value) const {
   return ros::serialization::serializationLength(value.template getValue<T>());
 }
 
@@ -46,23 +43,22 @@ size_t BuiltinSerializer::ImplT<T>::getSerializedLength(const Variant& value)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> BuiltinSerializer BuiltinSerializer::create() {
+template <typename T>
+BuiltinSerializer BuiltinSerializer::create() {
   BuiltinSerializer builtinSerializer;
   builtinSerializer.impl.reset(new ImplT<T>());
-  
+
   return builtinSerializer;
 }
 
 template <typename T>
-void BuiltinSerializer::ImplT<T>::serialize(ros::serialization::OStream&
-    stream, const Variant& value) {
+void BuiltinSerializer::ImplT<T>::serialize(ros::serialization::OStream& stream, const Variant& value) {
   ros::serialization::serialize(stream, value.template getValue<T>());
 }
 
 template <typename T>
-void BuiltinSerializer::ImplT<T>::deserialize(ros::serialization::IStream&
-    stream, Variant& value) {
+void BuiltinSerializer::ImplT<T>::deserialize(ros::serialization::IStream& stream, Variant& value) {
   ros::serialization::deserialize(stream, value.template getValue<T>());
 }
 
-}
+}  // namespace variant_topic_tools

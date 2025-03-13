@@ -26,91 +26,51 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-NullPointerException::NullPointerException() :
-  ros::Exception("Attempted null pointer operation") {
+NullPointerException::NullPointerException() : ros::Exception("Attempted null pointer operation") {}
+
+InvalidOperationException::InvalidOperationException(const std::string& what)
+    : ros::Exception("Attempted execution of an invalid operation: " + what) {}
+
+InvalidDataTypeException::InvalidDataTypeException() : ros::Exception("Attempted use of an invalid data type") {}
+
+ImmutableDataTypeException::ImmutableDataTypeException() : ros::Exception("Attempted modification of an immutable data type") {}
+
+NoSuchDataTypeException::NoSuchDataTypeException(const std::string& identifier)
+    : ros::Exception("Data type [" + identifier + "] does not exist") {}
+
+AmbiguousDataTypeIdentifierException::AmbiguousDataTypeIdentifierException(const std::string& identifier)
+    : ros::Exception("Data type identifier [" + identifier + "] is used ambiguously") {}
+
+DataTypeMismatchException::DataTypeMismatchException(const std::string& expectedDataType, const std::string& providedDataType)
+    : ros::Exception("Provided data type [" + providedDataType + "] mismatches expected data type [" + expectedDataType + "]") {}
+
+AmbiguousMemberNameException::AmbiguousMemberNameException(const std::string& name)
+    : ros::Exception("Member name [" + name + "] is used ambiguously") {}
+
+NoSuchMemberException::NoSuchMemberException(int index)
+    : ros::Exception("Member with index [" + std::to_string(index) + "] does not exist") {}
+
+NoSuchMemberException::NoSuchMemberException(const std::string& name) : ros::Exception("Member with name [" + name + "] does not exist") {}
+
+InvalidMessageMemberException::InvalidMessageMemberException() : ros::Exception("Attempted use of an invalid message member") {}
+
+MD5SumMismatchException::MD5SumMismatchException(const std::string& expectedMD5Sum, const std::string& providedMD5Sum)
+    : ros::Exception("Provided MD5 sum [" + providedMD5Sum + "] mismatches expected MD5 sum [" + expectedMD5Sum + "]") {}
+
+InvalidMessageTypeException::InvalidMessageTypeException(const std::string& invalidMessageType)
+    : ros::Exception("Message type [" + invalidMessageType + "] is invalid") {}
+
+MessageTypeMismatchException::MessageTypeMismatchException(const std::string& expectedMessageType, const std::string& providedMessageType)
+    : ros::Exception("Provided message type [" + providedMessageType + "] mismatches expected message type [" + expectedMessageType + "]") {
 }
 
-InvalidOperationException::InvalidOperationException(const std::string& what) :
-  ros::Exception("Attempted execution of an invalid operation: "+what) {
-}
+DefinitionParseException::DefinitionParseException(const std::string& dataType, const std::string& line, const std::string& what)
+    : ros::Exception("Error parsing the definition for [" + dataType + "]: " + what + "\n" + line) {}
 
-InvalidDataTypeException::InvalidDataTypeException() :
-  ros::Exception("Attempted use of an invalid data type") {
-}
+PackageNotFoundException::PackageNotFoundException(const std::string& package) : ros::Exception("Package [" + package + "] not found") {}
 
-ImmutableDataTypeException::ImmutableDataTypeException() :
-  ros::Exception("Attempted modification of an immutable data type") {
-}
+FileOpenException::FileOpenException(const std::string& filename) : ros::Exception("Error opening file [" + filename + "]") {}
 
-NoSuchDataTypeException::NoSuchDataTypeException(const std::string&
-    identifier) :
-  ros::Exception("Data type ["+identifier+"] does not exist") {
-}
+InvalidSerializerException::InvalidSerializerException() : ros::Exception("Attempted use of an invalid serializer") {}
 
-AmbiguousDataTypeIdentifierException::AmbiguousDataTypeIdentifierException(
-    const std::string& identifier) :
-  ros::Exception("Data type identifier ["+identifier+
-    "] is used ambiguously") {
-}
-
-DataTypeMismatchException::DataTypeMismatchException(const std::string&
-    expectedDataType, const std::string& providedDataType) :
-  ros::Exception("Provided data type ["+providedDataType+
-    "] mismatches expected data type ["+expectedDataType+"]") {
-}
-
-AmbiguousMemberNameException::AmbiguousMemberNameException(
-    const std::string& name) :
-  ros::Exception("Member name ["+name+"] is used ambiguously") {
-}
-
-NoSuchMemberException::NoSuchMemberException(int index) :
-  ros::Exception("Member with index ["+boost::lexical_cast<std::string>(index)+
-    "] does not exist") {
-}
-
-NoSuchMemberException::NoSuchMemberException(const std::string& name) :
-  ros::Exception("Member with name ["+name+"] does not exist") {
-}
-
-InvalidMessageMemberException::InvalidMessageMemberException() :
-  ros::Exception("Attempted use of an invalid message member") {
-}
-
-MD5SumMismatchException::MD5SumMismatchException(const std::string&
-    expectedMD5Sum, const std::string& providedMD5Sum) :
-  ros::Exception("Provided MD5 sum ["+providedMD5Sum+
-    "] mismatches expected MD5 sum ["+expectedMD5Sum+"]") {
-}
-
-InvalidMessageTypeException::InvalidMessageTypeException(const std::string&
-    invalidMessageType) :
-  ros::Exception("Message type ["+invalidMessageType+"] is invalid") {
-}
-
-MessageTypeMismatchException::MessageTypeMismatchException(const std::string&
-    expectedMessageType, const std::string& providedMessageType) :
-  ros::Exception("Provided message type ["+providedMessageType+
-    "] mismatches expected message type ["+expectedMessageType+"]") {
-}
-
-DefinitionParseException::DefinitionParseException(const std::string&
-    dataType, const std::string& line, const std::string& what) :
-  ros::Exception("Error parsing the definition for ["+dataType+"]: "+
-    what+"\n"+line) {
-}
-
-PackageNotFoundException::PackageNotFoundException(const std::string&
-    package) :
-  ros::Exception("Package ["+package+"] not found") {
-}
-
-FileOpenException::FileOpenException(const std::string& filename) :
-  ros::Exception("Error opening file ["+filename+"]") {
-}
-
-InvalidSerializerException::InvalidSerializerException() :
-  ros::Exception("Attempted use of an invalid serializer") {
-}
-
-}
+}  // namespace variant_topic_tools

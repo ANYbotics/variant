@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file BuiltinTypeTraits.h
-  * \brief Header file providing the built-in type traits
-  */
+ * \brief Header file providing the built-in type traits
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_TYPE_TRAITS_H
@@ -33,83 +33,83 @@
 #include <ros/time.h>
 
 namespace variant_topic_tools {
-  namespace type_traits {
-    template <typename T, typename D = void> struct IsBuiltin :
-      public boost::type_traits::ice_or<
-        boost::is_integral<T>::value,
-        boost::is_floating_point<T>::value> {
-    };
+namespace type_traits {
+template <typename T, typename D = void>
+struct IsBuiltin : public boost::type_traits::ice_or<boost::is_integral<T>::value, boost::is_floating_point<T>::value> {};
 
-    template <typename D> struct IsBuiltin<std::string, D> :
-      public boost::true_type {
-    };
+template <typename D>
+struct IsBuiltin<std::string, D> : public boost::true_type {};
 
-    template <typename D> struct IsBuiltin<ros::Duration, D> :
-      public boost::true_type {
-    };
+template <typename D>
+struct IsBuiltin<ros::Duration, D> : public boost::true_type {};
 
-    template <typename D> struct IsBuiltin<ros::Time, D> :
-      public boost::true_type {
-    };
+template <typename D>
+struct IsBuiltin<ros::Time, D> : public boost::true_type {};
 
-    template <typename T, typename D = void> struct BuiltinType {
-      typedef T ValueType;
-      typedef T StreamType;
-      typedef boost::type_traits::ice_or<
-        boost::is_integral<T>::value,
-        boost::is_floating_point<T>::value> IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename D> struct BuiltinType<uint8_t, D> {
-      typedef uint8_t ValueType;
-      typedef uint32_t StreamType;
-      typedef boost::true_type IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename D> struct BuiltinType<int8_t, D> {
-      typedef int8_t ValueType;
-      typedef int32_t StreamType;
-      typedef boost::true_type IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename D> struct BuiltinType<bool, D> {
-      typedef uint8_t ValueType;
-      typedef std::string StreamType;
-      typedef boost::true_type IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename D> struct BuiltinType<ros::Duration, D> {
-      typedef ros::Duration ValueType;
-      typedef ros::Duration StreamType;
-      typedef boost::true_type IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename D> struct BuiltinType<ros::Time, D> {
-      typedef ros::Time ValueType;
-      typedef ros::Time StreamType;
-      typedef boost::true_type IsNumeric;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-
-    template <typename T> struct ToBuiltinType {
-      typedef T BuiltinType;
-    };
-
-    template <size_t N> struct ToBuiltinType<char[N]> {
-      typedef std::string BuiltinType;
-    };
-  };
+template <typename T, typename D = void>
+struct BuiltinType {
+  using ValueType = T;
+  using StreamType = T;
+  using IsNumeric = boost::type_traits::ice_or<boost::is_integral<T>::value, boost::is_floating_point<T>::value>;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
 };
+
+template <typename D>
+struct BuiltinType<uint8_t, D> {
+  using ValueType = uint8_t;
+  using StreamType = uint32_t;
+  using IsNumeric = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename D>
+struct BuiltinType<int8_t, D> {
+  using ValueType = int8_t;
+  using StreamType = int32_t;
+  using IsNumeric = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename D>
+struct BuiltinType<bool, D> {
+  using ValueType = uint8_t;
+  using StreamType = std::string;
+  using IsNumeric = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename D>
+struct BuiltinType<ros::Duration, D> {
+  using ValueType = ros::Duration;
+  using StreamType = ros::Duration;
+  using IsNumeric = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename D>
+struct BuiltinType<ros::Time, D> {
+  using ValueType = ros::Time;
+  using StreamType = ros::Time;
+  using IsNumeric = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename T>
+struct ToBuiltinType {
+  using BuiltinType = T;
+};
+
+template <size_t N>
+struct ToBuiltinType<char[N]> {
+  using BuiltinType = std::string;
+};
+}  // namespace type_traits
+}  // namespace variant_topic_tools
 
 #endif

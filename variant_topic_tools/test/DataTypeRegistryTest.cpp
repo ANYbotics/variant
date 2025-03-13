@@ -36,7 +36,7 @@ TEST(DataTypeRegistry, Array) {
   ArrayDataType a6 = registry.addArrayDataType<bool[]>();
   ArrayDataType a7 = registry.addArrayDataType("int8", 3);
   ArrayDataType a8 = registry.addArrayDataType(typeid(int8_t));
-  
+
   EXPECT_TRUE(registry.getDataType<int[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("int32[3]").isArray());
   EXPECT_TRUE(registry.getDataType<int[]>().isArray());
@@ -48,19 +48,17 @@ TEST(DataTypeRegistry, Array) {
   EXPECT_TRUE(registry.getDataType<bool[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("bool[3]").isArray());
   EXPECT_TRUE(registry.getDataType<bool[]>().isArray());
-  EXPECT_TRUE(registry.getDataType("bool[]").isArray());  
+  EXPECT_TRUE(registry.getDataType("bool[]").isArray());
   EXPECT_TRUE(registry.getDataType<int8_t[3]>().isArray());
   EXPECT_TRUE(registry.getDataType("int8[3]").isArray());
   EXPECT_TRUE(registry.getDataType<int8_t[]>().isArray());
   EXPECT_TRUE(registry.getDataType("int8[]").isArray());
-  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).
-    getDataType("uint8[3]").isArray());
+  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).getDataType("uint8[3]").isArray());
   EXPECT_TRUE(registry.getDataType("uint8[3]").isArray());
-  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).
-    getDataType("uint8[]").isArray());
+  EXPECT_FALSE(const_cast<const DataTypeRegistry&>(registry).getDataType("uint8[]").isArray());
   EXPECT_TRUE(registry.getDataType("uint8[]").isArray());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }
 
 TEST(DataTypeRegistry, Builtin) {
@@ -76,17 +74,15 @@ TEST(DataTypeRegistry, Message) {
   DataTypeRegistry registry;
 
   MessageDataType m1 = registry.addMessageDataType<std_msgs::String>();
-  MessageDataType m2 = registry.addMessageDataType(
-    ros::message_traits::datatype<std_msgs::Bool>(),
-    ros::message_traits::definition<std_msgs::Bool>());
+  MessageDataType m2 =
+      registry.addMessageDataType(ros::message_traits::datatype<std_msgs::Bool>(), ros::message_traits::definition<std_msgs::Bool>());
   MessageDataType m3 = registry.addMessageDataType("my_msgs/Double");
   m3.addVariableMember<double>("data");
-  
+
   EXPECT_TRUE(registry.getDataType<std_msgs::String>().isMessage());
-  EXPECT_TRUE(registry.getDataType(
-    ros::message_traits::datatype<std_msgs::String>()).isMessage());
+  EXPECT_TRUE(registry.getDataType(ros::message_traits::datatype<std_msgs::String>()).isMessage());
   EXPECT_TRUE(registry.getDataType<std_msgs::Bool>().isMessage());
   EXPECT_TRUE(registry.getDataType("my_msgs/Double").isMessage());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }

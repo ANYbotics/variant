@@ -36,7 +36,7 @@ TEST(Variant, Builtin) {
   BuiltinVariant v2 = DataType("bool").createVariant();
   BuiltinVariant v3 = DataType("duration").createVariant();
   BuiltinVariant v4 = DataType("time").createVariant();
-  
+
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_EQ(typeid(double), v1.getValueTypeInfo());
@@ -44,7 +44,7 @@ TEST(Variant, Builtin) {
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_ANY_THROW(v1.getValue<int>());
   EXPECT_ANY_THROW(v1.setValue(0));
-  
+
   v1 = M_PI;
 
   EXPECT_EQ(M_PI, v1.getValue<double>());
@@ -52,32 +52,32 @@ TEST(Variant, Builtin) {
   EXPECT_FALSE(v1 != M_PI);
   EXPECT_TRUE(v1 != 1.0);
   EXPECT_FALSE(v1 == 1.0);
-  
+
   v1 = 1.0;
-  
+
   EXPECT_TRUE(v1 != 1);
   EXPECT_FALSE(v1 == 1);
   EXPECT_EQ(1.0, v1.getNumericValue());
-  
+
   v1.clear();
-  
+
   EXPECT_FALSE(v1.hasType());
   EXPECT_TRUE(v1.isEmpty());
-  
+
   EXPECT_EQ(typeid(uint8_t), v2.getValueTypeInfo());
   EXPECT_EQ(0.0, v2.getNumericValue());
-  
+
   EXPECT_EQ(0.0, v3.getNumericValue());
-  
+
   EXPECT_EQ(0.0, v4.getNumericValue());
 }
 
 TEST(Variant, Array) {
   DataTypeRegistry registry;
-  
+
   ArrayVariant v1 = DataType("int32[3]").createVariant();
   ArrayVariant v2 = DataType("float64[]").createVariant();
-  
+
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_EQ(3, v1.getNumMembers());
@@ -96,13 +96,13 @@ TEST(Variant, Array) {
   EXPECT_EQ(1, v1[1].getValue<int>());
   EXPECT_EQ(2, v1[2].getValue<int>());
   EXPECT_ANY_THROW(v1.clear());
-  
+
   EXPECT_TRUE(v2.hasType());
   EXPECT_TRUE(v2.isEmpty());
   EXPECT_EQ(0, v2.getNumMembers());
   EXPECT_NO_THROW(v2.resize(3));
   EXPECT_FALSE(v2.isEmpty());
-  EXPECT_EQ(3, v2.getNumMembers());  
+  EXPECT_EQ(3, v2.getNumMembers());
   EXPECT_TRUE(v2[0].hasType());
   EXPECT_FALSE(v2[0].isEmpty());
   EXPECT_NO_THROW(v2[0] = 0.0);
@@ -114,22 +114,18 @@ TEST(Variant, Array) {
   EXPECT_EQ(2.0, v2[2].getValue<double>());
   EXPECT_NO_THROW(v2.clear());
   EXPECT_TRUE(v2.isEmpty());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }
 
 TEST(Variant, Message) {
   DataTypeRegistry registry;
-  
-  MessageVariant v1(MessageDefinition::create<std_msgs::Bool>().
-    getMessageDataType().createVariant());
-  MessageVariant v2(MessageDefinition::create<std_msgs::String>().
-    getMessageDataType().createVariant());
-  MessageVariant v3(MessageDefinition::create<variant_msgs::Test>().
-    getMessageDataType().createVariant());
-  MessageVariant v4(registry.getDataType<variant_msgs::Test>().
-    createVariant());
-  
+
+  MessageVariant v1(MessageDefinition::create<std_msgs::Bool>().getMessageDataType().createVariant());
+  MessageVariant v2(MessageDefinition::create<std_msgs::String>().getMessageDataType().createVariant());
+  MessageVariant v3(MessageDefinition::create<variant_msgs::Test>().getMessageDataType().createVariant());
+  MessageVariant v4(registry.getDataType<variant_msgs::Test>().createVariant());
+
   EXPECT_TRUE(v1.hasType());
   EXPECT_FALSE(v1.isEmpty());
   EXPECT_EQ(typeid(void), v1.getValueTypeInfo());
@@ -138,7 +134,7 @@ TEST(Variant, Message) {
   EXPECT_FALSE(v1["data"].isEmpty());
   EXPECT_NO_THROW(v1["data"] = true);
   EXPECT_EQ(true, v1["data"].getValue<bool>());
-  
+
   EXPECT_TRUE(v2.hasType());
   EXPECT_FALSE(v2.isEmpty());
   EXPECT_EQ(typeid(void), v2.getValueTypeInfo());
@@ -147,7 +143,7 @@ TEST(Variant, Message) {
   EXPECT_FALSE(v2["data"].isEmpty());
   EXPECT_NO_THROW(v2["data"] = "Test");
   EXPECT_EQ("Test", v2["data"].getValue<std::string>());
-  
+
   EXPECT_TRUE(v3.hasType());
   EXPECT_FALSE(v3.isEmpty());
   EXPECT_EQ(typeid(void), v3.getValueTypeInfo());
@@ -156,7 +152,7 @@ TEST(Variant, Message) {
   EXPECT_EQ(typeid(void), v3["header"].getValueTypeInfo());
   EXPECT_NO_THROW(v3["builtin_string"] = "Test");
   EXPECT_EQ("Test", v3["builtin_string"].getValue<std::string>());
-  
+
   EXPECT_TRUE(v4.hasType());
   EXPECT_FALSE(v4.isEmpty());
   EXPECT_EQ(typeid(variant_msgs::Test), v4.getValueTypeInfo());
@@ -165,10 +161,8 @@ TEST(Variant, Message) {
   EXPECT_EQ(typeid(std_msgs::Header), v4["header"].getValueTypeInfo());
   EXPECT_NO_THROW(v4["builtin_string"] = "Test");
   EXPECT_EQ("Test", v4["builtin_string"].getValue<std::string>());
-  EXPECT_EQ(typeid(bool[3]),
-    v4["builtin_boolean_array"].getType().getTypeInfo());
-  EXPECT_EQ(typeid(boost::array<uint8_t, 3>),
-    v4["builtin_boolean_array"].getValueTypeInfo());
-  
-  registry.clear();
+  EXPECT_EQ(typeid(bool[3]), v4["builtin_boolean_array"].getType().getTypeInfo());
+  EXPECT_EQ(typeid(boost::array<uint8_t, 3>), v4["builtin_boolean_array"].getValueTypeInfo());
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }

@@ -18,8 +18,8 @@
 
 #include <typeinfo>
 
-#include <variant_topic_tools/Exceptions.h>
 #include <variant_topic_tools/DataTypeRegistry.h>
+#include <variant_topic_tools/Exceptions.h>
 #include <variant_topic_tools/MessageConstant.h>
 #include <variant_topic_tools/MessageDefinition.h>
 #include <variant_topic_tools/MessageSerializer.h>
@@ -33,18 +33,15 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageDataType::ImplT<T>::ImplT() :
-  Impl(ros::message_traits::template datatype<T>(),
-    ros::message_traits::template definition<T>()),
-  memberIndex(0) {
+MessageDataType::ImplT<T>::ImplT()
+    : Impl(ros::message_traits::template datatype<T>(), ros::message_traits::template definition<T>()), memberIndex(0) {
   ros::serialization::serialize(*this, this->message);
-  
+
   BOOST_ASSERT(memberIndex == this->variableMembers.getNumFields());
 }
 
 template <typename T>
-MessageDataType::ImplT<T>::~ImplT() {
-}
+MessageDataType::ImplT<T>::ImplT::~ImplT() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -74,8 +71,7 @@ const std::string& MessageDataType::ImplT<T>::getDefinition() const {
 
 template <typename T>
 size_t MessageDataType::ImplT<T>::getSize() const {
-  return type_traits::MessageType<T>::IsFixedSize::value ?
-    sizeof(typename type_traits::MessageType<T>::ValueType) : 0;
+  return type_traits::MessageType<T>::IsFixedSize::value ? sizeof(typename type_traits::MessageType<T>::ValueType) : 0;
 }
 
 template <typename T>
@@ -92,99 +88,94 @@ bool MessageDataType::ImplT<T>::isSimple() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageDataType MessageDataType::create() {
+template <typename T>
+MessageDataType MessageDataType::create() {
   MessageDefinition::template create<T>();
   MessageDataType dataType;
-  
+
   dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>()));
-  
+
   return dataType;
 }
 
-template <typename T> MessageConstant MessageDataType::addConstantMember(const
-    std::string& name, const T& value) {
+template <typename T>
+MessageConstant MessageDataType::addConstantMember(const std::string& name, const T& value) {
   return this->addConstantMember(name, Variant(value));
 }
 
-template <typename T> MessageVariable MessageDataType::addVariableMember(const
-    std::string& name) {
+template <typename T>
+MessageVariable MessageDataType::addVariableMember(const std::string& name) {
   return this->addVariableMember(name, typeid(T));
 }
 
 template <typename T>
-Serializer MessageDataType::ImplT<T>::createSerializer(const DataType& type)
-    const {
+Serializer MessageDataType::ImplT<T>::createSerializer(const DataType& /*type*/) const {
   return MessageSerializer::template create<T>();
 }
 
 template <typename T>
 Variant MessageDataType::ImplT<T>::createVariant(const DataType& type) const {
-  return static_cast<const Variant&>(MessageVariant::template create<T>(type,
-    this->variableMembers));
+  return static_cast<const Variant&>(MessageVariant::template create<T>(type, this->variableMembers));
 }
 
 template <typename T>
-void MessageDataType::ImplT<T>::addConstantMember(const MessageConstant&
-    member) {
+void MessageDataType::ImplT<T>::addConstantMember(const MessageConstant& /*member*/) {
   throw ImmutableDataTypeException();
 }
 
 template <typename T>
-void MessageDataType::ImplT<T>::addVariableMember(const MessageVariable&
-    member) {
+void MessageDataType::ImplT<T>::addVariableMember(const MessageVariable& /*member*/) {
   throw ImmutableDataTypeException();
 }
 
 template <typename T>
-template <typename M> void MessageDataType::ImplT<T>::next(const M& member) {
+template <typename M>
+void MessageDataType::ImplT<T>::next(const M& member) {
   BOOST_ASSERT(memberIndex < this->variableMembers.getNumFields());
 
-  MessageDataType::template addMember<T, typename type_traits::ToDataType<M>::
-    DataType>(this->variableMembers[memberIndex].getValue(),
-    reinterpret_cast<size_t>(&member)-reinterpret_cast<size_t>(
-    &this->message));
-  
-  Variant memberVariant = this->variableMembers[memberIndex].getValue().
-    getType().createVariant();      
+  MessageDataType::template addMember<T, typename type_traits::ToDataType<M>::DataType>(
+      this->variableMembers[memberIndex].getValue(), reinterpret_cast<size_t>(&member) - reinterpret_cast<size_t>(&this->message));
+
+  Variant memberVariant = this->variableMembers[memberIndex].getValue().getType().createVariant();
   BOOST_ASSERT(memberVariant.getValueTypeInfo() == typeid(M));
-  
+
   ++memberIndex;
 }
 
-template <typename T, typename M> void MessageDataType::addMember(
-    MessageVariable& member, size_t offset, typename boost::enable_if<
-    type_traits::IsArray<M> >::type*, typename boost::enable_if<typename
-    type_traits::ArrayType<M>::IsDynamic>::type*) {
+template <typename T, typename M>
+void MessageDataType::addMember(MessageVariable& member, size_t offset,
+                                typename boost::enable_if<type_traits::IsArray<M> >::type* /*unused*/,
+                                typename boost::enable_if<typename type_traits::ArrayType<M>::IsDynamic>::type* /*unused*/) {
   BOOST_ASSERT(member.getType().isArray());
-  
+
   ArrayDataType arrayType(member.getType());
-    
-  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
-    member = MessageVariable::template create<T, bool[]>(member.getName(),
-      offset);
-  else
+
+  if (arrayType.getMemberType().getTypeInfo() == typeid(bool)) {
+    member = MessageVariable::template create<T, bool[]>(member.getName(), offset);
+  } else {
     member = MessageVariable::template create<T, M>(member.getName(), offset);
+  }
 }
 
-template <typename T, typename M> void MessageDataType::addMember(
-    MessageVariable& member, size_t offset, typename boost::enable_if<
-    type_traits::IsArray<M> >::type*, typename boost::disable_if<typename
-    type_traits::ArrayType<M>::IsDynamic>::type*) {
+template <typename T, typename M>
+void MessageDataType::addMember(MessageVariable& member, size_t offset,
+                                typename boost::enable_if<type_traits::IsArray<M> >::type* /*unused*/,
+                                typename boost::disable_if<typename type_traits::ArrayType<M>::IsDynamic>::type* /*unused*/) {
   BOOST_ASSERT(member.getType().isArray());
-  
+
   ArrayDataType arrayType(member.getType());
-    
-  if (arrayType.getMemberType().getTypeInfo() == typeid(bool))
-    member = MessageVariable::template create<T, bool[type_traits::
-      ArrayType<M>::NumMembers]>(member.getName(), offset);
-  else
+
+  if (arrayType.getMemberType().getTypeInfo() == typeid(bool)) {
+    member = MessageVariable::template create<T, bool[type_traits::ArrayType<M>::NumMembers]>(member.getName(), offset);
+  } else {
     member = MessageVariable::template create<T, M>(member.getName(), offset);
+  }
 }
 
-template <typename T, typename M> void MessageDataType::addMember(
-    MessageVariable& member, size_t offset, typename boost::disable_if<
-    type_traits::IsArray<M> >::type*) {
+template <typename T, typename M>
+void MessageDataType::addMember(MessageVariable& member, size_t offset,
+                                typename boost::disable_if<type_traits::IsArray<M> >::type* /*unused*/) {
   member = MessageVariable::template create<T, M>(member.getName(), offset);
 }
 
-}
+}  // namespace variant_topic_tools

@@ -25,54 +25,42 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageSerializer::MessageSerializer() {
-}
+MessageSerializer::MessageSerializer() = default;
 
-MessageSerializer::MessageSerializer(const MessageFieldCollection<Serializer>&
-    memberSerializers) {
+MessageSerializer::MessageSerializer(const MessageFieldCollection<Serializer>& memberSerializers) {
   impl.reset(new ImplV(memberSerializers));
 }
 
-MessageSerializer::MessageSerializer(const MessageSerializer& src) :
-  Serializer(src) {
-}
+MessageSerializer::MessageSerializer(const MessageSerializer& src) = default;
 
-MessageSerializer::MessageSerializer(const Serializer& src) :
-  Serializer(src) {
-  if (impl)
+MessageSerializer::MessageSerializer(const Serializer& src) : Serializer(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl));
+  }
 }
 
-MessageSerializer::~MessageSerializer() {
-}
+MessageSerializer::~MessageSerializer() = default;
 
-MessageSerializer::Impl::Impl() {
-}
+MessageSerializer::Impl::Impl() = default;
 
-MessageSerializer::Impl::~Impl() {
-}
+MessageSerializer::Impl::~Impl() = default;
 
-MessageSerializer::ImplV::ImplV(const MessageFieldCollection<Serializer>&
-    memberSerializers) :
-  memberSerializers(memberSerializers) {
-}
+MessageSerializer::ImplV::ImplV(const MessageFieldCollection<Serializer>& memberSerializers) : memberSerializers(memberSerializers) {}
 
-MessageSerializer::ImplV::~ImplV() {
-}
+MessageSerializer::ImplV::~ImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-size_t MessageSerializer::ImplV::getSerializedLength(const Variant& value)
-    const {
+size_t MessageSerializer::ImplV::getSerializedLength(const Variant& value) const {
   MessageVariant messageValue = value;
   size_t length = 0;
 
-  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
-    length += memberSerializers[i].getValue().getSerializedLength(
-      messageValue[i]);
-  
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i) {
+    length += memberSerializers[i].getValue().getSerializedLength(messageValue[i]);
+  }
+
   return length;
 }
 
@@ -80,16 +68,15 @@ size_t MessageSerializer::ImplV::getSerializedLength(const Variant& value)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void MessageSerializer::ImplV::serialize(ros::serialization::OStream& stream,
-    const Variant& value) {
+void MessageSerializer::ImplV::serialize(ros::serialization::OStream& stream, const Variant& value) {
   MessageVariant messageValue = value;
-  
-  for (size_t i = 0; i < messageValue.getNumMembers(); ++i)
+
+  for (size_t i = 0; i < messageValue.getNumMembers(); ++i) {
     memberSerializers[i].getValue().serialize(stream, messageValue[i]);
+  }
 }
 
-void MessageSerializer::ImplV::deserialize(ros::serialization::IStream& stream,
-    Variant& value) {
+void MessageSerializer::ImplV::deserialize(ros::serialization::IStream& stream, Variant& value) {
   MessageVariant messageValue = value;
 
   for (size_t i = 0; i < messageValue.getNumMembers(); ++i) {
@@ -98,4 +85,4 @@ void MessageSerializer::ImplV::deserialize(ros::serialization::IStream& stream,
   }
 }
 
-}
+}  // namespace variant_topic_tools

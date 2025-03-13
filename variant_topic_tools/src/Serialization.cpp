@@ -19,16 +19,15 @@
 #include "variant_topic_tools/Serialization.h"
 
 namespace ros {
-  namespace serialization {
+namespace serialization {
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void PreDeserialize<variant_topic_tools::Message>::notify(const
-    PreDeserializeParams<variant_topic_tools::Message>& params) {
+void PreDeserialize<variant_topic_tools::Message>::notify(const PreDeserializeParams<variant_topic_tools::Message>& params) {
   params.message->setHeader(params.connection_header);
 }
 
-  }
-}
+}  // namespace serialization
+}  // namespace ros

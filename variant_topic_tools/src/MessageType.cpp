@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include <boost/unordered_map.hpp>
+#include <utility>
 
 #include <ros/package.h>
 
@@ -41,27 +42,15 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageType::MessageType(const std::string& dataType, const std::string&
-    md5Sum, const std::string& definition) :
-  dataType(dataType),
-  md5Sum(md5Sum),
-  definition(definition) {
-}
+MessageType::MessageType(std::string dataType, std::string md5Sum, std::string definition)
+    : dataType(std::move(dataType)), md5Sum(std::move(md5Sum)), definition(std::move(definition)) {}
 
-MessageType::MessageType(const MessageDataType& dataType) :
-  dataType(dataType.getIdentifier()),
-  md5Sum(dataType.getMD5Sum()),
-  definition(dataType.getDefinition()) {
-}
+MessageType::MessageType(const MessageDataType& dataType)
+    : dataType(dataType.getIdentifier()), md5Sum(dataType.getMD5Sum()), definition(dataType.getDefinition()) {}
 
-MessageType::MessageType(const MessageType& src) :
-  dataType(src.dataType),
-  md5Sum(src.md5Sum),
-  definition(src.definition) {
-}
+MessageType::MessageType(const MessageType& src) = default;
 
-MessageType::~MessageType() {
-}
+MessageType::~MessageType() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -92,8 +81,7 @@ const std::string& MessageType::getDefinition() const {
 }
 
 bool MessageType::isValid() const {
-  return !md5Sum.empty() && ((md5Sum == "*") || (md5Sum.length() == 32)) &&
-    !dataType.empty() && !definition.empty();
+  return !md5Sum.empty() && ((md5Sum == "*") || (md5Sum.length() == 32)) && !dataType.empty() && !definition.empty();
 }
 
 /*****************************************************************************/
@@ -103,10 +91,11 @@ bool MessageType::isValid() const {
 void MessageType::load(const std::string& messageDataType) {
   clear();
 
-  std::string messagePackage, messagePlainType;
-  if (!MessageTypeParser::matchType(messageDataType, messagePackage,
-      messagePlainType))
+  std::string messagePackage;
+  std::string messagePlainType;
+  if (!MessageTypeParser::matchType(messageDataType, messagePackage, messagePlainType)) {
     throw InvalidMessageTypeException(messageDataType);
+  }
 
   DataTypeRegistry registry;
   boost::unordered_map<std::string, std::string> definitions;
@@ -116,26 +105,30 @@ void MessageType::load(const std::string& messageDataType) {
   requiredTypes.insert(messageDataType);
   typesInOrder.push_back(messageDataType);
 
-  std::list<std::string>::iterator it = typesInOrder.begin();
+  auto it = typesInOrder.begin();
 
   while (it != typesInOrder.end()) {
-    std::string package, plainType;
+    std::string package;
+    std::string plainType;
 
-    if (!MessageTypeParser::matchType(*it, package, plainType))
+    if (!MessageTypeParser::matchType(*it, package, plainType)) {
       throw InvalidMessageTypeException(*it);
+    }
 
     if (package.empty()) {
-      if (plainType == "Header")
+      if (plainType == "Header") {
         package = "std_msgs";
-      else
+      } else {
         throw InvalidMessageTypeException(*it);
+      }
     }
 
     std::string packagePath = ros::package::getPath(package);
-    if (packagePath.empty())
+    if (packagePath.empty()) {
       throw PackageNotFoundException(package);
+    }
 
-    std::string messageFilename(packagePath+"/msg/"+plainType+".msg");
+    std::string messageFilename(packagePath + "/msg/" + plainType + ".msg");
     std::ifstream messageFile(messageFilename.c_str());
     std::string messageDefinition;
 
@@ -144,11 +137,10 @@ void MessageType::load(const std::string& messageDataType) {
       messageDefinition.reserve(messageFile.tellg());
       messageFile.seekg(0, std::ios::beg);
 
-      messageDefinition.assign((std::istreambuf_iterator<char>(messageFile)),
-        std::istreambuf_iterator<char>());
-    }
-    else
+      messageDefinition.assign((std::istreambuf_iterator<char>(messageFile)), std::istreambuf_iterator<char>());
+    } else {
       throw FileOpenException(messageFilename);
+    }
 
     messageFile.close();
 
@@ -157,26 +149,28 @@ void MessageType::load(const std::string& messageDataType) {
       std::string line;
 
       while (std::getline(stream, line)) {
-        std::string memberName, memberType;
-        size_t memberSize;
+        std::string memberName;
+        std::string memberType;
+        size_t memberSize = 0;
 
-        if (MessageDefinitionParser::matchArray(line, memberName, memberType,
-            memberSize) || MessageDefinitionParser::match(line, memberName,
-            memberType)) {
-          std::string memberPackage, plainMemberType;
+        if (MessageDefinitionParser::matchArray(line, memberName, memberType, memberSize) ||
+            MessageDefinitionParser::match(line, memberName, memberType)) {
+          std::string memberPackage;
+          std::string plainMemberType;
 
-          if (!MessageTypeParser::matchType(memberType, memberPackage,
-              plainMemberType))
+          if (!MessageTypeParser::matchType(memberType, memberPackage, plainMemberType)) {
             throw InvalidMessageTypeException(memberType);
+          }
 
           if (!registry.getDataType(memberType).isBuiltin()) {
             if (memberPackage.empty()) {
-              if (plainMemberType == "Header")
+              if (plainMemberType == "Header") {
                 memberPackage = "std_msgs";
-              else
+              } else {
                 memberPackage = package;
+              }
 
-              memberType = memberPackage+"/"+plainMemberType;
+              memberType = memberPackage + "/" + plainMemberType;
             }
 
             if (requiredTypes.find(memberType) == requiredTypes.end()) {
@@ -192,18 +186,18 @@ void MessageType::load(const std::string& messageDataType) {
     ++it;
   }
 
-  for (std::list<std::string>::const_iterator it = typesInOrder.begin();
-      it != typesInOrder.end(); ++it) {
+  for (auto& it : typesInOrder) {
     if (!definition.empty()) {
-      definition += "\n"+std::string(80, '=')+"\n";
-      definition += "MSG: "+*it+"\n";
+      definition += "\n" + std::string(80, '=') + "\n";
+      definition += "MSG: " + it + "\n";
     }
 
-    definition += definitions[*it];
+    definition += definitions[it];
   }
 
-  if (!definition.empty())
+  if (!definition.empty()) {
     dataType = messageDataType;
+  }
 }
 
 void MessageType::clear() {
@@ -216,25 +210,22 @@ void MessageType::write(std::ostream& stream) const {
   stream << dataType;
 }
 
-Publisher MessageType::advertise(ros::NodeHandle& nodeHandle,
-    const std::string& topic, size_t queueSize, bool latch, const
-    ros::SubscriberStatusCallback& connectCallback) {
+Publisher MessageType::advertise(ros::NodeHandle& nodeHandle, const std::string& topic, size_t queueSize, bool latch,
+                                 const ros::SubscriberStatusCallback& connectCallback) {
   Publisher publisher;
 
-  if (isValid())
-    publisher.impl.reset(new Publisher::Impl(nodeHandle, *this, topic,
-      queueSize, latch, connectCallback));
+  if (isValid()) {
+    publisher.impl.reset(new Publisher::Impl(nodeHandle, *this, topic, queueSize, latch, connectCallback));
+  }
 
   return publisher;
 }
 
-Subscriber MessageType::subscribe(ros::NodeHandle& nodeHandle, const
-    std::string& topic, size_t queueSize, const SubscriberCallback&
-    callback) {
+Subscriber MessageType::subscribe(ros::NodeHandle& nodeHandle, const std::string& topic, size_t queueSize,
+                                  const SubscriberCallback& callback) {
   Subscriber subscriber;
 
-  subscriber.impl.reset(new Subscriber::Impl(nodeHandle, *this, topic,
-    queueSize, callback));
+  subscriber.impl.reset(new Subscriber::Impl(nodeHandle, *this, topic, queueSize, callback));
 
   return subscriber;
 }
@@ -251,10 +242,9 @@ bool MessageType::operator!=(const MessageType& type) const {
   return (dataType != type.dataType) || (md5Sum != type.md5Sum);
 }
 
-std::ostream& operator<<(std::ostream& stream, const MessageType&
-    messageType) {
+std::ostream& operator<<(std::ostream& stream, const MessageType& messageType) {
   messageType.write(stream);
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

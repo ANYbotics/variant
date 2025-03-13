@@ -25,20 +25,17 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-ArraySerializer::ImplT<T>::ImplT() {
-}
+ArraySerializer::ImplT<T>::ImplT() {}
 
 template <typename T>
-ArraySerializer::ImplT<T>::~ImplT() {
-}
+ArraySerializer::ImplT<T>::~ImplT() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 template <typename T>
-size_t ArraySerializer::ImplT<T>::getSerializedLength(const Variant& value)
-    const {
+size_t ArraySerializer::ImplT<T>::getSerializedLength(const Variant& value) const {
   return ros::serialization::serializationLength(value.template getValue<T>());
 }
 
@@ -46,23 +43,22 @@ size_t ArraySerializer::ImplT<T>::getSerializedLength(const Variant& value)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> ArraySerializer ArraySerializer::create() {
+template <typename T>
+ArraySerializer ArraySerializer::create() {
   ArraySerializer arraySerializer;
   arraySerializer.impl.reset(new ImplT<T>());
-  
+
   return arraySerializer;
 }
 
 template <typename T>
-void ArraySerializer::ImplT<T>::serialize(ros::serialization::OStream& stream,
-    const Variant& value) {
+void ArraySerializer::ImplT<T>::serialize(ros::serialization::OStream& stream, const Variant& value) {
   ros::serialization::serialize(stream, value.template getValue<T>());
 }
 
 template <typename T>
-void ArraySerializer::ImplT<T>::deserialize(ros::serialization::IStream&
-    stream, Variant& value) {
+void ArraySerializer::ImplT<T>::deserialize(ros::serialization::IStream& stream, Variant& value) {
   ros::serialization::deserialize(stream, value.template getValue<T>());
 }
 
-}
+}  // namespace variant_topic_tools

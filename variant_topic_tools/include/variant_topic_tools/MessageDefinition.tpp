@@ -24,7 +24,8 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T> void MessageDefinition::setMessageType() {
+template <typename T>
+void MessageDefinition::setMessageType() {
   this->setMessageType(MessageType::template create<T>());
 }
 
@@ -32,8 +33,9 @@ template <typename T> void MessageDefinition::setMessageType() {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageDefinition MessageDefinition::create() {
+template <typename T>
+MessageDefinition MessageDefinition::create() {
   return MessageDefinition(MessageType::template create<T>());
 }
 
-}
+}  // namespace variant_topic_tools

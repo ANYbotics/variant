@@ -17,25 +17,29 @@
  ******************************************************************************/
 
 /** \file MessageFieldTypeTraits.h
-  * \brief Header file providing the MessageFieldTypeTraits class interface
-  */
+ * \brief Header file providing the MessageFieldTypeTraits class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_FIELD_TYPE_TRAITS_H
 
 namespace variant_topic_tools {
-  /** \brief Message field type traits
-    */
-  struct MessageFieldTypeTraits {
-    template <typename U> struct HasIsValid {
-      template <typename V, bool (V::*)() const> struct Test {};
-      
-      template <typename V> static char test(Test<V, &V::isValid>*);
-      template <typename V> static int test(...);
-      
-      static const bool value = sizeof(test<U>(0)) == sizeof(char);
-    };
+/** \brief Message field type traits
+ */
+struct MessageFieldTypeTraits {
+  template <typename U>
+  struct HasIsValid {
+    template <typename V, bool (V::*)() const>
+    struct Test {};
+
+    template <typename V>
+    static char test(Test<V, &V::isValid>*);
+    template <typename V>
+    static int test(...);
+
+    static const bool value = sizeof(test<U>(0)) == sizeof(char);
   };
 };
+}  // namespace variant_topic_tools
 
 #endif

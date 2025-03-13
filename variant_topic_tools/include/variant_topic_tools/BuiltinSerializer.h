@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file BuiltinSerializer.h
-  * \brief Header file providing the BuiltinSerializer class interface
-  */
+ * \brief Header file providing the BuiltinSerializer class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_SERIALIZER_H
@@ -27,84 +27,83 @@
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
-  /** \brief Built-in serializer
-    */
-  class BuiltinSerializer :
-    public Serializer {
+/** \brief Built-in serializer
+ */
+class BuiltinSerializer : public Serializer {
   friend class BuiltinDataType;
   friend class BuiltinVariant;
-  public:
-    /** \brief Default constructor
-      */ 
-    BuiltinSerializer();
-    
-    /** \brief Copy constructor
-      */ 
-    BuiltinSerializer(const BuiltinSerializer& src);
-    
-    /** \brief Copy constructor (overloaded version taking a serializer)
-      */ 
-    BuiltinSerializer(const Serializer& src);
-    
-    /** \brief Destructor
-      */ 
-    ~BuiltinSerializer();
-    
-  protected:
-    /** \brief Built-in data serializer implementation
-      */
-    class Impl :
-      public virtual Serializer::Impl {
-    public:
-      /** \brief Default constructor
-        */
-      Impl();
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-    };
-    
-    /** \brief Built-in serializer implementation (templated strong-typed
-      *   version)
-      */
-    template <typename T> class ImplT :
-      public Impl {
-    public:
-      BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
-      
-      /** \brief Declaration of the value type
-        */
-      typedef typename type_traits::BuiltinType<T>::ValueType ValueType;
-      
-      /** \brief Default constructor
-        */
-      ImplT();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
 
-      /** \brief Retrieve the serialized length of a variant value
-        *   (implementation)
-        */ 
-      size_t getSerializedLength(const Variant& value) const;
-    
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);
-    };
-    
-    /** \brief Create a built-in serializer
-      */ 
-    template <typename T> static BuiltinSerializer create();    
+ public:
+  /** \brief Default constructor
+   */
+  BuiltinSerializer();
+
+  /** \brief Copy constructor
+   */
+  BuiltinSerializer(const BuiltinSerializer& src);
+
+  /** \brief Copy constructor (overloaded version taking a serializer)
+   */
+  BuiltinSerializer(const Serializer& src);
+
+  /** \brief Destructor
+   */
+  ~BuiltinSerializer();
+
+ protected:
+  /** \brief Built-in data serializer implementation
+   */
+  class Impl : public virtual Serializer::Impl {
+   public:
+    /** \brief Default constructor
+     */
+    Impl();
+
+    /** \brief Destructor
+     */
+    ~Impl() override;
   };
+
+  /** \brief Built-in serializer implementation (templated strong-typed
+   *   version)
+   */
+  template <typename T>
+  class ImplT : public Impl {
+   public:
+    BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
+
+    /** \brief Declaration of the value type
+     */
+    using ValueType = typename type_traits::BuiltinType<T>::ValueType;
+
+    /** \brief Default constructor
+     */
+    ImplT();
+
+    /** \brief Destructor
+     */
+    ~ImplT() override;
+
+    /** \brief Retrieve the serialized length of a variant value
+     *   (implementation)
+     */
+    size_t getSerializedLength(const Variant& value) const override;
+
+    /** \brief Serialize a variant value (implementation)
+     */
+    void serialize(ros::serialization::OStream& stream, const Variant& value) override;
+
+    /** \brief Deserialize a variant value (implementation)
+     */
+    void deserialize(ros::serialization::IStream& stream, Variant& value) override;
+  };
+
+  /** \brief Create a built-in serializer
+   */
+  template <typename T>
+  static BuiltinSerializer create();
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/BuiltinSerializer.tpp>
 

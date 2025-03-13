@@ -16,10 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/MessageDataType.h"
+#include "variant_topic_tools/MessageVariant.h"
 #include <variant_topic_tools/MessageSerializer.h>
 #include <variant_topic_tools/MessageVariable.h>
-#include "variant_topic_tools/MessageVariant.h"
+#include "variant_topic_tools/MessageDataType.h"
 
 namespace variant_topic_tools {
 
@@ -27,69 +27,55 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageVariant::MessageVariant() {
-}
+MessageVariant::MessageVariant() = default;
 
-MessageVariant::MessageVariant(const DataType& type, const
-    MessageFieldCollection<Variant>& members) :
-  CollectionVariant(type) {
-  if (type.isValid())
+MessageVariant::MessageVariant(const DataType& type, const MessageFieldCollection<Variant>& members) : CollectionVariant(type) {
+  if (type.isValid()) {
     value.reset(new ValueImplV(members));
+  }
 }
 
-MessageVariant::MessageVariant(const MessageVariant& src) :
-  CollectionVariant(src) {
-}
+MessageVariant::MessageVariant(const MessageVariant& src) = default;
 
-MessageVariant::MessageVariant(const Variant& src) :
-  CollectionVariant(src) {
-  if (value)
+MessageVariant::MessageVariant(const Variant& src) : CollectionVariant(src) {
+  if (value) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
+  }
 }
 
-MessageVariant::~MessageVariant() {
-}
+MessageVariant::~MessageVariant() = default;
 
-MessageVariant::Value::Value() {
-}
+MessageVariant::Value::Value() = default;
 
-MessageVariant::Value::~Value() {
-}
+MessageVariant::Value::~Value() = default;
 
-MessageVariant::ValueImplV::ValueImplV(const MessageFieldCollection<Variant>&
-    members) :
-  members(members) {
-}
+MessageVariant::ValueImplV::ValueImplV(const MessageFieldCollection<Variant>& members) : members(members) {}
 
-MessageVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
-  members(src.members) {
-}
+MessageVariant::ValueImplV::ValueImplV(const ValueImplV& src) : members(src.members) {}
 
-MessageVariant::ValueImplV::~ValueImplV() {
-}
+MessageVariant::ValueImplV::~ValueImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 void MessageVariant::Value::setValue(const Variant::Value& value) {
-  const Value& messageValue = dynamic_cast<const Value&>(value);
+  const auto& messageValue = dynamic_cast<const Value&>(value);
 
-  for (size_t i = 0; i < getNumMembers(); ++i)
+  for (size_t i = 0; i < getNumMembers(); ++i) {
     setMember(i, messageValue.getMember(i));
+  }
 }
 
 size_t MessageVariant::ValueImplV::getNumMembers() const {
   return members.getNumFields();
 }
 
-void MessageVariant::ValueImplV::setMember(int index, const Variant&
-    member) {
+void MessageVariant::ValueImplV::setMember(int index, const Variant& member) {
   members.getField(index).setValue(member);
 }
 
-void MessageVariant::ValueImplV::setMember(const std::string& name, const
-    Variant& member) {
+void MessageVariant::ValueImplV::setMember(const std::string& name, const Variant& member) {
   members.getField(name).setValue(member);
 }
 
@@ -101,8 +87,7 @@ Variant MessageVariant::ValueImplV::getMember(const std::string& name) const {
   return members.getField(name).getValue();
 }
 
-const std::string& MessageVariant::ValueImplV::getMemberName(int index)
-    const {
+const std::string& MessageVariant::ValueImplV::getMemberName(int index) const {
   return members.getField(index).getName();
 }
 
@@ -114,8 +99,7 @@ bool MessageVariant::ValueImplV::hasMember(const std::string& name) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void MessageVariant::Value::writeMember(std::ostream& stream, int index)
-    const {
+void MessageVariant::Value::writeMember(std::ostream& stream, int index) const {
   Variant member = getMember(index);
 
   if (!member.getType().isBuiltin()) {
@@ -126,26 +110,26 @@ void MessageVariant::Value::writeMember(std::ostream& stream, int index)
 
     memberStream << member;
 
-    while (std::getline(memberStream, line))
+    while (std::getline(memberStream, line)) {
       stream << "\n  " << line;
-  }
-  else
+    }
+  } else {
     stream << getMemberName(index) << ": " << member;
+  }
 }
 
 Variant::ValuePtr MessageVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
 }
 
-Serializer MessageVariant::ValueImplV::createSerializer(const DataType& type)
-    const {
+Serializer MessageVariant::ValueImplV::createSerializer(const DataType& /*type*/) const {
   MessageFieldCollection<Serializer> memberSerializers;
 
-  for (size_t i = 0; i < members.getNumFields(); ++i)
-    memberSerializers.appendField(members[i].getName(),
-      members[i].getValue().createSerializer());
+  for (size_t i = 0; i < members.getNumFields(); ++i) {
+    memberSerializers.appendField(members[i].getName(), members[i].getValue().createSerializer());
+  }
 
   return MessageSerializer(memberSerializers);
 }
 
-}
+}  // namespace variant_topic_tools

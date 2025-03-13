@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file DataTypeTraits.h
-  * \brief Header file providing the data type traits
-  */
+ * \brief Header file providing the data type traits
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_DATA_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_DATA_TYPE_TRAITS_H
@@ -30,47 +30,49 @@
 #include <variant_topic_tools/MessageTypeTraits.h>
 
 namespace variant_topic_tools {
-  namespace type_traits {
-    template <typename T, typename Enable = void> struct DataType;
-    
-    template <typename T> struct DataType<T, typename boost::
-        enable_if<IsBuiltin<T> >::type> {
-      typedef typename BuiltinType<T>::ValueType ValueType;
-      typedef typename BuiltinType<T>::IsFixedSize IsFixedSize;
-      typedef typename BuiltinType<T>::IsFixedSize IsSimple;
-    };
-    
-    template <typename T> struct DataType<T, typename boost::
-        enable_if<IsArray<T> >::type> {
-      typedef typename ArrayType<T>::ValueType ValueType;
-      typedef typename ArrayType<T>::IsFixedSize IsFixedSize;
-      typedef typename ArrayType<T>::IsFixedSize IsSimple;
-    };    
-    
-    template <typename T> struct DataType<T, typename boost::
-        enable_if<IsMessage<T> >::type> {
-      typedef typename MessageType<T>::ValueType ValueType;
-      typedef typename MessageType<T>::IsFixedSize IsFixedSize;
-      typedef typename MessageType<T>::IsFixedSize IsSimple;
-    };    
-    
-    template <typename T, typename Enable = void> struct ToDataType;
-    
-    template <typename T> struct ToDataType<T, typename boost::
-        enable_if<IsBuiltin<typename ToBuiltinType<T>::BuiltinType> >::type> {
-      typedef typename ToBuiltinType<T>::BuiltinType DataType;
-    };
-    
-    template <typename T> struct ToDataType<T, typename boost::
-        enable_if<IsArray<typename ToArrayType<T>::ArrayType> >::type> {
-      typedef typename ToArrayType<T>::ArrayType DataType;
-    };
-    
-    template <typename T> struct ToDataType<T, typename boost::
-        enable_if<IsMessage<typename ToMessageType<T>::MessageType> >::type> {
-      typedef typename ToMessageType<T>::MessageType DataType;
-    };
-  };
+namespace type_traits {
+template <typename T, typename Enable = void>
+struct DataType;
+
+template <typename T>
+struct DataType<T, typename boost::enable_if<IsBuiltin<T> >::type> {
+  using ValueType = typename BuiltinType<T>::ValueType;
+  using IsFixedSize = typename BuiltinType<T>::IsFixedSize;
+  using IsSimple = typename BuiltinType<T>::IsFixedSize;
 };
+
+template <typename T>
+struct DataType<T, typename boost::enable_if<IsArray<T> >::type> {
+  using ValueType = typename ArrayType<T>::ValueType;
+  using IsFixedSize = typename ArrayType<T>::IsFixedSize;
+  using IsSimple = typename ArrayType<T>::IsFixedSize;
+};
+
+template <typename T>
+struct DataType<T, typename boost::enable_if<IsMessage<T> >::type> {
+  using ValueType = typename MessageType<T>::ValueType;
+  using IsFixedSize = typename MessageType<T>::IsFixedSize;
+  using IsSimple = typename MessageType<T>::IsFixedSize;
+};
+
+template <typename T, typename Enable = void>
+struct ToDataType;
+
+template <typename T>
+struct ToDataType<T, typename boost::enable_if<IsBuiltin<typename ToBuiltinType<T>::BuiltinType> >::type> {
+  using DataType = typename ToBuiltinType<T>::BuiltinType;
+};
+
+template <typename T>
+struct ToDataType<T, typename boost::enable_if<IsArray<typename ToArrayType<T>::ArrayType> >::type> {
+  using DataType = typename ToArrayType<T>::ArrayType;
+};
+
+template <typename T>
+struct ToDataType<T, typename boost::enable_if<IsMessage<typename ToMessageType<T>::MessageType> >::type> {
+  using DataType = typename ToMessageType<T>::MessageType;
+};
+}  // namespace type_traits
+}  // namespace variant_topic_tools
 
 #endif

@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/ArraySerializer.h"
 #include <variant_topic_tools/ArrayVariant.h>
+#include "variant_topic_tools/ArraySerializer.h"
 
 namespace variant_topic_tools {
 
@@ -26,13 +26,10 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-ArrayDataType::ImplT<T>::ImplT() :
-  Impl(typeid(typename type_traits::ArrayType<T>::MemberType)) {
-}
+ArrayDataType::ImplT<T>::ImplT() : Impl(typeid(typename type_traits::ArrayType<T>::MemberType)) {}
 
 template <typename T>
-ArrayDataType::ImplT<T>::~ImplT() {
-}
+ArrayDataType::ImplT<T>::~ImplT() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -50,8 +47,7 @@ size_t ArrayDataType::ImplT<T>::getNumMembers() const {
 
 template <typename T>
 size_t ArrayDataType::ImplT<T>::getSize() const {
-  return type_traits::ArrayType<T>::IsFixedSize::value ?
-    sizeof(typename type_traits::ArrayType<T>::ValueType) : 0;
+  return type_traits::ArrayType<T>::IsFixedSize::value ? sizeof(typename type_traits::ArrayType<T>::ValueType) : 0;
 }
 
 template <typename T>
@@ -73,34 +69,33 @@ bool ArrayDataType::ImplT<T>::isSimple() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> ArrayDataType ArrayDataType::create() {
+template <typename T>
+ArrayDataType ArrayDataType::create() {
   ArrayDataType dataType;
-  
+
   dataType.impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplT<T>()));
-  
+
   return dataType;
 }
 
-template <typename T, size_t N> ArrayDataType ArrayDataType::create(
-    typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T, size_t N>
+ArrayDataType ArrayDataType::create(typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
   return ArrayDataType::template create<T[]>();
 }
 
-template <typename T, size_t N> ArrayDataType ArrayDataType::create(
-    typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
+template <typename T, size_t N>
+ArrayDataType ArrayDataType::create(typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type*) {
   return ArrayDataType::template create<T[N]>();
 }
 
 template <typename T>
-Serializer ArrayDataType::ImplT<T>::createSerializer(const DataType& type)
-    const {
+Serializer ArrayDataType::ImplT<T>::createSerializer(const DataType& type) const {
   return ArraySerializer::template create<T>();
 }
 
 template <typename T>
-Variant ArrayDataType::ImplT<T>::createVariant(const DataType& type)
-    const {
+Variant ArrayDataType::ImplT<T>::createVariant(const DataType& type) const {
   return ArrayVariant::template create<T>(type, this->memberType);
 }
 
-}
+}  // namespace variant_topic_tools

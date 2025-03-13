@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <utility>
+
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/Message.h"
@@ -27,23 +29,16 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Subscriber::Subscriber() {
-}
+Subscriber::Subscriber() = default;
 
-Subscriber::Subscriber(const Subscriber& src) :
-  impl(src.impl) {
-}
+Subscriber::Subscriber(const Subscriber& src) = default;
 
-Subscriber::~Subscriber() {  
-}
+Subscriber::~Subscriber() = default;
 
-Subscriber::Impl::Impl(ros::NodeHandle& nodeHandle, const MessageType& type,
-    const std::string& topic, size_t queueSize, const SubscriberCallback&
-    callback) :
-  type(type),
-  callback(callback) {
-  subscriber = nodeHandle.subscribe(topic, queueSize,
-    &Subscriber::Impl::eventCallback, this);
+Subscriber::Impl::Impl(ros::NodeHandle& nodeHandle, const MessageType& type, const std::string& topic, size_t queueSize,
+                       SubscriberCallback callback)
+    : type(type), callback(std::move(callback)) {
+  subscriber = nodeHandle.subscribe(topic, queueSize, &Subscriber::Impl::eventCallback, this);
 }
 
 Subscriber::Impl::~Impl() {
@@ -55,10 +50,11 @@ Subscriber::Impl::~Impl() {
 /*****************************************************************************/
 
 Subscriber::operator ros::Subscriber() const {
-  if (impl)
+  if (impl) {
     return impl->subscriber;
-  else
+  } else {
     return ros::Subscriber();
+  }
 }
 
 /*****************************************************************************/
@@ -66,21 +62,23 @@ Subscriber::operator ros::Subscriber() const {
 /*****************************************************************************/
 
 std::string Subscriber::getTopic() const {
-  if (impl)
+  if (impl) {
     return impl->subscriber.getTopic();
-  else
+  } else {
     return std::string();
+  }
 }
 
 size_t Subscriber::getNumPublishers() const {
-  if (impl)
+  if (impl) {
     return impl->subscriber.getNumPublishers();
-  else
+  } else {
     return 0;
+  }
 }
 
 bool Subscriber::Impl::isValid() const {
-  return subscriber;
+  return subscriber != nullptr;
 }
 
 /*****************************************************************************/
@@ -88,60 +86,58 @@ bool Subscriber::Impl::isValid() const {
 /*****************************************************************************/
 
 void Subscriber::shutdown() {
-  if (impl)
+  if (impl) {
     impl->shutdown();
+  }
 }
 
 void Subscriber::Impl::shutdown() {
   subscriber = ros::Subscriber();
-  
+
   type = MessageType();
   dataType = DataType();
   serializer = MessageSerializer();
 }
 
-void Subscriber::Impl::eventCallback(const ros::MessageEvent<Message const>&
-    event) {
+void Subscriber::Impl::eventCallback(const ros::MessageEvent<Message const>& event) {
   boost::shared_ptr<const Message> message = event.getConstMessage();
-  
-  if (!type.isValid())
+
+  if (!type.isValid()) {
     type = message->getType();
-  
+  }
+
   if (message->getType().getDataType() == type.getDataType()) {
-    if ((type.getMD5Sum() == "*") || (message->getType().getMD5Sum() == "*") ||
-        (message->getType().getMD5Sum() == type.getMD5Sum())) {
+    if ((type.getMD5Sum() == "*") || (message->getType().getMD5Sum() == "*") || (message->getType().getMD5Sum() == type.getMD5Sum())) {
       if (!dataType) {
         DataTypeRegistry registry;
         dataType = registry.getDataType(type.getDataType());
-        
+
         if (!dataType) {
           type = message->getType();
-          
+
           MessageDefinition definition(type);
           dataType = definition.getMessageDataType();
         }
       }
-        
-      if (dataType && !serializer)
+
+      if (dataType && !serializer) {
         serializer = dataType.createSerializer();
+      }
 
       if (serializer) {
         MessageVariant variant = dataType.createVariant();
-        ros::serialization::IStream stream(const_cast<uint8_t*>(
-          message->getData().data()), message->getSize());
-        
+        ros::serialization::IStream stream(const_cast<uint8_t*>(message->getData().data()), message->getSize());
+
         serializer.deserialize(stream, variant);
-        
+
         callback(variant, event.getReceiptTime());
       }
+    } else {
+      throw MD5SumMismatchException(type.getMD5Sum(), message->getType().getMD5Sum());
     }
-    else
-      throw MD5SumMismatchException(type.getMD5Sum(),
-        message->getType().getMD5Sum());
+  } else {
+    throw MessageTypeMismatchException(type.getDataType(), message->getType().getDataType());
   }
-  else
-    throw MessageTypeMismatchException(type.getDataType(),
-      message->getType().getDataType());
 }
 
-}
+}  // namespace variant_topic_tools

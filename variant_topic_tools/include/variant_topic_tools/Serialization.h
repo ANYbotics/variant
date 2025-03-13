@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file Serialization.h
-  * \brief Header file providing the variant message serialization
-  */
+ * \brief Header file providing the variant message serialization
+ */
 
 #ifndef TOPIC_VARIANT_SERIALIZATION_H
 #define TOPIC_VARIANT_SERIALIZATION_H
@@ -28,22 +28,22 @@
 #include <variant_topic_tools/Message.h>
 
 namespace ros {
-  namespace serialization {
-    template <> struct Serializer<variant_topic_tools::Message> {      
-      template <class Stream> inline static void read(Stream& stream,
-        variant_topic_tools::Message& message);      
-      template <class Stream> inline static void write(Stream& stream,
-        const variant_topic_tools::Message& message);
-      inline static uint32_t serializedLength(const
-        variant_topic_tools::Message& message);
-    };
-
-    template <> struct PreDeserialize<variant_topic_tools::Message> {
-      static void notify(const
-        PreDeserializeParams<variant_topic_tools::Message>& params);
-    };
-  };
+namespace serialization {
+template <>
+struct Serializer<variant_topic_tools::Message> {
+  template <class Stream>
+  inline static void read(Stream& stream, variant_topic_tools::Message& message);
+  template <class Stream>
+  inline static void write(Stream& stream, const variant_topic_tools::Message& message);
+  inline static uint32_t serializedLength(const variant_topic_tools::Message& message);
 };
+
+template <>
+struct PreDeserialize<variant_topic_tools::Message> {
+  static void notify(const PreDeserializeParams<variant_topic_tools::Message>& params);
+};
+}  // namespace serialization
+}  // namespace ros
 
 #include <variant_topic_tools/Serialization.tpp>
 

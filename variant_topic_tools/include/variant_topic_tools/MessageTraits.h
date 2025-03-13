@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageTraits.h
-  * \brief Header file providing the variant message traits
-  */
+ * \brief Header file providing the variant message traits
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TRAITS_H
@@ -28,26 +28,29 @@
 #include <variant_topic_tools/Message.h>
 
 namespace ros {
-  namespace message_traits {
-    template <> struct IsMessage<variant_topic_tools::Message> :
-      TrueType {};
-    template <> struct IsMessage<const variant_topic_tools::Message> :
-      TrueType {};
+namespace message_traits {
+template <>
+struct IsMessage<variant_topic_tools::Message> : TrueType {};
+template <>
+struct IsMessage<const variant_topic_tools::Message> : TrueType {};
 
-    template <> struct MD5Sum<variant_topic_tools::Message> {
-      static const char* value(const variant_topic_tools::Message& message);
-      static const char* value();
-    };
-
-    template <> struct DataType<variant_topic_tools::Message> {
-      static const char* value(const variant_topic_tools::Message& message);
-      static const char* value();
-    };
-
-    template <> struct Definition<variant_topic_tools::Message> {
-      static const char* value(const variant_topic_tools::Message& message);
-    };
-  };
+template <>
+struct MD5Sum<variant_topic_tools::Message> {
+  static const char* value(const variant_topic_tools::Message& message);
+  static const char* value();
 };
+
+template <>
+struct DataType<variant_topic_tools::Message> {
+  static const char* value(const variant_topic_tools::Message& message);
+  static const char* value();
+};
+
+template <>
+struct Definition<variant_topic_tools::Message> {
+  static const char* value(const variant_topic_tools::Message& message);
+};
+}  // namespace message_traits
+}  // namespace ros
 
 #endif

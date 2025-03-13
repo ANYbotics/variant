@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file Message.h
-  * \brief Header file providing the Message class interface
-  */
+ * \brief Header file providing the Message class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_H
@@ -34,115 +34,119 @@
 #include <variant_topic_tools/MessageType.h>
 
 namespace variant_topic_tools {
-  /** \brief Generic message type
-    * 
-    * This generic message type can be used to subscribe to any topic.
-    * It is heavily inspired by the ShapeShifter message type provided
-    * in the topic_tools package.
-    */
-  class Message {
-  public:
-    /** \brief Default constructor
-      */ 
-    Message();
-    
-    /** \brief Constructor (templated version taking a message
-      */ 
-    template <typename T> Message(const T& message, const MessageHeader&
-      header = MessageHeader());
-    
-    /** \brief Copy constructor
-      */ 
-    Message(const Message& src);
-    
-    /** \brief Destructor
-      */ 
-    ~Message();
+/** \brief Generic message type
+ *
+ * This generic message type can be used to subscribe to any topic.
+ * It is heavily inspired by the ShapeShifter message type provided
+ * in the topic_tools package.
+ */
+class Message {
+ public:
+  /** \brief Default constructor
+   */
+  Message();
 
-    /** \brief Set the message header
-      * 
-      * \note This will modify the message type from the fields of the
-      *   specified header.
-      */
-    void setHeader(const MessageHeader& header);
-    
-    /** \brief Retrieve the message header
-      */
-    const MessageHeader& getHeader() const;
-    
-    /** \brief Set the message type
-      * 
-      * \note This will modify the message header from the members of the
-      *   specified type.
-      */
-    void setType(const MessageType& type);
-    
-    /** \brief Retrieve the message type
-      */
-    const MessageType& getType() const;
+  /** \brief Constructor (templated version taking a message
+   */
+  template <typename T>
+  Message(const T& message, const MessageHeader& header = MessageHeader());
 
-    /** \brief Set the message data
-      */
-    void setData(const std::vector<uint8_t>& data);
-    
-    /** \brief Retrieve the message data (non-const version)
-      */
-    std::vector<uint8_t>& getData();
-    
-    /** \brief Retrieve the message data (const version)
-      */
-    const std::vector<uint8_t>& getData() const;
-    
-    /** \brief Set the message size
-      */
-    void setSize(size_t size);
+  /** \brief Copy constructor
+   */
+  Message(const Message& src);
 
-    /** \brief Retrieve the message size
-      */
-    size_t getSize() const;
+  /** \brief Destructor
+   */
+  ~Message();
 
-    /** \brief Morph the message
-      */
-    template <typename T> void morph();
+  /** \brief Set the message header
+   *
+   * \note This will modify the message type from the fields of the
+   *   specified header.
+   */
+  void setHeader(const MessageHeader& header);
 
-    /** \brief Attempt to serialize this message from a variant
-      */
-    void serialize(const MessageVariant& variant);
-      
-    /** \brief Attempt to deserialize this message into a variant
-      */
-    void deserialize(MessageVariant& variant) const;
-    
-    /** \brief Attempt to convert the message to a variant message
-      */
-    boost::shared_ptr<variant_msgs::Variant> toVariantMessage() const;
-      
-    /** \brief Attempt to convert the message to a strong-typed message
-      */
-    template <typename T> boost::shared_ptr<T> toMessage() const;
+  /** \brief Retrieve the message header
+   */
+  const MessageHeader& getHeader() const;
 
-    /** \brief Read serialized message contents from stream
-      */ 
-    template <typename Stream> void read(Stream& stream);
+  /** \brief Set the message type
+   *
+   * \note This will modify the message header from the members of the
+   *   specified type.
+   */
+  void setType(const MessageType& type);
 
-    /** \brief Write serialized message contents to stream
-      */
-    template <typename Stream> void write(Stream& stream) const;
+  /** \brief Retrieve the message type
+   */
+  const MessageType& getType() const;
 
-  protected:
-    /** \brief The header of this message
-      */ 
-    MessageHeader header;
-    
-    /** \brief The type of this message
-      */ 
-    MessageType type;
-    
-    /** \brief The data of this message
-      */ 
-    std::vector<uint8_t> data;
-  };
+  /** \brief Set the message data
+   */
+  void setData(const std::vector<uint8_t>& data);
+
+  /** \brief Retrieve the message data (non-const version)
+   */
+  std::vector<uint8_t>& getData();
+
+  /** \brief Retrieve the message data (const version)
+   */
+  const std::vector<uint8_t>& getData() const;
+
+  /** \brief Set the message size
+   */
+  void setSize(size_t size);
+
+  /** \brief Retrieve the message size
+   */
+  size_t getSize() const;
+
+  /** \brief Morph the message
+   */
+  template <typename T>
+  void morph();
+
+  /** \brief Attempt to serialize this message from a variant
+   */
+  void serialize(const MessageVariant& variant);
+
+  /** \brief Attempt to deserialize this message into a variant
+   */
+  void deserialize(MessageVariant& variant) const;
+
+  /** \brief Attempt to convert the message to a variant message
+   */
+  boost::shared_ptr<variant_msgs::Variant> toVariantMessage() const;
+
+  /** \brief Attempt to convert the message to a strong-typed message
+   */
+  template <typename T>
+  boost::shared_ptr<T> toMessage() const;
+
+  /** \brief Read serialized message contents from stream
+   */
+  template <typename Stream>
+  void read(Stream& stream);
+
+  /** \brief Write serialized message contents to stream
+   */
+  template <typename Stream>
+  void write(Stream& stream) const;
+
+ protected:
+  /** \brief The header of this message
+   */
+  MessageHeader header;
+
+  /** \brief The type of this message
+   */
+  MessageType type;
+
+  /** \brief The data of this message
+   */
+  std::vector<uint8_t> data;
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/Message.tpp>
 

@@ -27,14 +27,13 @@ using namespace variant_topic_tools;
 
 TEST(MessageDefinition, Parse) {
   DataTypeRegistry registry;
-  
+
   MessageDefinition d1 = MessageDefinition::create<variant_msgs::Test>();
   MessageDataType t1 = d1.getMessageDataType();
-  MessageType m2("my_msgs/Test", "*",
-    ros::message_traits::definition<variant_msgs::Test>());
+  MessageType m2("my_msgs/Test", "*", ros::message_traits::definition<variant_msgs::Test>());
   MessageDefinition d2(m2);
   MessageDataType t2 = d2.getMessageDataType();
-  
+
   EXPECT_TRUE(t1.isValid());
   EXPECT_TRUE(t1[0].isConstant());
   EXPECT_EQ("header", t1[1].getName());
@@ -47,13 +46,13 @@ TEST(MessageDefinition, Parse) {
   EXPECT_ANY_THROW(d1.getField("string/length"));
   EXPECT_TRUE(d1.hasField("byte_constant"));
   EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }
 
 TEST(MessageDefinition, Load) {
   DataTypeRegistry registry;
-  
+
   MessageDefinition d1;
   EXPECT_NO_THROW(d1.load("variant_msgs/Test"));
   EXPECT_NO_THROW(d1.getField("header"));
@@ -61,6 +60,6 @@ TEST(MessageDefinition, Load) {
   EXPECT_ANY_THROW(d1.getField("string/length"));
   EXPECT_TRUE(d1.hasField("byte_constant"));
   EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }

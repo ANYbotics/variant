@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <utility>
+
 #include "variant_topic_tools/MessageHeader.h"
 
 namespace variant_topic_tools {
@@ -24,39 +26,31 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageHeader::MessageHeader() :
-  fields(new Fields()) {
-}
+MessageHeader::MessageHeader() : fields(new Fields()) {}
 
-MessageHeader::MessageHeader(const FieldsPtr& fields) :
-  fields(fields) {
-}
+MessageHeader::MessageHeader(FieldsPtr fields) : fields(std::move(fields)) {}
 
-MessageHeader::MessageHeader(const MessageHeader& src) :
-  fields(src.fields) {
-}
+MessageHeader::MessageHeader(const MessageHeader& src) = default;
 
-MessageHeader::~MessageHeader() {
-}
+MessageHeader::~MessageHeader() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-void MessageHeader::setField(const std::string& name, const std::string&
-    value) {
+void MessageHeader::setField(const std::string& name, const std::string& value) {
   (*fields)[name] = value;
 }
 
 const std::string& MessageHeader::getField(const std::string& name) const {
-  Fields::const_iterator it = fields->find(name);
-    
+  auto it = fields->find(name);
+
   if (it == fields->end()) {
     static std::string value = std::string();
     return value;
-  }
-  else
+  } else {
     return it->second;
+  }
 }
 
 void MessageHeader::setPublisher(const std::string& publisher) {
@@ -99,4 +93,4 @@ const std::string& MessageHeader::operator[](const std::string& name) const {
   return getField(name);
 }
 
-}
+}  // namespace variant_topic_tools

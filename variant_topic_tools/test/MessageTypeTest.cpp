@@ -29,16 +29,16 @@ using namespace variant_topic_tools;
 
 TEST(MessageType, Load) {
   DataTypeRegistry registry;
-  
-  MessageType t1, t2, t3;
-  
+
+  MessageType t1;
+  MessageType t2;
+  MessageType t3;
+
   EXPECT_NO_THROW(t1.load("variant_msgs/Test"));
-  EXPECT_EQ(ros::message_traits::definition<variant_msgs::Test>(),
-    t1.getDefinition());
-  EXPECT_ANY_THROW(t2.load("variant_msgs/Undefined"));  
+  EXPECT_EQ(ros::message_traits::definition<variant_msgs::Test>(), t1.getDefinition());
+  EXPECT_ANY_THROW(t2.load("variant_msgs/Undefined"));
   EXPECT_NO_THROW(t3.load("geometry_msgs/PoseStamped"));
-  EXPECT_EQ(ros::message_traits::definition<geometry_msgs::PoseStamped>(),
-    t3.getDefinition());
-  
-  registry.clear();
+  EXPECT_EQ(ros::message_traits::definition<geometry_msgs::PoseStamped>(), t3.getDefinition());
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }

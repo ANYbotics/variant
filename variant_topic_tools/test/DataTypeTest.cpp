@@ -35,7 +35,7 @@ TEST(DataType, Array) {
   DataTypeRegistry registry;
   registry.addArrayDataType<int32_t, 3>();
   registry.addArrayDataType<int32_t, 0>();
-  
+
   ArrayDataType a1("int32[3]");
   ArrayDataType a2("int32[]");
 
@@ -43,16 +43,16 @@ TEST(DataType, Array) {
   EXPECT_TRUE(a1.isArray());
   EXPECT_FALSE(a1.isDynamic());
   EXPECT_FALSE(a1.isFixedSize());
-  
+
   EXPECT_TRUE(a2.isValid());
   EXPECT_TRUE(a2.isArray());
   EXPECT_TRUE(a2.isDynamic());
   EXPECT_FALSE(a2.isFixedSize());
-  
+
   EXPECT_TRUE(registry.getDataType<int32_t[3]>().isArray());
   EXPECT_TRUE(registry.getDataType<int32_t[]>().isArray());
-  
-  registry.clear();
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }
 
 TEST(DataType, Builtin) {
@@ -70,24 +70,20 @@ TEST(DataType, Builtin) {
 
 TEST(DataType, Message) {
   DataTypeRegistry registry;
-  
+
   registry.addArrayDataType<double, 0>();
   registry.addArrayDataType<double, 3>();
-  
+
   MessageDataType m1 = registry.addMessageDataType<std_msgs::Bool>();
   MessageDataType m2 = registry.addMessageDataType("my_msgs/Double");
   m2.addVariableMember<double>("data");
   MessageDataType m3 = registry.addMessageDataType("my_msgs/Complex",
-    "float64 real\n"
-    "float64 imaginary\n"
-  );
-  MessageDataType m4 = registry.addMessageDataType("my_msgs/Vector",
-    "float64[] data\n");
-  MessageDataType m5 = registry.addMessageDataType("my_msgs/Array",
-    "float64[3] data\n");
-  MessageDataType m6 = MessageDefinition::create<variant_msgs::Test>().
-    getMessageDataType();
-  
+                                                   "float64 real\n"
+                                                   "float64 imaginary\n");
+  MessageDataType m4 = registry.addMessageDataType("my_msgs/Vector", "float64[] data\n");
+  MessageDataType m5 = registry.addMessageDataType("my_msgs/Array", "float64[3] data\n");
+  MessageDataType m6 = MessageDefinition::create<variant_msgs::Test>().getMessageDataType();
+
   EXPECT_TRUE(m1.isValid());
   EXPECT_TRUE(m1.isMessage());
   EXPECT_TRUE(m1.hasTypeInfo());
@@ -115,8 +111,7 @@ TEST(DataType, Message) {
   EXPECT_TRUE(m6.isMessage());
   EXPECT_FALSE(m5.hasTypeInfo());
   EXPECT_TRUE(m6.hasHeader());
-  EXPECT_EQ(ros::message_traits::md5sum<variant_msgs::Test>(),
-    m6.getMD5Sum());
-  
-  registry.clear();
+  EXPECT_EQ(ros::message_traits::md5sum<variant_msgs::Test>(), m6.getMD5Sum());
+
+  variant_topic_tools::DataTypeRegistry::clear();
 }

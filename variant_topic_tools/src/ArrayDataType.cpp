@@ -27,43 +27,33 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-ArrayDataType::ArrayDataType() {
-}
+ArrayDataType::ArrayDataType() = default;
 
 ArrayDataType::ArrayDataType(const DataType& memberType, size_t numMembers) {
-  impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplV(memberType, numMembers)));
+  impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplV(memberType, numMembers)));
 }
 
-ArrayDataType::ArrayDataType(const ArrayDataType& src) :
-  DataType(src) {
-}
+ArrayDataType::ArrayDataType(const ArrayDataType& src) = default;
 
-ArrayDataType::ArrayDataType(const DataType& src) :
-  DataType(src) {
-  if (impl)
+ArrayDataType::ArrayDataType(const DataType& src) : DataType(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(*impl));
+  }
 }
 
-ArrayDataType::~ArrayDataType() {
+ArrayDataType::~ArrayDataType() = default;
+
+ArrayDataType::Impl::Impl(const DataType& memberType) : memberType(memberType) {
+  if (!memberType.isValid()) {
+    throw InvalidDataTypeException();
+  }
 }
 
-ArrayDataType::Impl::Impl(const DataType& memberType) :
-  memberType(memberType) {
-  if (!memberType.isValid())
-    throw InvalidDataTypeException();  
-}
+ArrayDataType::Impl::~Impl() = default;
 
-ArrayDataType::Impl::~Impl() {
-}
+ArrayDataType::ImplV::ImplV(const DataType& memberType, size_t numMembers) : Impl(memberType), numMembers(numMembers) {}
 
-ArrayDataType::ImplV::ImplV(const DataType& memberType, size_t numMembers) :
-  Impl(memberType),
-  numMembers(numMembers) {
-}
-
-ArrayDataType::ImplV::~ImplV() {
-}
+ArrayDataType::ImplV::~ImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -73,29 +63,30 @@ const DataType& ArrayDataType::getMemberType() const {
   if (!impl) {
     static DataType memberType;
     return memberType;
-  }
-  else
+  } else {
     return boost::static_pointer_cast<Impl>(*impl)->memberType;
+  }
 }
 
 size_t ArrayDataType::getNumMembers() const {
-  if (impl)
+  if (impl) {
     return boost::static_pointer_cast<Impl>(*impl)->getNumMembers();
-  else
+  } else {
     return 0;
+  }
 }
 
 bool ArrayDataType::isDynamic() const {
-  if (impl)
+  if (impl) {
     return boost::static_pointer_cast<Impl>(*impl)->isDynamic();
-  else
+  } else {
     return 0;
+  }
 }
 
 const std::string& ArrayDataType::Impl::getIdentifier() const {
   if (identifier.empty()) {
-    identifier = memberType.getIdentifier()+(getNumMembers() ?
-      "["+boost::lexical_cast<std::string>(getNumMembers())+"]" : "[]");
+    identifier = memberType.getIdentifier() + ((getNumMembers() != 0u) ? "[" + std::to_string(getNumMembers()) + "]" : "[]");
   }
 
   return identifier;
@@ -106,15 +97,15 @@ size_t ArrayDataType::ImplV::getNumMembers() const {
 }
 
 size_t ArrayDataType::ImplV::getSize() const {
-  return numMembers*memberType.getSize();
+  return numMembers * memberType.getSize();
 }
 
 bool ArrayDataType::ImplV::isDynamic() const {
-  return !numMembers;
+  return numMembers == 0u;
 }
 
 bool ArrayDataType::ImplV::isFixedSize() const {
-  return numMembers && memberType.isFixedSize();
+  return (numMembers != 0u) && memberType.isFixedSize();
 }
 
 bool ArrayDataType::ImplV::isSimple() const {
@@ -125,7 +116,7 @@ bool ArrayDataType::ImplV::isSimple() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-Serializer ArrayDataType::ImplV::createSerializer(const DataType& type) const {
+Serializer ArrayDataType::ImplV::createSerializer(const DataType& /*type*/) const {
   return ArraySerializer(memberType.createSerializer(), numMembers);
 }
 
@@ -139,11 +130,12 @@ Variant ArrayDataType::ImplV::createVariant(const DataType& type) const {
 
 ArrayDataType& ArrayDataType::operator=(const DataType& src) {
   DataType::operator=(src);
-  
-  if (impl)
+
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl));
-    
+  }
+
   return *this;
 }
 
-}
+}  // namespace variant_topic_tools

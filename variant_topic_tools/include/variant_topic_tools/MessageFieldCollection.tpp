@@ -26,19 +26,15 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageFieldCollection<T>::MessageFieldCollection() {
-}
+MessageFieldCollection<T>::MessageFieldCollection() = default;
 
 template <typename T>
-MessageFieldCollection<T>::MessageFieldCollection(const
-    MessageFieldCollection<T>& src) :
-  fieldsInOrder(src.fieldsInOrder),
-  fieldsByName(src.fieldsByName) {
-}
+MessageFieldCollection<T>::MessageFieldCollection(const MessageFieldCollection<T>& src)
+    : fieldsInOrder(src.fieldsInOrder),
+      fieldsByName(src.fieldsByName){}
 
 template <typename T>
-MessageFieldCollection<T>::~MessageFieldCollection() {
-}
+MessageFieldCollection<T>::~MessageFieldCollection() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -51,54 +47,51 @@ size_t MessageFieldCollection<T>::getNumFields() const {
 
 template <typename T>
 MessageField<T>& MessageFieldCollection<T>::getField(int index) {
-  if ((index >= 0) && (index < this->fieldsInOrder.size()))
+  if ((index >= 0) && (index < this->fieldsInOrder.size())) {
     return *(this->fieldsInOrder[index]);
-  else
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::getField(int index)
-    const {
-  if ((index >= 0) && (index < this->fieldsInOrder.size()))
+const MessageField<T>& MessageFieldCollection<T>::getField(int index) const {
+  if ((index >= 0) && (index < this->fieldsInOrder.size())) {
     return *(this->fieldsInOrder[index]);
-  else
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
 template <typename T>
-MessageField<T>& MessageFieldCollection<T>::getField(const std::string&
-    name) {
+MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name) {
   return this->getField(name, 0);
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::getField(const std::string&
-    name) const {
+const MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name) const {
   return this->getField(name, 0);
 }
 
 template <typename T>
-MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name,
-    size_t pos) const {
+MessageField<T>& MessageFieldCollection<T>::getField(const std::string& name, size_t pos) const {
   pos = name.find_first_not_of('/', pos);
 
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
 
     if (i != std::string::npos) {
-      typename boost::unordered_map<std::string, MessageFieldPtr>::
-        const_iterator it = this->fieldsByName.find(name.substr(pos, i-pos));
+      typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator it = this->fieldsByName.find(name.substr(pos, i - pos));
 
-      if (it != this->fieldsByName.end())
-        return it->second->getField(name, i+1);
-    }
-    else {
-      typename boost::unordered_map<std::string, MessageFieldPtr>::
-        const_iterator it = this->fieldsByName.find(name.substr(pos));
+      if (it != this->fieldsByName.end()) {
+        return it->second->getField(name, i + 1);
+      }
+    } else {
+      typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator it = this->fieldsByName.find(name.substr(pos));
 
-      if (it != this->fieldsByName.end())
+      if (it != this->fieldsByName.end()) {
         return *(it->second);
+      }
     }
   }
 
@@ -111,24 +104,18 @@ bool MessageFieldCollection<T>::hasField(const std::string& name) const {
 }
 
 template <typename T>
-bool MessageFieldCollection<T>::hasField(const std::string& name, size_t pos)
-    const {
+bool MessageFieldCollection<T>::hasField(const std::string& name, size_t pos) const {
   pos = name.find_first_not_of('/', pos);
 
   if (pos != std::string::npos) {
     size_t i = name.find_first_of('/', pos);
 
     if (i != std::string::npos) {
-      typename boost::unordered_map<std::string, MessageFieldPtr>::
-        const_iterator it = this->fieldsByName.find(name.substr(
-        pos, i-pos));
+      typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator it = this->fieldsByName.find(name.substr(pos, i - pos));
 
-      return ((it != this->fieldsByName.end()) &&
-        it->second->hasField(name, i+1));
-    }
-    else {
-      typename boost::unordered_map<std::string, MessageFieldPtr>::
-        const_iterator it = this->fieldsByName.find(name.substr(pos));
+      return ((it != this->fieldsByName.end()) && it->second->hasField(name, i + 1));
+    } else {
+      typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator it = this->fieldsByName.find(name.substr(pos));
 
       return (it != this->fieldsByName.end());
     }
@@ -150,31 +137,25 @@ template <typename T>
 void MessageFieldCollection<T>::appendField(const MessageField<T>& field) {
   BOOST_ASSERT(field.getName().find('/') == std::string::npos);
 
-  typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator
-    it = this->fieldsByName.find(field.getName());
+  typename boost::unordered_map<std::string, MessageFieldPtr>::const_iterator it = this->fieldsByName.find(field.getName());
 
   if (it == this->fieldsByName.end()) {
     this->fieldsInOrder.push_back(MessageFieldPtr(new MessageField<T>(field)));
-    this->fieldsByName.insert(std::make_pair(field.getName(),
-      this->fieldsInOrder.back()));
-  }
-  else
+    this->fieldsByName.insert(std::make_pair(field.getName(), this->fieldsInOrder.back()));
+  } else {
     throw AmbiguousMemberNameException(field.getName());
+  }
 }
 
 template <typename T>
-void MessageFieldCollection<T>::appendField(const std::string& name,
-    const T& value) {
+void MessageFieldCollection<T>::appendField(const std::string& name, const T& value) {
   this->appendField(MessageField<T>(name, value));
 }
 
 template <typename T>
-void MessageFieldCollection<T>::merge(const MessageFieldCollection<T>&
-    collection) {
-  this->fieldsInOrder.insert(this->fieldsInOrder.end(),
-    collection.fieldsInOrder.begin(), collection.fieldsInOrder.end());
-  this->fieldsByName.insert(collection.fieldsByName.begin(),
-    collection.fieldsByName.end());
+void MessageFieldCollection<T>::merge(const MessageFieldCollection<T>& collection) {
+  this->fieldsInOrder.insert(this->fieldsInOrder.end(), collection.fieldsInOrder.begin(), collection.fieldsInOrder.end());
+  this->fieldsByName.insert(collection.fieldsByName.begin(), collection.fieldsByName.end());
 }
 
 template <typename T>
@@ -184,11 +165,11 @@ void MessageFieldCollection<T>::clear() {
 }
 
 template <typename T>
-void MessageFieldCollection<T>::write(std::ostream& stream, const std::string&
-    indent) const {
+void MessageFieldCollection<T>::write(std::ostream& stream, const std::string& indent) const {
   for (size_t i = 0; i < this->fieldsInOrder.size(); ++i) {
-    if (i)
+    if (i != 0u) {
       stream << "\n";
+    }
     this->fieldsInOrder[i]->write(stream, indent);
   }
 }
@@ -203,54 +184,50 @@ MessageField<T>& MessageFieldCollection<T>::operator[](int index) {
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::operator[](int index)
-    const {
+const MessageField<T>& MessageFieldCollection<T>::operator[](int index) const {
   return this->getField(index);
 }
 
 template <typename T>
-MessageField<T>& MessageFieldCollection<T>::operator[](const std::string&
-    name) {
+MessageField<T>& MessageFieldCollection<T>::operator[](const std::string& name) {
   return this->getField(name);
 }
 
 template <typename T>
-const MessageField<T>& MessageFieldCollection<T>::operator[](const
-    std::string& name) const {
+const MessageField<T>& MessageFieldCollection<T>::operator[](const std::string& name) const {
   return this->getField(name);
 }
 
 template <typename T>
-MessageFieldCollection<T>& MessageFieldCollection<T>::operator+=(const
-    MessageField<T>& field) {
+MessageFieldCollection<T>& MessageFieldCollection<T>::operator+=(const MessageField<T>& field) {
   this->appendField(field);
   return *this;
 }
 
 template <typename T>
-bool MessageFieldCollection<T>::operator==(const MessageFieldCollection<T>&
-    collection) const {
+bool MessageFieldCollection<T>::operator==(const MessageFieldCollection<T>& collection) const {
   if (this->fieldsInOrder.size() == collection.fieldsInOrder.size()) {
-    for (size_t i = 0; i < this->fieldsInOrder.size(); ++i)
-      if (*this->fieldsInOrder[i] != *collection.fieldsInOrder[i])
+    for (size_t i = 0; i < this->fieldsInOrder.size(); ++i) {
+      if (*this->fieldsInOrder[i] != *collection.fieldsInOrder[i]) {
         return false;
+      }
+    }
 
     return true;
-  }
-  else
+  } else {
     return false;
+  }
 }
 
 template <typename T>
-bool MessageFieldCollection<T>::operator!=(const MessageFieldCollection<T>&
-    collection) const {
+bool MessageFieldCollection<T>::operator!=(const MessageFieldCollection<T>& collection) const {
   return !this->operator==(collection);
 }
 
-template <typename T> std::ostream& operator<<(std::ostream& stream, const
-    MessageFieldCollection<T>& collection) {
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const MessageFieldCollection<T>& collection) {
   collection.write(stream);
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

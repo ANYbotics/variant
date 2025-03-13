@@ -29,78 +29,74 @@ size_t subscriberQueueSize = 100;
 
 variant_topic_tools::MessageDefinition messageDefinition;
 
-void callback(const ros::MessageEvent<variant_topic_tools::Message>&
-  messageEvent);
+void callback(const ros::MessageEvent<variant_topic_tools::Message>& messageEvent);
 
 bool getTopicBase(const std::string& topic, std::string& topicBase) {
   std::string tmp = topic;
   int i = tmp.rfind('/');
 
-  while( (tmp.size() > 0) && (i >= (int)(tmp.size()-1))) {
-    tmp = tmp.substr(0,tmp.size()-1);
+  while ((!tmp.empty()) && (i >= (int)(tmp.size() - 1))) {
+    tmp = tmp.substr(0, tmp.size() - 1);
     i = tmp.rfind('/');
   }
 
-  if (tmp.size() == 0)
+  if (tmp.empty()) {
     return false;
+  }
 
-  if(i < 0)
+  if (i < 0) {
     topicBase = tmp;
-  else
-    topicBase = tmp.substr(i+1, tmp.size()-i-1);
+  } else {
+    topicBase = tmp.substr(i + 1, tmp.size() - i - 1);
+  }
 
   return true;
 }
 
 void subscribe() {
-  subscriber = nodeHandle->subscribe(subscriberTopic, subscriberQueueSize,
-    &callback);
+  subscriber = nodeHandle->subscribe(subscriberTopic, subscriberQueueSize, &callback);
 }
 
-void callback(const ros::MessageEvent<variant_topic_tools::Message>&
-    messageEvent) {
-  boost::shared_ptr<const variant_topic_tools::Message> message =
-    messageEvent.getConstMessage();
+void callback(const ros::MessageEvent<variant_topic_tools::Message>& messageEvent) {
+  boost::shared_ptr<const variant_topic_tools::Message> message = messageEvent.getConstMessage();
 
   if (!messageDefinition.isValid()) {
     messageDefinition.setMessageType(message->getType());
-    
+
     std::cout << "Topic: " << message->getHeader().getTopic() << "\n";
     std::cout << "Publisher: " << message->getHeader().getPublisher() << "\n";
-    std::cout << "Latched: " << (message->getHeader().isLatched() ?
-      "yes" : "no") << "\n";
+    std::cout << "Latched: " << (message->getHeader().isLatched() ? "yes" : "no") << "\n";
     std::cout << "---\n";
     std::cout << "Type: " << message->getType().getDataType() << "\n";
     std::cout << "MD5 Sum: " << message->getType().getMD5Sum() << "\n";
-    std::cout << "Definition:\n";    
+    std::cout << "Definition:\n";
     std::cout << "---\n";
     std::cout << messageDefinition;
     std::cout << "---\n";
-    
+
     ros::shutdown();
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc < 2) {
     printf("\nusage: info TOPIC\n\n");
     return 1;
   }
-  
+
   if (!getTopicBase((argv[1]), subscriberTopic)) {
     ROS_ERROR("Failed to extract topic base from [%s]", argv[1]);
     return 1;
   }
-  
-  ros::init(argc, argv, subscriberTopic+"_info",
-    ros::init_options::AnonymousName);
-  
+
+  ros::init(argc, argv, subscriberTopic + "_info", ros::init_options::AnonymousName);
+
   subscriberTopic = argv[1];
-  
+
   nodeHandle.reset(new ros::NodeHandle("~"));
- 
+
   subscribe();
   ros::spin();
-  
+
   return 0;
 }

@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/Variant.h"
 #include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/BuiltinVariant.h"
 #include "variant_topic_tools/CollectionVariant.h"
 #include "variant_topic_tools/MessageVariant.h"
 #include "variant_topic_tools/Serializer.h"
-#include "variant_topic_tools/Variant.h"
 
 namespace variant_topic_tools {
 
@@ -29,21 +29,15 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Variant::Variant() {
-}
+Variant::Variant() = default;
 
-Variant::Variant(const DataType& type) :
-  type(type) {
-}
+Variant::Variant(const DataType& type) : type(type) {}
 
-Variant::~Variant() {
-}
+Variant::~Variant() = default;
 
-Variant::Value::Value() {
-}
+Variant::Value::Value() = default;
 
-Variant::Value::~Value() {
-}
+Variant::Value::~Value() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -54,10 +48,11 @@ const DataType& Variant::getType() const {
 }
 
 const std::type_info& Variant::getValueTypeInfo() const {
-  if (value)
+  if (value) {
     return value->getTypeInfo();
-  else
+  } else {
     return typeid(void);
+  }
 }
 
 bool Variant::hasType() const {
@@ -65,31 +60,35 @@ bool Variant::hasType() const {
 }
 
 bool Variant::isArray() const {
-  if (value)
+  if (value) {
     return boost::dynamic_pointer_cast<ArrayVariant::Value>(value) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool Variant::isBuiltin() const {
-  if (value)
+  if (value) {
     return boost::dynamic_pointer_cast<BuiltinVariant::Value>(value) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool Variant::isCollection() const {
-  if (value)
+  if (value) {
     return boost::dynamic_pointer_cast<CollectionVariant::Value>(value) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool Variant::isMessage() const {
-  if (value)
+  if (value) {
     return boost::dynamic_pointer_cast<MessageVariant::Value>(value) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool Variant::isEmpty() const {
@@ -126,20 +125,23 @@ void Variant::clear() {
 }
 
 void Variant::read(std::istream& stream) {
-  if (value)
+  if (value) {
     value->read(stream);
+  }
 }
 
 void Variant::write(std::ostream& stream) const {
-  if (value)
+  if (value) {
     value->write(stream);
+  }
 }
 
 Serializer Variant::createSerializer() const {
-  if (value)
+  if (value) {
     return value->createSerializer(type);
-  else
+  } else {
     return Serializer();
+  }
 }
 
 /*****************************************************************************/
@@ -156,4 +158,4 @@ std::ostream& operator<<(std::ostream& stream, const Variant& variant) {
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

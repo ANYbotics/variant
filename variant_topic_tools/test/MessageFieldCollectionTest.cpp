@@ -24,32 +24,32 @@ using namespace variant_topic_tools;
 
 TEST(MessageFieldCollection, Namespaces) {
   variant_topic_tools::MessageFieldCollection<bool> c1;
-  
+
   c1.appendField("field1");
   c1.appendField("field2", true);
   c1["field2"].appendField("field2_1");
 
   EXPECT_FALSE(c1.isEmpty());
   EXPECT_EQ(2, c1.getNumFields());
-  
+
   EXPECT_TRUE(c1.hasField("field1"));
   EXPECT_TRUE(c1.hasField("/field2"));
   EXPECT_TRUE(c1.hasField("field2/field2_1"));
   EXPECT_TRUE(c1.hasField("/field2/field2_1"));
   EXPECT_FALSE(c1.hasField("field3"));
   EXPECT_FALSE(c1.hasField("field2/field2_2"));
-  
+
   EXPECT_NO_THROW(c1.getField("field1"));
   EXPECT_NO_THROW(c1.getField("/field2"));
   EXPECT_NO_THROW(c1.getField("field2/field2_1"));
   EXPECT_NO_THROW(c1.getField("/field2/field2_1"));
   EXPECT_ANY_THROW(c1.getField("field3"));
   EXPECT_ANY_THROW(c1.getField("field2/field2_2"));
-  
+
   EXPECT_FALSE(c1["field1"].getValue());
   EXPECT_TRUE(c1["field2"].getValue());
-  
+
   c1.clear();
-  
+
   EXPECT_TRUE(c1.isEmpty());
 }

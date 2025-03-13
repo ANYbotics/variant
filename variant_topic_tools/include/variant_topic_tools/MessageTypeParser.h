@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageTypeParser.h
-  * \brief Header file providing the MessageTypeParser class interface
-  */
+ * \brief Header file providing the MessageTypeParser class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_PARSER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_PARSER_H
@@ -28,42 +28,41 @@
 #include <ros/ros.h>
 
 namespace variant_topic_tools {
-  /** \brief Message definition parser
-    */
-  class MessageTypeParser {
-  public:
-    /** \brief Match any message type expression
-      */
-    static bool matchType(const std::string& expression, std::string&
-      package, std::string& type);
-    
-  private:
-    /** \brief Regular expression for matching a package
-      */
-    static const boost::regex packageExpression;
-    
-    /** \brief Regular expression for matching a message type
-      */
-    static const boost::regex typeExpression;
-    
-    /** \brief Regular expression for matching a message type without
-      *   package prefix
-      */
-    static const boost::regex plainTypeExpression;
-    
-    /** \brief Regular expression for matching a message type with
-      *   package prefix
-      */
-    static const boost::regex packageTypeExpression;
-    
-    /** \brief Default constructor
-      */ 
-    MessageTypeParser();
-    
-    /** \brief Destructor
-      */ 
-    ~MessageTypeParser();    
-  };  
+/** \brief Message definition parser
+ */
+class MessageTypeParser {
+ public:
+  /** \brief Match any message type expression
+   */
+  static bool matchType(const std::string& expression, std::string& package, std::string& type);
+
+ private:
+  /** \brief Regular expression for matching a package
+   */
+  static const boost::regex packageExpression;
+
+  /** \brief Regular expression for matching a message type
+   */
+  static const boost::regex typeExpression;
+
+  /** \brief Regular expression for matching a message type without
+   *   package prefix
+   */
+  static const boost::regex plainTypeExpression;
+
+  /** \brief Regular expression for matching a message type with
+   *   package prefix
+   */
+  static const boost::regex packageTypeExpression;
+
+  /** \brief Default constructor
+   */
+  MessageTypeParser();
+
+  /** \brief Destructor
+   */
+  ~MessageTypeParser();
 };
+}  // namespace variant_topic_tools
 
 #endif

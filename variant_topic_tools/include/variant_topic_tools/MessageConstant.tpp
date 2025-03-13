@@ -22,12 +22,12 @@ namespace variant_topic_tools {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageConstant MessageConstant::create(const
-    std::string& name, const T& value) {
+template <typename T>
+MessageConstant MessageConstant::create(const std::string& name, const T& value) {
   MessageConstant messageConstant;
   messageConstant.impl.reset(new Impl(name, value));
-  
+
   return messageConstant;
 }
 
-}
+}  // namespace variant_topic_tools

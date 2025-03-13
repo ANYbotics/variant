@@ -26,32 +26,27 @@ using namespace variant_topic_tools;
 
 TEST(MessageDefinitionParser, Parse) {
   std::vector<MessageType> messageTypes;
-  
-  MessageDefinitionParser::parse(
-    ros::message_traits::datatype<variant_msgs::Test>(),
-    ros::message_traits::definition<variant_msgs::Test>(),
-    messageTypes);
-  
+
+  MessageDefinitionParser::parse(ros::message_traits::datatype<variant_msgs::Test>(), ros::message_traits::definition<variant_msgs::Test>(),
+                                 messageTypes);
+
   EXPECT_FALSE(messageTypes.empty());
-  EXPECT_EQ(ros::message_traits::datatype<variant_msgs::Test>(),
-    messageTypes[0].getDataType());
-  EXPECT_EQ(ros::message_traits::datatype<std_msgs::Header>(),
-    messageTypes[1].getDataType());
-  EXPECT_EQ(ros::message_traits::definition<std_msgs::Header>(),
-    messageTypes[1].getDefinition());
+  EXPECT_EQ(ros::message_traits::datatype<variant_msgs::Test>(), messageTypes[0].getDataType());
+  EXPECT_EQ(ros::message_traits::datatype<std_msgs::Header>(), messageTypes[1].getDataType());
+  EXPECT_EQ(ros::message_traits::definition<std_msgs::Header>(), messageTypes[1].getDefinition());
 }
 
 TEST(MessageDefinitionParser, Match) {
-  std::string name, type, value;
-  size_t size;
-  
+  std::string name;
+  std::string type;
+  std::string value;
+  size_t size = 0;
+
   EXPECT_TRUE(MessageDefinitionParser::matchType("int32"));
-  EXPECT_TRUE(MessageDefinitionParser::matchArrayType("int32[3]",
-    type, size));
+  EXPECT_TRUE(MessageDefinitionParser::matchArrayType("int32[3]", type, size));
   EXPECT_EQ("int32", type);
   EXPECT_EQ(3, size);
-  EXPECT_TRUE(MessageDefinitionParser::matchArrayType("int32[]",
-    type, size));
+  EXPECT_TRUE(MessageDefinitionParser::matchArrayType("int32[]", type, size));
   EXPECT_EQ("int32", type);
   EXPECT_EQ(0, size);
   EXPECT_TRUE(MessageDefinitionParser::match("int32 x # Comment", name, type));
@@ -59,35 +54,28 @@ TEST(MessageDefinitionParser, Match) {
   EXPECT_EQ("int32", type);
   EXPECT_FALSE(MessageDefinitionParser::match("# Comment", name, type));
   EXPECT_FALSE(MessageDefinitionParser::match("int32 # Comment", name, type));
-  EXPECT_TRUE(MessageDefinitionParser::match("int32 x=1 # Comment",
-    name, type));
+  EXPECT_TRUE(MessageDefinitionParser::match("int32 x=1 # Comment", name, type));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32", type);
-  EXPECT_TRUE(MessageDefinitionParser::matchConstant("int32 x=1 # Comment",
-    name, type, value));
+  EXPECT_TRUE(MessageDefinitionParser::matchConstant("int32 x=1 # Comment", name, type, value));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32", type);
   EXPECT_EQ("1", value);
-  EXPECT_TRUE(MessageDefinitionParser::matchConstant(
-    "string x= value # Comment ", name, type, value));
+  EXPECT_TRUE(MessageDefinitionParser::matchConstant("string x= value # Comment ", name, type, value));
   EXPECT_EQ("x", name);
   EXPECT_EQ("string", type);
   EXPECT_EQ("value # Comment", value);
-  EXPECT_TRUE(MessageDefinitionParser::matchVariable("int32 x # Comment",
-    name, type));
+  EXPECT_TRUE(MessageDefinitionParser::matchVariable("int32 x # Comment", name, type));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32", type);
-  EXPECT_TRUE(MessageDefinitionParser::matchVariable("int32[3] x # Comment",
-    name, type));
+  EXPECT_TRUE(MessageDefinitionParser::matchVariable("int32[3] x # Comment", name, type));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32[3]", type);
-  EXPECT_TRUE(MessageDefinitionParser::matchArray("int32[3] x # Comment",
-    name, type, size));
+  EXPECT_TRUE(MessageDefinitionParser::matchArray("int32[3] x # Comment", name, type, size));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32", type);
   EXPECT_EQ(3, size);
-  EXPECT_TRUE(MessageDefinitionParser::matchArray("int32[] x # Comment",
-    name, type, size));
+  EXPECT_TRUE(MessageDefinitionParser::matchArray("int32[] x # Comment", name, type, size));
   EXPECT_EQ("x", name);
   EXPECT_EQ("int32", type);
   EXPECT_EQ(0, size);

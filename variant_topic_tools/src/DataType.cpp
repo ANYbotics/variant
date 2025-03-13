@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/DataType.h"
+#include <variant_topic_tools/Serializer.h>
 #include "variant_topic_tools/ArrayDataType.h"
 #include "variant_topic_tools/BuiltinDataType.h"
-#include "variant_topic_tools/DataType.h"
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/MessageDataType.h"
-#include <variant_topic_tools/Serializer.h>
 #include "variant_topic_tools/Variant.h"
 
 namespace variant_topic_tools {
@@ -30,43 +30,40 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-DataType::DataType() {
-}
+DataType::DataType() = default;
 
 DataType::DataType(const char* identifier) {
   DataTypeRegistry registry;
   DataType dataType = registry.getDataType(identifier);
-  
+
   impl = dataType.impl;
 }
 
 DataType::DataType(const std::string& identifier) {
   DataTypeRegistry registry;
   DataType dataType = registry.getDataType(identifier);
-  
+
   impl = dataType.impl;
 }
 
 DataType::DataType(const std::type_info& typeInfo) {
   DataTypeRegistry registry;
   DataType dataType = registry.getDataType(typeInfo);
-  
+
   impl = dataType.impl;
 }
 
 DataType::DataType(const DataType& src) {
-  if (src.impl)
+  if (src.impl) {
     impl.reset(new boost::shared_ptr<Impl>(*src.impl));
+  }
 }
 
-DataType::~DataType() {
-}
+DataType::~DataType() = default;
 
-DataType::Impl::Impl() {
-}
+DataType::Impl::Impl() = default;
 
-DataType::Impl::~Impl() {
-}
+DataType::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -76,58 +73,65 @@ const std::string& DataType::getIdentifier() const {
   if (!impl) {
     static std::string identifier;
     return identifier;
-  }
-  else
+  } else {
     return (*impl)->getIdentifier();
+  }
 }
 
 const std::type_info& DataType::getTypeInfo() const {
-  if (impl)
+  if (impl) {
     return (*impl)->getTypeInfo();
-  else
+  } else {
     return typeid(void);
+  }
 }
 
 size_t DataType::getSize() const {
-  if (impl)
+  if (impl) {
     return (*impl)->getSize();
-  else
+  } else {
     return 0;
+  }
 }
 
 bool DataType::isArray() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<ArrayDataType::Impl>(*impl) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool DataType::isBuiltin() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool DataType::isMessage() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<MessageDataType::Impl>(*impl) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool DataType::isFixedSize() const {
-  if (impl)
+  if (impl) {
     return (*impl)->isFixedSize();
-  else
+  } else {
     return true;
+  }
 }
 
 bool DataType::isSimple() const {
-  if (impl)
+  if (impl) {
     return (*impl)->isSimple();
-  else
+  } else {
     return true;
+  }
 }
 
 bool DataType::isValid() const {
@@ -135,10 +139,11 @@ bool DataType::isValid() const {
 }
 
 bool DataType::hasTypeInfo() const {
-  if (impl)
+  if (impl) {
     return ((*impl)->getTypeInfo() != typeid(void));
-  else
+  } else {
     return false;
+  }
 }
 
 const std::type_info& DataType::Impl::getTypeInfo() const {
@@ -154,22 +159,25 @@ void DataType::clear() {
 }
 
 void DataType::write(std::ostream& stream) const {
-  if (impl)
+  if (impl) {
     stream << (*impl)->getIdentifier();
+  }
 }
 
 Serializer DataType::createSerializer() const {
-  if (impl)
+  if (impl) {
     return (*impl)->createSerializer(*this);
-  else
+  } else {
     return Serializer();
+  }
 }
 
 Variant DataType::createVariant() const {
-  if (impl)
+  if (impl) {
     return (*impl)->createVariant(*this);
-  else
+  } else {
     return Variant();
+  }
 }
 
 /*****************************************************************************/
@@ -177,13 +185,14 @@ Variant DataType::createVariant() const {
 /*****************************************************************************/
 
 DataType& DataType::operator=(const DataType& src) {
-  if (impl && src.impl)
+  if (impl && src.impl) {
     *impl = *src.impl;
-  else if (src.impl)
+  } else if (src.impl) {
     impl.reset(new boost::shared_ptr<Impl>(*src.impl));
-  else
+  } else {
     impl = src.impl;
-  
+  }
+
   return *this;
 }
 
@@ -192,4 +201,4 @@ std::ostream& operator<<(std::ostream& stream, const DataType& dataType) {
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

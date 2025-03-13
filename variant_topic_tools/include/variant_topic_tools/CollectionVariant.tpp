@@ -22,22 +22,24 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T> T& CollectionVariant::getValue(int index) {
+template <typename T>
+T& CollectionVariant::getValue(int index) {
   return this->getMember(index).template getValue<T>();
 }
 
-template <typename T> const T& CollectionVariant::getValue(int index)
-    const {
+template <typename T>
+const T& CollectionVariant::getValue(int index) const {
   return this->getMember(index).template getValue<T>();
 }
 
-template <typename T> T& CollectionVariant::getValue(const std::string& name) {
+template <typename T>
+T& CollectionVariant::getValue(const std::string& name) {
   return this->getMember(name).template getValue<T>();
 }
 
-template <typename T> const T& CollectionVariant::getValue(const std::string&
-    name) const {
+template <typename T>
+const T& CollectionVariant::getValue(const std::string& name) const {
   return this->getMember(name).template getValue<T>();
 }
 
-}
+}  // namespace variant_topic_tools

@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file ArrayTypeTraits.h
-  * \brief Header file providing the array type traits
-  */
+ * \brief Header file providing the array type traits
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_TYPE_TRAITS_H
@@ -32,65 +32,69 @@
 #include <variant_topic_tools/MessageTypeTraits.h>
 
 namespace variant_topic_tools {
-  namespace type_traits {
-    template <typename T> struct IsArray :
-      public boost::false_type {
-    };
-    
-    template <typename T> struct IsArray<T[]> :
-      public boost::true_type {
-    };
-    
-    template <typename T, size_t N> struct IsArray<T[N]> :
-      public boost::true_type {
-    };
-    
-    template <size_t N> struct IsArray<char[N]> :
-      public boost::false_type {
-    };
-    
-    template <typename T, typename D = void> struct ArrayMemberType {
-      typedef T ValueType;
-    };
-    
-    template <typename D> struct ArrayMemberType<bool, D> {
-      typedef uint8_t ValueType;
-    };
-    
-    template <typename T> struct ArrayType;
-    
-    template <typename T> struct ArrayType<T[]> {
-      typedef T MemberType;
-      typedef typename ArrayMemberType<T>::ValueType MemberValueType;
-      typedef std::vector<MemberValueType> ValueType;
-      static const size_t NumMembers = 0;
-      typedef boost::true_type IsDynamic;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-    
-    template <typename T, size_t N> struct ArrayType<T[N]> {
-      typedef T MemberType;
-      typedef typename ArrayMemberType<T>::ValueType MemberValueType;
-      typedef boost::array<MemberValueType, N> ValueType;
-      static const size_t NumMembers = N;
-      typedef boost::false_type IsDynamic;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-    
-    template <typename T> struct ToArrayType {
-      typedef T ArrayType;
-    };
-    
-    template <typename T> struct ToArrayType<std::vector<T> > {
-      typedef T ArrayType[];
-    };
-    
-    template <typename T, size_t N> struct ToArrayType<boost::array<T, N> > {
-      typedef T ArrayType[N];
-    };
-  };
+namespace type_traits {
+template <typename T>
+struct IsArray : public boost::false_type {};
+
+template <typename T>
+struct IsArray<T[]> : public boost::true_type {};
+
+template <typename T, size_t N>
+struct IsArray<T[N]> : public boost::true_type {};
+
+template <size_t N>
+struct IsArray<char[N]> : public boost::false_type {};
+
+template <typename T, typename D = void>
+struct ArrayMemberType {
+  using ValueType = T;
 };
+
+template <typename D>
+struct ArrayMemberType<bool, D> {
+  using ValueType = uint8_t;
+};
+
+template <typename T>
+struct ArrayType;
+
+template <typename T>
+struct ArrayType<T[]> {
+  using MemberType = T;
+  using MemberValueType = typename ArrayMemberType<T>::ValueType;
+  using ValueType = std::vector<MemberValueType>;
+  static const size_t NumMembers = 0;
+  using IsDynamic = boost::true_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename T, size_t N>
+struct ArrayType<T[N]> {
+  using MemberType = T;
+  using MemberValueType = typename ArrayMemberType<T>::ValueType;
+  using ValueType = boost::array<MemberValueType, N>;
+  static const size_t NumMembers = N;
+  using IsDynamic = boost::false_type;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
+};
+
+template <typename T>
+struct ToArrayType {
+  using ArrayType = T;
+};
+
+template <typename T>
+struct ToArrayType<std::vector<T> > {
+  typedef T ArrayType[];
+};
+
+template <typename T, size_t N>
+struct ToArrayType<boost::array<T, N> > {
+  typedef T ArrayType[N];
+};
+}  // namespace type_traits
+}  // namespace variant_topic_tools
 
 #endif

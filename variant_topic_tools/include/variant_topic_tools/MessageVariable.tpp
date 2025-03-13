@@ -26,49 +26,41 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageVariable::ImplT<T>::ImplT(const std::string& name, const DataType&
-    type) :
-  Impl(name, type) {
-}
+MessageVariable::ImplT<T>::ImplT(const std::string& name, const DataType& type)
+    : Impl(name, type){}
 
 template <typename T>
-MessageVariable::ImplT<T>::~ImplT() {
-}
+MessageVariable::ImplT<T>::ImplT::~ImplT() = default;
 
 template <typename T, typename M>
-MessageVariable::ImplM<T, M>::ImplM(const std::string& name, const DataType&
-    type, size_t offset) :
-  ImplT<T>(name, type),
-  offset(offset) {
-}
+MessageVariable::ImplM<T, M>::ImplM(const std::string& name, const DataType& type, size_t offset)
+    : ImplT<T>(name, type),
+      offset(offset){}
 
 template <typename T, typename M>
-MessageVariable::ImplM<T, M>::~ImplM() {
-}
+MessageVariable::ImplM<T, M>::ImplM::~ImplM() = default;
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T, typename M> MessageVariable MessageVariable::create(
-    const std::string& name, size_t offset) {
+template <typename T, typename M>
+MessageVariable MessageVariable::create(const std::string& name, size_t offset) {
   DataTypeRegistry registry;
   MessageVariable messageVariable;
-  
-  messageVariable.impl.reset(new ImplM<T, M>(name, registry.template
-    getDataType<M>(), offset));
-  
+
+  messageVariable.impl.reset(new ImplM<T, M>(name, registry.template getDataType<M>(), offset));
+
   return messageVariable;
 }
 
-template <typename T, typename M> Variant MessageVariable::ImplM<T, M>::
-    createVariant(const Pointer<ValueType>& message) const {
+template <typename T, typename M>
+Variant MessageVariable::ImplM<T, M>::createVariant(const Pointer<ValueType>& message) const {
   Variant variant = this->type.createVariant();
-  
-  Variant::template set<M>(variant, MessageMemberPointer<T, M>(message,
-    this->offset));
-  
+
+  Variant::template set<M>(variant, MessageMemberPointer<T, M>(message, this->offset));
+
   return variant;
 }
 
-}
+}  // namespace variant_topic_tools

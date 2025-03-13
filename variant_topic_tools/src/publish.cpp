@@ -36,76 +36,78 @@ bool getTopicBase(const std::string& topic, std::string& topicBase) {
   std::string tmp = topic;
   int i = tmp.rfind('/');
 
-  while( (tmp.size() > 0) && (i >= (int)(tmp.size()-1))) {
-    tmp = tmp.substr(0,tmp.size()-1);
+  while ((!tmp.empty()) && (i >= (int)(tmp.size() - 1))) {
+    tmp = tmp.substr(0, tmp.size() - 1);
     i = tmp.rfind('/');
   }
 
-  if (tmp.size() == 0)
+  if (tmp.empty()) {
     return false;
+  }
 
-  if(i < 0)
+  if (i < 0) {
     topicBase = tmp;
-  else
-    topicBase = tmp.substr(i+1, tmp.size()-i-1);
+  } else {
+    topicBase = tmp.substr(i + 1, tmp.size() - i - 1);
+  }
 
   return true;
 }
 
 void publishOnce() {
-  if (!messageDefinition.isValid())
+  if (!messageDefinition.isValid()) {
     messageDefinition.load(publisherType);
-  
-  if (!messageType.isValid())
+  }
+
+  if (!messageType.isValid()) {
     messageType = messageDefinition.getMessageDataType();
-    
-  if (!publisher)
-    publisher = messageType.advertise(*nodeHandle, publisherTopic,
-      publisherQueueSize, true);
-  
-  variant_topic_tools::MessageVariant variant = messageDefinition.
-    getMessageDataType().createVariant();
-    
+  }
+
+  if (!publisher) {
+    publisher = messageType.advertise(*nodeHandle, publisherTopic, publisherQueueSize, true);
+  }
+
+  variant_topic_tools::MessageVariant variant = messageDefinition.getMessageDataType().createVariant();
+
   publisher.publish(variant);
 }
 
-void publish(const ros::TimerEvent& event) {
+void publish(const ros::TimerEvent& /*event*/) {
   publishOnce();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc < 3) {
     printf("\nusage: echo TOPIC TYPE [RATE]\n\n");
     return 1;
   }
-  
+
   if (!getTopicBase((argv[1]), publisherTopic)) {
     ROS_ERROR("Failed to extract topic base from [%s]", argv[1]);
     return 1;
   }
-  
-  ros::init(argc, argv, publisherTopic+"_publish",
-    ros::init_options::AnonymousName);
-  
+
+  ros::init(argc, argv, publisherTopic + "_publish", ros::init_options::AnonymousName);
+
   nodeHandle.reset(new ros::NodeHandle("~"));
-  
+
   publisherTopic = argv[1];
-  publisherType = argv[2]; 
-  if (argc > 3)
+  publisherType = argv[2];
+  if (argc > 3) {
     publisherRate = boost::lexical_cast<double>(argv[3]);
-  
-  if (publisherRate > 0.0) {
-    publisherTimer = nodeHandle->createTimer(ros::Rate(publisherRate).
-      expectedCycleTime(), &publish);
   }
-  else
+
+  if (publisherRate > 0.0) {
+    publisherTimer = nodeHandle->createTimer(ros::Rate(publisherRate).expectedCycleTime(), &publish);
+  } else {
     publishOnce();
- 
+  }
+
   ros::AsyncSpinner spinner(1);
   spinner.start();
   ros::waitForShutdown();
-  
+
   publisherTimer.stop();
-  
+
   return 0;
 }

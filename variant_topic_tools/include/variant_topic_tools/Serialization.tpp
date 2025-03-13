@@ -17,26 +17,25 @@
  ******************************************************************************/
 
 namespace ros {
-  namespace serialization {
+namespace serialization {
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <class Stream> void Serializer<variant_topic_tools::Message>::read(
-    Stream& stream, variant_topic_tools::Message& message) {
+template <class Stream>
+void Serializer<variant_topic_tools::Message>::read(Stream& stream, variant_topic_tools::Message& message) {
   message.read(stream);
 }
 
-template <class Stream> void Serializer<variant_topic_tools::Message>::write(
-    Stream& stream, const variant_topic_tools::Message& message) {
+template <class Stream>
+void Serializer<variant_topic_tools::Message>::write(Stream& stream, const variant_topic_tools::Message& message) {
   message.write(stream);
 }
 
-uint32_t Serializer<variant_topic_tools::Message>::serializedLength(const
-    variant_topic_tools::Message& message) {
+uint32_t Serializer<variant_topic_tools::Message>::serializedLength(const variant_topic_tools::Message& message) {
   return message.getSize();
 }
 
-  }
-}
+}  // namespace serialization
+}  // namespace ros

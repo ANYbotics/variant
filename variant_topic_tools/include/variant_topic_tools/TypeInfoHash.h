@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file TypeInfoHash.h
-  * \brief Header file providing the TypeInfoHash class interface
-  */
+ * \brief Header file providing the TypeInfoHash class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_TYPE_INFO_HASH_H
 #define VARIANT_TOPIC_TOOLS_TYPE_INFO_HASH_H
@@ -26,16 +26,14 @@
 #include <typeinfo>
 
 namespace variant_topic_tools {
-  /** \brief Type information hash
-    */
-  class TypeInfoHash {
-  public:
-    /** \brief Type information hash operator
-      */
-    inline size_t operator()(const std::type_info* typeInfo) const {
-      return reinterpret_cast<size_t>(typeInfo);
-    };
-  };
+/** \brief Type information hash
+ */
+class TypeInfoHash {
+ public:
+  /** \brief Type information hash operator
+   */
+  inline std::size_t operator()(const std::type_info* typeInfo) const { return reinterpret_cast<std::size_t>(typeInfo); };
 };
+}  // namespace variant_topic_tools
 
 #endif

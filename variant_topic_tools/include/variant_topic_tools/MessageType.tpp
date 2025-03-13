@@ -26,14 +26,12 @@ namespace variant_topic_tools {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageType MessageType::create() {
+template <typename T>
+MessageType MessageType::create() {
   BOOST_STATIC_ASSERT(ros::message_traits::IsMessage<T>::value);
-  
-  return MessageType(
-    ros::message_traits::template datatype<T>(),
-    ros::message_traits::template md5sum<T>(),
-    ros::message_traits::template definition<T>()
-  );
+
+  return MessageType(ros::message_traits::template datatype<T>(), ros::message_traits::template md5sum<T>(),
+                     ros::message_traits::template definition<T>());
 }
 
-}
+}  // namespace variant_topic_tools

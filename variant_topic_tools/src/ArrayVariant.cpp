@@ -16,9 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/ArrayDataType.h"
 #include "variant_topic_tools/ArraySerializer.h"
-#include "variant_topic_tools/ArrayVariant.h"
 #include "variant_topic_tools/Exceptions.h"
 
 namespace variant_topic_tools {
@@ -27,74 +27,60 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-ArrayVariant::ArrayVariant() {
-}
+ArrayVariant::ArrayVariant() = default;
 
-ArrayVariant::ArrayVariant(const DataType& type, const DataType& memberType,
-    size_t numMembers) :
-  CollectionVariant(type) {
-  if (type.isValid())
+ArrayVariant::ArrayVariant(const DataType& type, const DataType& memberType, size_t numMembers) : CollectionVariant(type) {
+  if (type.isValid()) {
     value.reset(new ValueImplV(memberType, numMembers));
+  }
 }
 
-ArrayVariant::ArrayVariant(const ArrayVariant& src) :
-  CollectionVariant(src) {
-}
+ArrayVariant::ArrayVariant(const ArrayVariant& src) = default;
 
-ArrayVariant::ArrayVariant(const Variant& src) :
-  CollectionVariant(src) {
-  if (value)
+ArrayVariant::ArrayVariant(const Variant& src) : CollectionVariant(src) {
+  if (value) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
+  }
 }
 
-ArrayVariant::~ArrayVariant() {
-}
+ArrayVariant::~ArrayVariant() = default;
 
-ArrayVariant::Value::Value() {
-}
+ArrayVariant::Value::Value() = default;
 
-ArrayVariant::Value::~Value() {
-}
+ArrayVariant::Value::~Value() = default;
 
-ArrayVariant::ValueImplV::ValueImplV(const DataType& memberType, size_t
-    numMembers) :
-  memberType(memberType),
-  numMembers(numMembers),
-  members(numMembers) {
-  for (size_t i = 0; i < numMembers; ++i)
+ArrayVariant::ValueImplV::ValueImplV(const DataType& memberType, size_t numMembers)
+    : memberType(memberType), numMembers(numMembers), members(numMembers) {
+  for (size_t i = 0; i < numMembers; ++i) {
     members[i] = memberType.createVariant();
+  }
 }
 
-ArrayVariant::ValueImplV::ValueImplV(const ValueImplV& src) :
-  memberType(src.memberType),
-  numMembers(src.numMembers),
-  members(src.members) {
-}
+ArrayVariant::ValueImplV::ValueImplV(const ValueImplV& src)
+    : memberType(src.memberType), numMembers(src.numMembers), members(src.members) {}
 
-ArrayVariant::ValueImplV::~ValueImplV() {
-}
+ArrayVariant::ValueImplV::~ValueImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 void ArrayVariant::Value::setValue(const Variant::Value& value) {
-  const Value& arrayValue = dynamic_cast<const Value&>(value);
+  const auto& arrayValue = dynamic_cast<const Value&>(value);
 
   resize(arrayValue.getNumMembers());
 
-  for (size_t i = 0; i < getNumMembers(); ++i)
+  for (size_t i = 0; i < getNumMembers(); ++i) {
     setMember(i, arrayValue.getMember(i));
+  }
 }
 
-void ArrayVariant::Value::setMember(const std::string& name, const Variant&
-    member) {
-  int index;
+void ArrayVariant::Value::setMember(const std::string& name, const Variant& member) {
+  int index = 0;
 
   try {
     index = boost::lexical_cast<int>(name);
-  }
-  catch (...) {
+  } catch (...) {
     throw NoSuchMemberException(name);
   }
 
@@ -102,12 +88,11 @@ void ArrayVariant::Value::setMember(const std::string& name, const Variant&
 }
 
 Variant ArrayVariant::Value::getMember(const std::string& name) const {
-  int index;
+  int index = 0;
 
   try {
     index = boost::lexical_cast<int>(name);
-  }
-  catch (...) {
+  } catch (...) {
     throw NoSuchMemberException(name);
   }
 
@@ -115,36 +100,35 @@ Variant ArrayVariant::Value::getMember(const std::string& name) const {
 }
 
 bool ArrayVariant::Value::hasMember(const std::string& name) const {
-  int index;
+  int index = 0;
 
   try {
     index = boost::lexical_cast<int>(name);
-  }
-  catch (...) {
+  } catch (...) {
     return false;
   }
 
   return (index < getNumMembers());
 }
 
-
 size_t ArrayVariant::ValueImplV::getNumMembers() const {
   return members.size();
 }
 
-void ArrayVariant::ValueImplV::setMember(int index, const Variant&
-    member) {
-  if (index < members.size())
+void ArrayVariant::ValueImplV::setMember(int index, const Variant& member) {
+  if (index < members.size()) {
     members[index] = member;
-  else
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
 Variant ArrayVariant::ValueImplV::getMember(int index) const {
-  if (index < members.size())
+  if (index < members.size()) {
     return members[index];
-  else
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
 /*****************************************************************************/
@@ -153,89 +137,93 @@ Variant ArrayVariant::ValueImplV::getMember(int index) const {
 
 void ArrayVariant::addMember(const Variant& member) {
   if (value) {
-    if (member.getType().isValid())
+    if (member.getType().isValid()) {
       boost::dynamic_pointer_cast<Value>(value)->addMember(member);
-    else
+    } else {
       throw InvalidDataTypeException();
-  }
-  else
+    }
+  } else {
     throw InvalidOperationException("Adding a member to an invalid array");
+  }
 }
 
 void ArrayVariant::resize(size_t numMembers) {
-  if (value)
+  if (value) {
     boost::dynamic_pointer_cast<Value>(value)->resize(numMembers);
-  else if (numMembers)
+  } else if (numMembers != 0u) {
     throw InvalidOperationException("Resizing an invalid array");
+  }
 }
 
 void ArrayVariant::clear() {
-  if (value)
+  if (value) {
     boost::dynamic_pointer_cast<Value>(value)->clear();
+  }
 }
 
-void ArrayVariant::Value::writeMember(std::ostream& stream, int index)
-    const {
+void ArrayVariant::Value::writeMember(std::ostream& stream, int index) const {
   if (!getMember(index).getType().isBuiltin()) {
-    stream << boost::lexical_cast<std::string>(index) << ":";
+    stream << std::to_string(index) << ":";
 
     std::stringstream memberStream;
     std::string line;
 
     memberStream << getMember(index);
 
-    while (std::getline(memberStream, line))
+    while (std::getline(memberStream, line)) {
       stream << "\n  " << line;
+    }
+  } else {
+    stream << std::to_string(index) << ": " << getMember(index);
   }
-  else
-    stream << boost::lexical_cast<std::string>(index) << ": " <<
-      getMember(index);
 }
 
 void ArrayVariant::ValueImplV::addMember(const Variant& member) {
-  if (!numMembers) {
-    if (member.getType() == memberType)
+  if (numMembers == 0u) {
+    if (member.getType() == memberType) {
       members.push_back(member);
-    else
-      throw DataTypeMismatchException(memberType.getIdentifier(),
-        member.getType().getIdentifier());
-  }
-  else
+    } else {
+      throw DataTypeMismatchException(memberType.getIdentifier(), member.getType().getIdentifier());
+    }
+  } else {
     throw InvalidOperationException("Adding a member to a non-dynamic array");
+  }
 }
 
 void ArrayVariant::ValueImplV::resize(size_t numMembers) {
-  if (!this->numMembers || (numMembers == this->numMembers)) {
+  if ((this->numMembers == 0u) || (numMembers == this->numMembers)) {
     if (numMembers != members.size()) {
       size_t i = members.size();
 
       members.resize(numMembers);
 
-      for ( ; i < members.size(); ++i)
+      for (; i < members.size(); ++i) {
         members[i] = memberType.createVariant();
+      }
     }
-  }
-  else
+  } else {
     throw InvalidOperationException("Resizing a non-dynamic array");
+  }
 }
 
 void ArrayVariant::ValueImplV::clear() {
-  if (!numMembers)
+  if (numMembers == 0u) {
     members.clear();
-  else
+  } else {
     throw InvalidOperationException("Clearing a non-dynamic array");
+  }
 }
 
 Variant::ValuePtr ArrayVariant::ValueImplV::clone() const {
   return Variant::ValuePtr(new ValueImplV(*this));
 }
 
-Serializer ArrayVariant::ValueImplV::createSerializer(const DataType& type)
-    const {
-  if (!members.empty())
+Serializer ArrayVariant::ValueImplV::createSerializer(const DataType& /*type*/) const {
+  if (!members.empty()) {
     return ArraySerializer(members.front().createSerializer(), numMembers);
-  else
+  } else {
     return ArraySerializer(Serializer(), 0);
+  }
 }
 
 /*****************************************************************************/
@@ -247,4 +235,4 @@ ArrayVariant& ArrayVariant::operator+=(const Variant& member) {
   return *this;
 }
 
-}
+}  // namespace variant_topic_tools

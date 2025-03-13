@@ -45,142 +45,129 @@ DataTypeRegistry::DataTypeRegistry() {
     addBuiltinDataType<uint32_t>("uint32");
     addBuiltinDataType<uint64_t>("uint64");
     addBuiltinDataType<uint8_t>("uint8");
-    
+
     addBuiltinDataType<uint8_t>("char");
     addBuiltinDataType<int8_t>("byte");
-    
+
     addBuiltinDataType<ros::Duration>("duration");
     addBuiltinDataType<std::string>("string");
     addBuiltinDataType<ros::Time>("time");
   }
 }
 
-DataTypeRegistry::~DataTypeRegistry() {
-}
+DataTypeRegistry::~DataTypeRegistry() = default;
 
-DataTypeRegistry::Impl::Impl() {
-}
+DataTypeRegistry::Impl::Impl() = default;
 
-DataTypeRegistry::Impl::~Impl() {
-}
+DataTypeRegistry::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 DataType DataTypeRegistry::getDataType(const std::string& identifier) {
-  boost::unordered_map<std::string, DataType>::const_iterator it =
-    impl->dataTypesByIdentifier.find(identifier);
-  
-  if (it != impl->dataTypesByIdentifier.end())
+  boost::unordered_map<std::string, DataType>::const_iterator it = impl->dataTypesByIdentifier.find(identifier);
+
+  if (it != impl->dataTypesByIdentifier.end()) {
     return it->second;
-  
-  std::string name, memberType;
-  size_t size;
-  
-  if (MessageDefinitionParser::matchArrayType(identifier, memberType,
-      size)) {
-    boost::unordered_map<std::string, DataType>::const_iterator jt =
-      impl->dataTypesByIdentifier.find(memberType);
-    
-    if (jt != impl->dataTypesByIdentifier.end())
-      return addArrayDataType(jt->second, size);
   }
-  
+
+  std::string name;
+  std::string memberType;
+  size_t size = 0;
+
+  if (MessageDefinitionParser::matchArrayType(identifier, memberType, size)) {
+    boost::unordered_map<std::string, DataType>::const_iterator jt = impl->dataTypesByIdentifier.find(memberType);
+
+    if (jt != impl->dataTypesByIdentifier.end()) {
+      return addArrayDataType(jt->second, size);
+    }
+  }
+
   return DataType();
 }
 
 DataType DataTypeRegistry::getDataType(const std::string& identifier) const {
-  boost::unordered_map<std::string, DataType>::const_iterator it =
-    impl->dataTypesByIdentifier.find(identifier);
-  
-  if (it != impl->dataTypesByIdentifier.end())
+  boost::unordered_map<std::string, DataType>::const_iterator it = impl->dataTypesByIdentifier.find(identifier);
+
+  if (it != impl->dataTypesByIdentifier.end()) {
     return it->second;
-  else
+  } else {
     return DataType();
+  }
 }
 
 DataType DataTypeRegistry::getDataType(const std::type_info& typeInfo) const {
-  boost::unordered_multimap<const std::type_info*, DataType, TypeInfoHash>::
-    const_iterator it = impl->dataTypesByInfo.find(&typeInfo);
-    
-  if (it != impl->dataTypesByInfo.end())
+  boost::unordered_multimap<const std::type_info*, DataType, TypeInfoHash>::const_iterator it = impl->dataTypesByInfo.find(&typeInfo);
+
+  if (it != impl->dataTypesByInfo.end()) {
     return it->second;
-  else
+  } else {
     return DataType();
+  }
 }
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-ArrayDataType DataTypeRegistry::addArrayDataType(const DataType& memberType,
-    size_t numMembers) {
+ArrayDataType DataTypeRegistry::addArrayDataType(const DataType& memberType, size_t numMembers) {
   ArrayDataType arrayDataType(memberType, numMembers);
   addDataType(arrayDataType);
-  
+
   return arrayDataType;
 }
 
-MessageDataType DataTypeRegistry::addMessageDataType(const std::string&
-    identifier, const MessageFieldCollection<MessageConstant>& constantMembers,
-    const MessageFieldCollection<MessageVariable>& variableMembers) {
-  MessageDataType messageDataType(identifier, constantMembers,
-    variableMembers);
+MessageDataType DataTypeRegistry::addMessageDataType(const std::string& identifier,
+                                                     const MessageFieldCollection<MessageConstant>& constantMembers,
+                                                     const MessageFieldCollection<MessageVariable>& variableMembers) {
+  MessageDataType messageDataType(identifier, constantMembers, variableMembers);
   addDataType(messageDataType);
-  
+
   return messageDataType;
 }
 
-MessageDataType DataTypeRegistry::addMessageDataType(const std::string&
-    identifier, const std::string& definition) {
+MessageDataType DataTypeRegistry::addMessageDataType(const std::string& identifier, const std::string& definition) {
   MessageDataType messageDataType(identifier, definition);
   addDataType(messageDataType);
-  
+
   return messageDataType;
 }
 
 void DataTypeRegistry::addDataType(const DataType& dataType) {
   if (dataType.isValid()) {
-    boost::unordered_map<std::string, DataType>::iterator it =
-      impl->dataTypesByIdentifier.find(dataType.getIdentifier());
-      
+    boost::unordered_map<std::string, DataType>::iterator it = impl->dataTypesByIdentifier.find(dataType.getIdentifier());
+
     if (it == impl->dataTypesByIdentifier.end()) {
-      impl->dataTypesByIdentifier.insert(
-        std::make_pair(dataType.getIdentifier(), dataType));
-      
-      if (dataType.hasTypeInfo())
-        impl->dataTypesByInfo.insert(
-          std::make_pair(&dataType.getTypeInfo(), dataType));
-    }
-    else if (!it->second.hasTypeInfo() && dataType.hasTypeInfo()) {
+      impl->dataTypesByIdentifier.insert(std::make_pair(dataType.getIdentifier(), dataType));
+
+      if (dataType.hasTypeInfo()) {
+        impl->dataTypesByInfo.insert(std::make_pair(&dataType.getTypeInfo(), dataType));
+      }
+    } else if (!it->second.hasTypeInfo() && dataType.hasTypeInfo()) {
       it->second = dataType;
-      
-      impl->dataTypesByInfo.insert(
-        std::make_pair(&dataType.getTypeInfo(), dataType));
-    }
-    else
+
+      impl->dataTypesByInfo.insert(std::make_pair(&dataType.getTypeInfo(), dataType));
+    } else {
       throw AmbiguousDataTypeIdentifierException(it->first);
-  }
-  else
+    }
+  } else {
     throw InvalidDataTypeException();
+  }
 }
 
 void DataTypeRegistry::removeDataType(const DataType& dataType) {
   if (dataType.isValid()) {
-    boost::unordered_map<std::string, DataType>::iterator it =
-      impl->dataTypesByIdentifier.find(dataType.getIdentifier());
-      
-    if ((it != impl->dataTypesByIdentifier.end()) &&
-        (it->second.impl == dataType.impl))
+    boost::unordered_map<std::string, DataType>::iterator it = impl->dataTypesByIdentifier.find(dataType.getIdentifier());
+
+    if ((it != impl->dataTypesByIdentifier.end()) && (it->second.impl == dataType.impl)) {
       impl->dataTypesByIdentifier.erase(it);
-    
+    }
+
     if (dataType.hasTypeInfo()) {
-      typedef boost::unordered_multimap<const std::type_info*, DataType,
-        TypeInfoHash>::iterator Iterator;
-        
-      std::pair<Iterator, Iterator> range =
-        impl->dataTypesByInfo.equal_range(&dataType.getTypeInfo());
+      using Iterator = boost::unordered_multimap<const std::type_info*, DataType, TypeInfoHash>::iterator;
+
+      std::pair<Iterator, Iterator> range = impl->dataTypesByInfo.equal_range(&dataType.getTypeInfo());
       for (Iterator it = range.first; it != range.second; ++it) {
         if (it->second.impl == dataType.impl) {
           impl->dataTypesByInfo.erase(it);
@@ -188,9 +175,9 @@ void DataTypeRegistry::removeDataType(const DataType& dataType) {
         }
       }
     }
-  }
-  else
+  } else {
     throw InvalidDataTypeException();
+  }
 }
 
 void DataTypeRegistry::clear() {
@@ -198,12 +185,12 @@ void DataTypeRegistry::clear() {
   impl->dataTypesByInfo.clear();
 }
 
-void DataTypeRegistry::write(std::ostream& stream) const {
-  for (boost::unordered_map<std::string, DataType>::const_iterator
-      it = impl->dataTypesByIdentifier.begin();
-      it != impl->dataTypesByIdentifier.end(); ++it) {
-    if (it != impl->dataTypesByIdentifier.begin())
+void DataTypeRegistry::write(std::ostream& stream) {
+  for (boost::unordered_map<std::string, DataType>::const_iterator it = impl->dataTypesByIdentifier.begin();
+       it != impl->dataTypesByIdentifier.end(); ++it) {
+    if (it != impl->dataTypesByIdentifier.begin()) {
       stream << "\n";
+    }
     stream << it->second;
   }
 }
@@ -224,10 +211,9 @@ DataType DataTypeRegistry::operator[](const std::type_info& typeInfo) const {
   return getDataType(typeInfo);
 }
 
-std::ostream& operator<<(std::ostream& stream, const DataTypeRegistry&
-    dataTypeRegistry) {
-  dataTypeRegistry.write(stream);
+std::ostream& operator<<(std::ostream& stream, const DataTypeRegistry& dataTypeRegistry) {
+  variant_topic_tools::DataTypeRegistry::write(stream);
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

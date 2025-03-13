@@ -26,20 +26,23 @@ namespace variant_topic_tools {
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-template <typename T> DataType DataTypeRegistry::getDataType() {
+template <typename T>
+DataType DataTypeRegistry::getDataType() {
   DataType dataType(this->getDataType(typeid(T)));
-  
+
   if (!dataType.isValid()) {
     dataType = DataTypeRegistry::template createDataType<T>();
-    
-    if (dataType.isValid())
-      this->addDataType(dataType);
+
+    if (dataType.isValid()) {
+      variant_topic_tools::DataTypeRegistry::addDataType(dataType);
+    }
   }
-  
+
   return dataType;
 }
 
-template <typename T> DataType DataTypeRegistry::getDataType() const {
+template <typename T>
+DataType DataTypeRegistry::getDataType() const {
   return this->getDataType(typeid(T));
 }
 
@@ -47,55 +50,57 @@ template <typename T> DataType DataTypeRegistry::getDataType() const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> ArrayDataType DataTypeRegistry::addArrayDataType() {
+template <typename T>
+ArrayDataType DataTypeRegistry::addArrayDataType() {
   ArrayDataType arrayDataType = ArrayDataType::template create<T>();
-  this->addDataType(arrayDataType);
-  
+  variant_topic_tools::DataTypeRegistry::addDataType(arrayDataType);
+
   return arrayDataType;
 }
 
-template <typename T, size_t N> ArrayDataType DataTypeRegistry::
-    addArrayDataType() {
+template <typename T, size_t N>
+ArrayDataType DataTypeRegistry::addArrayDataType() {
   ArrayDataType arrayDataType = ArrayDataType::template create<T, N>();
-  this->addDataType(arrayDataType);
-  
+  variant_topic_tools::DataTypeRegistry::addDataType(arrayDataType);
+
   return arrayDataType;
 }
 
-template <typename T> BuiltinDataType DataTypeRegistry::addBuiltinDataType(
-    const std::string& identifier) {
-  BuiltinDataType builtinDataType = BuiltinDataType::template create<T>(
-    identifier);
-  this->addDataType(builtinDataType);
-  
+template <typename T>
+BuiltinDataType DataTypeRegistry::addBuiltinDataType(const std::string& identifier) {
+  BuiltinDataType builtinDataType = BuiltinDataType::template create<T>(identifier);
+  variant_topic_tools::DataTypeRegistry::addDataType(builtinDataType);
+
   return builtinDataType;
 }
 
-template <typename T> MessageDataType DataTypeRegistry::addMessageDataType() {
+template <typename T>
+MessageDataType DataTypeRegistry::addMessageDataType() {
   MessageDataType messageDataType = MessageDataType::template create<T>();
-  this->addDataType(messageDataType);
-  
+  variant_topic_tools::DataTypeRegistry::addDataType(messageDataType);
+
   return messageDataType;
 }
 
-template <typename T> void DataTypeRegistry::addDataType() {
+template <typename T>
+void DataTypeRegistry::addDataType() {
   DataType dataType = DataTypeRegistry::template createDataType<T>();
-  this->addDataType(dataType);
+  variant_topic_tools::DataTypeRegistry::addDataType(dataType);
 }
 
-template <typename T> BuiltinDataType DataTypeRegistry::createDataType(
-    typename boost::enable_if<type_traits::IsBuiltin<T> >::type*) {
+template <typename T>
+BuiltinDataType DataTypeRegistry::createDataType(typename boost::enable_if<type_traits::IsBuiltin<T> >::type* /*unused*/) {
   return BuiltinDataType();
 }
 
-template <typename T> ArrayDataType DataTypeRegistry::createDataType(
-    typename boost::enable_if<type_traits::IsArray<T> >::type*) {
+template <typename T>
+ArrayDataType DataTypeRegistry::createDataType(typename boost::enable_if<type_traits::IsArray<T> >::type* /*unused*/) {
   return ArrayDataType::template create<T>();
 }
 
-template <typename T> MessageDataType DataTypeRegistry::createDataType(
-    typename boost::enable_if<type_traits::IsMessage<T> >::type*) {
+template <typename T>
+MessageDataType DataTypeRegistry::createDataType(typename boost::enable_if<type_traits::IsMessage<T> >::type* /*unused*/) {
   return MessageDataType::template create<T>();
 }
 
-}
+}  // namespace variant_topic_tools

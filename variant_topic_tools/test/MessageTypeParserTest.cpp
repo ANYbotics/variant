@@ -23,13 +23,13 @@
 using namespace variant_topic_tools;
 
 TEST(MessageTypeParser, Match) {
-  std::string package, type;
-  
+  std::string package;
+  std::string type;
+
   EXPECT_TRUE(MessageTypeParser::matchType("PlainType", package, type));
   EXPECT_EQ(std::string(), package);
   EXPECT_EQ("PlainType", type);
-  EXPECT_TRUE(MessageTypeParser::matchType("package/PackageType", package,
-    type));
+  EXPECT_TRUE(MessageTypeParser::matchType("package/PackageType", package, type));
   EXPECT_EQ("package", package);
   EXPECT_EQ("PackageType", type);
 }

@@ -27,21 +27,14 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-ArrayVariant::ValueImplT<T>::ValueImplT(const DataType& memberType, const
-    Pointer<ValueType>& array) :
-  memberType(memberType),
-  array(array) {
-}
+ArrayVariant::ValueImplT<T>::ValueImplT(const DataType& memberType, const Pointer<ValueType>& array)
+    : memberType(memberType), array(array) {}
 
 template <typename T>
-ArrayVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
-  memberType(src.memberType),
-  array(src.array) {
-}
+ArrayVariant::ValueImplT<T>::ValueImplT(const /*unused*/ ValueImplT<T>& src) : memberType(src.memberType), array(src.array) {}
 
 template <typename T>
-ArrayVariant::ValueImplT<T>::~ValueImplT() {
-}
+ArrayVariant::ValueImplT<T>::~ValueImplT() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -53,8 +46,7 @@ void ArrayVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
 }
 
 template <typename T>
-typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
-    ValueImplT<T>::getValue() {
+typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::ValueImplT<T>::getValue() {
   if (!this->array) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
@@ -64,8 +56,7 @@ typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
 }
 
 template <typename T>
-const typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
-    ValueImplT<T>::getValue() const {
+const typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::ValueImplT<T>::getValue() const {
   if (!this->array) {
     static ValueType array = ValueType();
     static bool initialized = false;
@@ -76,8 +67,7 @@ const typename ArrayVariant::ValueImplT<T>::ValueType& ArrayVariant::
     }
 
     return array;
-  }
-  else
+  } else
     return *this->array;
 }
 
@@ -90,8 +80,7 @@ size_t ArrayVariant::ValueImplT<T>::getNumMembers() const {
 }
 
 template <typename T>
-void ArrayVariant::ValueImplT<T>::setMember(int index, const Variant&
-    member) {
+void ArrayVariant::ValueImplT<T>::setMember(int index, const Variant& member) {
   if (!this->array) {
     this->array = Pointer<ValueType>(new ValueType());
     ArrayVariant::template initialize<T>(*this->array);
@@ -113,12 +102,10 @@ Variant ArrayVariant::ValueImplT<T>::getMember(int index) const {
   if ((index >= 0) && (index < this->array->size())) {
     Variant member = this->memberType.createVariant();
 
-    Variant::template set<MemberType>(member, ArrayMemberPointer<T>(
-      this->array, index));
+    Variant::template set<MemberType>(member, ArrayMemberPointer<T>(this->array, index));
 
     return member;
-  }
-  else
+  } else
     throw NoSuchMemberException(index);
 }
 
@@ -126,8 +113,8 @@ Variant ArrayVariant::ValueImplT<T>::getMember(int index) const {
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> ArrayVariant ArrayVariant::create(const
-    DataType& type, const DataType& memberType) {
+template <typename T>
+ArrayVariant ArrayVariant::create(const DataType& type, const DataType& memberType) {
   ArrayVariant variant;
 
   variant.type = type;
@@ -158,8 +145,7 @@ void ArrayVariant::ValueImplT<T>::resize(size_t numMembers) {
 
 template <typename T>
 void ArrayVariant::ValueImplT<T>::clear() {
-  if (this->array)
-    ArrayVariant::template clear<T>(*this->array);
+  if (this->array) ArrayVariant::template clear<T>(*this->array);
 }
 
 template <typename T>
@@ -168,59 +154,54 @@ Variant::ValuePtr ArrayVariant::ValueImplT<T>::clone() const {
 }
 
 template <typename T>
-Serializer ArrayVariant::ValueImplT<T>::createSerializer(const DataType&
-    type) const {
+Serializer ArrayVariant::ValueImplT<T>::createSerializer(const DataType& type) const {
   return ArraySerializer::template create<T>();
 }
 
-template <typename T> void ArrayVariant::initialize(typename type_traits::
-    ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-    type_traits::ArrayType<T>::IsDynamic>::type*) {
-}
+template <typename T>
+void ArrayVariant::initialize(typename type_traits::ArrayType<T>::ValueType& array,
+                              typename boost::enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {}
 
-template <typename T> void ArrayVariant::initialize(typename type_traits::
-    ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-    type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::initialize(typename type_traits::ArrayType<T>::ValueType& array,
+                              typename boost::disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   array.assign(typename type_traits::ArrayType<T>::MemberValueType());
 }
 
-template <typename T> void ArrayVariant::add(typename type_traits::
-    ArrayType<T>::ValueType& array, const typename type_traits::
-    ArrayType<T>::MemberType& member, typename boost::enable_if<
-    typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::add(typename type_traits::ArrayType<T>::ValueType& array, const typename type_traits::ArrayType<T>::MemberType& member,
+                       typename boost::enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   array.push_back(member);
 }
 
-template <typename T> void ArrayVariant::add(typename type_traits::
-    ArrayType<T>::ValueType& array, const typename type_traits::
-    ArrayType<T>::MemberType& member, typename boost::disable_if<
-    typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::add(typename type_traits::ArrayType<T>::ValueType& array, const typename type_traits::ArrayType<T>::MemberType& member,
+                       typename boost::disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   throw InvalidOperationException("Adding a member to a non-dynamic array");
 }
 
-template <typename T> void ArrayVariant::resize(typename type_traits::
-    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
-    enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::resize(typename type_traits::ArrayType<T>::ValueType& array, size_t numMembers,
+                          typename boost::enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   array.resize(numMembers);
 }
 
-template <typename T> void ArrayVariant::resize(typename type_traits::
-    ArrayType<T>::ValueType& array, size_t numMembers, typename boost::
-    disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
-  if (numMembers != type_traits::ArrayType<T>::NumMembers)
-    throw InvalidOperationException("Resizing a non-dynamic array");
+template <typename T>
+void ArrayVariant::resize(typename type_traits::ArrayType<T>::ValueType& array, size_t numMembers,
+                          typename boost::disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
+  if (numMembers != type_traits::ArrayType<T>::NumMembers) throw InvalidOperationException("Resizing a non-dynamic array");
 }
 
-template <typename T> void ArrayVariant::clear(typename type_traits::
-    ArrayType<T>::ValueType& array, typename boost::enable_if<typename
-    type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::clear(typename type_traits::ArrayType<T>::ValueType& array,
+                         typename boost::enable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   array.clear();
 }
 
-template <typename T> void ArrayVariant::clear(typename type_traits::
-    ArrayType<T>::ValueType& array, typename boost::disable_if<typename
-    type_traits::ArrayType<T>::IsDynamic>::type*) {
+template <typename T>
+void ArrayVariant::clear(typename type_traits::ArrayType<T>::ValueType& array,
+                         typename boost::disable_if<typename type_traits::ArrayType<T>::IsDynamic>::type*) {
   throw InvalidOperationException("Clearing a non-dynamic array");
 }
 
-}
+}  // namespace variant_topic_tools

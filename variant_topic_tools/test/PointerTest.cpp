@@ -29,79 +29,75 @@ using namespace variant_topic_tools;
 TEST(Pointer, Builtin) {
   BuiltinPointer<int> p1(new int());
   BuiltinPointer<int> p2;
-  
+
   EXPECT_TRUE(p1);
   EXPECT_NO_THROW(*p1);
-  
+
   EXPECT_FALSE(p2);
   EXPECT_ANY_THROW(*p2);
 }
 
 TEST(Pointer, Array) {
-  boost::array<int, 3>* a1 = new boost::array<int, 3>();
+  auto* a1 = new boost::array<int, 3>();
   (*a1)[0] = 0;
   (*a1)[1] = 1;
-  (*a1)[2] = 2;  
+  (*a1)[2] = 2;
   ArrayMemberPointer<int[3]> p1(a1, 1);
-  
-  std::vector<int>* a2 = new std::vector<int>(3);
+
+  auto* a2 = new std::vector<int>(3);
   (*a2)[0] = 0;
   (*a2)[1] = 1;
-  (*a2)[2] = 2;  
+  (*a2)[2] = 2;
   ArrayMemberPointer<int[]> p2(a2, 1);
   ArrayMemberPointer<int[]> p3(p2.getArray(), 2);
-  
+
   EXPECT_EQ(a1, p1.getArray().get());
   EXPECT_EQ(1, p1.getIndex());
   EXPECT_EQ(1, *p1);
-  
+
   EXPECT_EQ(a2, p2.getArray().get());
   EXPECT_EQ(1, p2.getIndex());
   EXPECT_EQ(1, *p2);
-  
+
   EXPECT_EQ(a2, p3.getArray().get());
   EXPECT_EQ(2, p3.getIndex());
   EXPECT_EQ(2, *p3);
 }
 
 TEST(Pointer, Message) {
-  variant_msgs::Test* m1 = new variant_msgs::Test();
+  auto* m1 = new variant_msgs::Test();
   m1->builtin_int = 42;
   m1->builtin_string = "Test";
-  
-  MessageMemberPointer<variant_msgs::Test, int32_t> p1(m1,
-    offsetof(variant_msgs::Test, builtin_int));
-  MessageMemberPointer<variant_msgs::Test, std::string> p2(
-    p1.getMessage(), offsetof(variant_msgs::Test, builtin_string));
-  
+
+  MessageMemberPointer<variant_msgs::Test, int32_t> p1(m1, offsetof(variant_msgs::Test, builtin_int));
+  MessageMemberPointer<variant_msgs::Test, std::string> p2(p1.getMessage(), offsetof(variant_msgs::Test, builtin_string));
+
   EXPECT_EQ(m1, p1.getMessage().get());
   EXPECT_EQ(offsetof(variant_msgs::Test, builtin_int), p1.getOffset());
   EXPECT_EQ(m1->builtin_int, *p1);
-  
+
   EXPECT_EQ(m1, p2.getMessage().get());
   EXPECT_EQ(offsetof(variant_msgs::Test, builtin_string), p2.getOffset());
   EXPECT_EQ(m1->builtin_string, *p2);
 }
 
 TEST(Pointer, ArrayOfMessages) {
-  variant_msgs::Test* m1 = new variant_msgs::Test();
+  auto* m1 = new variant_msgs::Test();
   m1->string_array[1].data = "Test";
-  
-  MessageMemberPointer<variant_msgs::Test, std_msgs::String[3]>
-    p1(m1, offsetof(variant_msgs::Test, string_array));
+
+  MessageMemberPointer<variant_msgs::Test, std_msgs::String[3]> p1(m1, offsetof(variant_msgs::Test, string_array));
   ArrayMemberPointer<std_msgs::String[3]> p2(p1, 1);
-  MessageMemberPointer<std_msgs::String, std::string>
-    p3(p2, offsetof(std_msgs::String, data));
-  
+  MessageMemberPointer<std_msgs::String, std::string> p3(p2, offsetof(std_msgs::String, data));
+
   EXPECT_EQ(m1, p1.getMessage().get());
   EXPECT_EQ(offsetof(variant_msgs::Test, string_array), p1.getOffset());
-  
+
   EXPECT_EQ(&m1->string_array, p2.getArray().get());
   EXPECT_EQ(1, p2.getIndex());
-  
+
   EXPECT_EQ(&m1->string_array[1], p3.getMessage().get());
   EXPECT_EQ(offsetof(std_msgs::String, data), p3.getOffset());
-  
+
   EXPECT_NO_THROW(p1.reset());
   EXPECT_ANY_THROW(*p1);
   EXPECT_NO_THROW(*p2);
@@ -111,5 +107,5 @@ TEST(Pointer, ArrayOfMessages) {
   EXPECT_ANY_THROW(*p2);
   EXPECT_NO_THROW(*p3);
   EXPECT_EQ("Test", *p3);
-  EXPECT_NO_THROW(p3.reset());  
+  EXPECT_NO_THROW(p3.reset());
 }

@@ -24,26 +24,20 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-BuiltinSerializer::BuiltinSerializer() {
-}
+BuiltinSerializer::BuiltinSerializer() = default;
 
-BuiltinSerializer::BuiltinSerializer(const BuiltinSerializer& src) :
-  Serializer(src) {
-}
+BuiltinSerializer::BuiltinSerializer(const BuiltinSerializer& src) = default;
 
-BuiltinSerializer::BuiltinSerializer(const Serializer& src) :
-  Serializer(src) {
-  if (impl)
+BuiltinSerializer::BuiltinSerializer(const Serializer& src) : Serializer(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl));
+  }
 }
 
-BuiltinSerializer::~BuiltinSerializer() {
-}
+BuiltinSerializer::~BuiltinSerializer() = default;
 
-BuiltinSerializer::Impl::Impl() {
-}
+BuiltinSerializer::Impl::Impl() = default;
 
-BuiltinSerializer::Impl::~Impl() {
-}
+BuiltinSerializer::Impl::~Impl() = default;
 
-}
+}  // namespace variant_topic_tools

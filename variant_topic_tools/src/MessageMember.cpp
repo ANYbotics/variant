@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <utility>
+
 #include "variant_topic_tools/DataType.h"
 #include "variant_topic_tools/MessageConstant.h"
 #include "variant_topic_tools/MessageMember.h"
@@ -27,22 +29,15 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageMember::MessageMember() {
-}
+MessageMember::MessageMember() = default;
 
-MessageMember::MessageMember(const MessageMember& src) :
-  impl(src.impl) {
-}
+MessageMember::MessageMember(const MessageMember& src) = default;
 
-MessageMember::~MessageMember() {
-}
+MessageMember::~MessageMember() = default;
 
-MessageMember::Impl::Impl(const std::string& name) :
-  name(name) {
-}
+MessageMember::Impl::Impl(std::string name) : name(std::move(name)) {}
 
-MessageMember::Impl::~Impl() {
-}
+MessageMember::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -52,32 +47,34 @@ const std::string& MessageMember::getName() const {
   if (!impl) {
     static std::string name;
     return name;
-  }
-  else
+  } else {
     return impl->name;
+  }
 }
 
 const DataType& MessageMember::getType() const {
   if (!impl) {
     static DataType type;
     return type;
-  }
-  else
+  } else {
     return impl->getType();
+  }
 }
 
 bool MessageMember::isVariable() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<MessageVariable::Impl>(impl) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool MessageMember::isConstant() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<MessageConstant::Impl>(impl) != nullptr;
-  else
+  } else {
     return false;
+  }
 }
 
 bool MessageMember::isValid() const {
@@ -89,18 +86,18 @@ bool MessageMember::isValid() const {
 /*****************************************************************************/
 
 void MessageMember::write(std::ostream& stream) const {
-  if (impl)
+  if (impl) {
     impl->write(stream);
+  }
 }
 
 /*****************************************************************************/
 /* Operators                                                                 */
 /*****************************************************************************/
 
-std::ostream& operator<<(std::ostream& stream, const MessageMember&
-    messageMember) {
+std::ostream& operator<<(std::ostream& stream, const MessageMember& messageMember) {
   messageMember.write(stream);
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

@@ -16,10 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <variant_topic_tools/Exceptions.h>
 #include <variant_topic_tools/MessageMemberPointer.h>
 #include <variant_topic_tools/MessageSerializer.h>
 #include <variant_topic_tools/MessageVariable.h>
-#include <variant_topic_tools/Exceptions.h>
 
 namespace variant_topic_tools {
 
@@ -28,21 +28,14 @@ namespace variant_topic_tools {
 /*****************************************************************************/
 
 template <typename T>
-MessageVariant::ValueImplT<T>::ValueImplT(const MessageFieldCollection<
-    MessageVariable>& members, const Pointer<ValueType>& message) :
-  members(members),
-  message(message) {
-}
+MessageVariant::ValueImplT<T>::ValueImplT(const MessageFieldCollection<MessageVariable>& members, const Pointer<ValueType>& message)
+    : members(members), message(message) {}
 
 template <typename T>
-MessageVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) :
-  members(src.members),
-  message(src.message) {
-}
+MessageVariant::ValueImplT<T>::ValueImplT(const ValueImplT<T>& src) : members(src.members), message(src.message) {}
 
 template <typename T>
-MessageVariant::ValueImplT<T>::~ValueImplT() {
-}
+MessageVariant::ValueImplT<T>::ValueImplT::~ValueImplT() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -54,23 +47,22 @@ void MessageVariant::ValueImplT<T>::set(const Pointer<ValueType>& value) {
 }
 
 template <typename T>
-typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::
-    ValueImplT<T>::getValue() {
-  if (!this->message)
+typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::ValueImplT<T>::getValue() {
+  if (!this->message) {
     this->message = Pointer<ValueType>(new ValueType());
+  }
 
   return *this->message;
 }
 
 template <typename T>
-const typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::
-    ValueImplT<T>::getValue() const {
+const typename MessageVariant::ValueImplT<T>::ValueType& MessageVariant::ValueImplT<T>::getValue() const {
   if (!this->message) {
     static ValueType message = ValueType();
     return message;
-  }
-  else
+  } else {
     return *this->message;
+  }
 }
 
 template <typename T>
@@ -79,45 +71,40 @@ size_t MessageVariant::ValueImplT<T>::getNumMembers() const {
 }
 
 template <typename T>
-void MessageVariant::ValueImplT<T>::setMember(int index, const Variant&
-    member) {
+void MessageVariant::ValueImplT<T>::setMember(int index, const Variant& member) {
   this->getMember(index).setValue(member);
 }
 
 template <typename T>
-void MessageVariant::ValueImplT<T>::setMember(const std::string& name,
-    const Variant& member) {
+void MessageVariant::ValueImplT<T>::setMember(const std::string& name, const Variant& member) {
   this->getMember(name).setValue(member);
 }
 
 template <typename T>
 Variant MessageVariant::ValueImplT<T>::getMember(int index) const {
-  if (!this->message)
+  if (!this->message) {
     this->message = Pointer<ValueType>(new ValueType());
+  }
 
-  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
-    this->members[index].getValue().impl)->createVariant(this->message);
+  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(this->members[index].getValue().impl)->createVariant(this->message);
 }
 
 template <typename T>
-Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name)
-    const {
-  if (!this->message)
+Variant MessageVariant::ValueImplT<T>::getMember(const std::string& name) const {
+  if (!this->message) {
     this->message = Pointer<ValueType>(new ValueType());
+  }
 
-  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(
-    this->members[name].getValue().impl)->createVariant(this->message);
+  return boost::static_pointer_cast<MessageVariable::ImplT<T> >(this->members[name].getValue().impl)->createVariant(this->message);
 }
 
 template <typename T>
-const std::string& MessageVariant::ValueImplT<T>::getMemberName(
-    int index) const {
+const std::string& MessageVariant::ValueImplT<T>::getMemberName(int index) const {
   return this->members.getField(index).getName();
 }
 
 template <typename T>
-bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
-    const {
+bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name) const {
   return this->members.hasField(name);
 }
 
@@ -125,8 +112,8 @@ bool MessageVariant::ValueImplT<T>::hasMember(const std::string& name)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-template <typename T> MessageVariant MessageVariant::create(const DataType&
-    type, const MessageFieldCollection<MessageVariable>& members) {
+template <typename T>
+MessageVariant MessageVariant::create(const DataType& type, const MessageFieldCollection<MessageVariable>& members) {
   MessageVariant variant;
 
   variant.type = type;
@@ -141,9 +128,8 @@ Variant::ValuePtr MessageVariant::ValueImplT<T>::clone() const {
 }
 
 template <typename T>
-Serializer MessageVariant::ValueImplT<T>::createSerializer(const DataType&
-    type) const {
+Serializer MessageVariant::ValueImplT<T>::createSerializer(const DataType& /*type*/) const {
   return MessageSerializer::template create<T>();
 }
 
-}
+}  // namespace variant_topic_tools

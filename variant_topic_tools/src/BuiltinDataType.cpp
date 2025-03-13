@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include <utility>
+
 #include "variant_topic_tools/BuiltinDataType.h"
 
 namespace variant_topic_tools {
@@ -24,38 +26,32 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-BuiltinDataType::BuiltinDataType() {
-}
+BuiltinDataType::BuiltinDataType() = default;
 
-BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) :
-  DataType(src) {
-}
+BuiltinDataType::BuiltinDataType(const BuiltinDataType& src) = default;
 
-BuiltinDataType::BuiltinDataType(const DataType& src) :
-  DataType(src) {
-  if (impl)
+BuiltinDataType::BuiltinDataType(const DataType& src) : DataType(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(*impl));
+  }
 }
 
-BuiltinDataType::~BuiltinDataType() {
-}
+BuiltinDataType::~BuiltinDataType() = default;
 
-BuiltinDataType::Impl::Impl(const std::string& identifier) :
-  identifier(identifier) {
-}
+BuiltinDataType::Impl::Impl(std::string identifier) : identifier(std::move(identifier)) {}
 
-BuiltinDataType::Impl::~Impl() {
-}
+BuiltinDataType::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 bool BuiltinDataType::isNumeric() const {
-  if (impl)
+  if (impl) {
     return boost::dynamic_pointer_cast<Impl>(*impl)->isNumeric();
-  else
+  } else {
     return false;
+  }
 }
 
 const std::string& BuiltinDataType::Impl::getIdentifier() const {
@@ -68,11 +64,12 @@ const std::string& BuiltinDataType::Impl::getIdentifier() const {
 
 BuiltinDataType& BuiltinDataType::operator=(const DataType& src) {
   DataType::operator=(src);
-  
-  if (impl)
+
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<BuiltinDataType::Impl>(*impl));
-    
+  }
+
   return *this;
 }
 
-}
+}  // namespace variant_topic_tools

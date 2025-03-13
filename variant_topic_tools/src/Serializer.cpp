@@ -16,9 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
+#include "variant_topic_tools/Serializer.h"
 #include "variant_topic_tools/DataType.h"
 #include "variant_topic_tools/Exceptions.h"
-#include "variant_topic_tools/Serializer.h"
 
 namespace variant_topic_tools {
 
@@ -26,36 +26,32 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-Serializer::Serializer() {
-}
+Serializer::Serializer() = default;
 
 Serializer::Serializer(const DataType& dataType) {
-  if (dataType.isValid())
+  if (dataType.isValid()) {
     impl = dataType.createSerializer().impl;
+  }
 }
 
-Serializer::Serializer(const Serializer& src) :
-  impl(src.impl) {
-}
+Serializer::Serializer(const Serializer& src) = default;
 
-Serializer::~Serializer() {
-}
+Serializer::~Serializer() = default;
 
-Serializer::Impl::Impl() {
-}
+Serializer::Impl::Impl() = default;
 
-Serializer::Impl::~Impl() {
-}
+Serializer::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 size_t Serializer::getSerializedLength(const Variant& value) const {
-  if (impl)
+  if (impl) {
     return impl->getSerializedLength(value);
-  else
+  } else {
     return 0;
+  }
 }
 
 bool Serializer::isValid() const {
@@ -70,32 +66,31 @@ void Serializer::clear() {
   impl.reset();
 }
 
-void Serializer::serialize(ros::serialization::OStream& stream, const Variant&
-    value) {
-  if (impl)
+void Serializer::serialize(ros::serialization::OStream& stream, const Variant& value) {
+  if (impl) {
     impl->serialize(stream, value);
-  else
+  } else {
     throw InvalidSerializerException();
+  }
 }
 
-void Serializer::deserialize(ros::serialization::IStream& stream, Variant&
-    value) {
-  if (impl)
+void Serializer::deserialize(ros::serialization::IStream& stream, Variant& value) {
+  if (impl) {
     impl->deserialize(stream, value);
-  else
+  } else {
     throw InvalidSerializerException();
+  }
 }
 
-void Serializer::advance(ros::serialization::Stream& stream, const Variant&
-    value) {
-  if (impl)
+void Serializer::advance(ros::serialization::Stream& stream, const Variant& value) {
+  if (impl) {
     return impl->advance(stream, value);
-  else
+  } else {
     throw InvalidSerializerException();
+  }
 }
 
-void Serializer::Impl::advance(ros::serialization::Stream& stream, const
-    Variant& value) {
+void Serializer::Impl::advance(ros::serialization::Stream& stream, const Variant& value) const {
   stream.advance(getSerializedLength(value));
 }
 
@@ -103,8 +98,8 @@ void Serializer::Impl::advance(ros::serialization::Stream& stream, const
 /* Operators                                                                 */
 /*****************************************************************************/
 
-std::ostream& operator<<(std::ostream& stream, const Serializer& serializer) {
+std::ostream& operator<<(std::ostream& stream, const Serializer& /*serializer*/) {
   return stream;
 }
 
-}
+}  // namespace variant_topic_tools

@@ -25,57 +25,47 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-ArraySerializer::ArraySerializer() {
-}
+ArraySerializer::ArraySerializer() = default;
 
-ArraySerializer::ArraySerializer(const Serializer& memberSerializer, size_t
-    numMembers) {
+ArraySerializer::ArraySerializer(const Serializer& memberSerializer, size_t numMembers) {
   impl.reset(new ImplV(memberSerializer, numMembers));
 }
 
-ArraySerializer::ArraySerializer(const ArraySerializer& src) :
-  Serializer(src) {
-}
+ArraySerializer::ArraySerializer(const ArraySerializer& src) = default;
 
-ArraySerializer::ArraySerializer(const Serializer& src) :
-  Serializer(src) {
-  if (impl)
+ArraySerializer::ArraySerializer(const Serializer& src) : Serializer(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(impl));
+  }
 }
 
-ArraySerializer::~ArraySerializer() {
-}
+ArraySerializer::~ArraySerializer() = default;
 
-ArraySerializer::Impl::Impl() {
-}
+ArraySerializer::Impl::Impl() = default;
 
-ArraySerializer::Impl::~Impl() {
-}
+ArraySerializer::Impl::~Impl() = default;
 
-ArraySerializer::ImplV::ImplV(const Serializer& memberSerializer, size_t
-    numMembers) :
-  memberSerializer(memberSerializer),
-  numMembers(numMembers) {
-}
+ArraySerializer::ImplV::ImplV(const Serializer& memberSerializer, size_t numMembers)
+    : memberSerializer(memberSerializer), numMembers(numMembers) {}
 
-ArraySerializer::ImplV::~ImplV() {
-}
+ArraySerializer::ImplV::~ImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
-size_t ArraySerializer::ImplV::getSerializedLength(const Variant& value)
-    const {
+size_t ArraySerializer::ImplV::getSerializedLength(const Variant& value) const {
   ArrayVariant arrayValue = value;
   size_t length = 0;
 
-  if (!numMembers)
+  if (numMembers == 0u) {
     length += sizeof(uint32_t);
-  
-  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
+  }
+
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i) {
     length += memberSerializer.getSerializedLength(arrayValue[i]);
-  
+  }
+
   return length;
 }
 
@@ -83,32 +73,32 @@ size_t ArraySerializer::ImplV::getSerializedLength(const Variant& value)
 /* Methods                                                                   */
 /*****************************************************************************/
 
-void ArraySerializer::ImplV::serialize(ros::serialization::OStream& stream,
-    const Variant& value) {
+void ArraySerializer::ImplV::serialize(ros::serialization::OStream& stream, const Variant& value) {
   ArrayVariant arrayValue = value;
-  
-  if (!numMembers)
+
+  if (numMembers == 0u) {
     stream.next((uint32_t)arrayValue.getNumMembers());
-  
-  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i)
+  }
+
+  for (size_t i = 0; i < arrayValue.getNumMembers(); ++i) {
     memberSerializer.serialize(stream, arrayValue[i]);
+  }
 }
 
-void ArraySerializer::ImplV::deserialize(ros::serialization::IStream& stream,
-    Variant& value) {
+void ArraySerializer::ImplV::deserialize(ros::serialization::IStream& stream, Variant& value) {
   ArrayVariant arrayValue = value;
 
-  if (!numMembers) {
+  if (numMembers == 0u) {
     uint32_t numMembers = 0;
     stream.next(numMembers);
-    
+
     arrayValue.resize(numMembers);
   }
-  
+
   for (size_t i = 0; i < arrayValue.getNumMembers(); ++i) {
     Variant member = arrayValue[i];
     memberSerializer.deserialize(stream, member);
   }
 }
 
-}
+}  // namespace variant_topic_tools

@@ -26,35 +26,26 @@ namespace variant_topic_tools {
 
 template <typename T>
 Pointer<T>::Pointer(T* pointer) {
-  if (pointer)
-    this->impl.reset(new Impl(boost::shared_ptr<T>(pointer)));
+  if (pointer) this->impl.reset(new Impl(boost::shared_ptr<T>(pointer)));
 }
 
 template <typename T>
-Pointer<T>::Pointer(const Pointer<T>& src) :
-  impl(src.impl) {
-}
+Pointer<T>::Pointer(const Pointer<T>& src) : impl(src.impl) {}
 
 template <typename T>
-Pointer<T>::~Pointer() {
-}
+Pointer<T>::~Pointer() {}
 
 template <typename T>
-Pointer<T>::ImplA::ImplA() {
-}
+Pointer<T>::ImplA::ImplA() {}
 
 template <typename T>
-Pointer<T>::ImplA::~ImplA() {
-}
+Pointer<T>::ImplA::~ImplA() {}
 
 template <typename T>
-Pointer<T>::Impl::Impl(const boost::shared_ptr<T>& pointer) :
-  pointer(pointer) {
-}
+Pointer<T>::Impl::Impl(const boost::shared_ptr<T>& pointer) : pointer(pointer) {}
 
 template <typename T>
-Pointer<T>::Impl::~Impl() {
-}
+Pointer<T>::Impl::~Impl() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -89,7 +80,7 @@ void Pointer<T>::reset() {
 template <typename T>
 T& Pointer<T>::operator*() const {
   T* pointer = this->operator->();
-    
+
   if (pointer)
     return *pointer;
   else
@@ -119,4 +110,4 @@ bool Pointer<T>::operator!=(const Pointer<T>& pointer) const {
   return (this->operator->() != pointer.operator->());
 }
 
-}
+}  // namespace variant_topic_tools

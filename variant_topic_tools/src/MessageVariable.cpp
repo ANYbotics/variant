@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include "variant_topic_tools/Exceptions.h"
 #include "variant_topic_tools/MessageVariable.h"
+#include "variant_topic_tools/Exceptions.h"
 
 namespace variant_topic_tools {
 
@@ -25,36 +25,29 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageVariable::MessageVariable() {
-}
+MessageVariable::MessageVariable() = default;
 
-MessageVariable::MessageVariable(const std::string& name, const DataType&
-    type) {
+MessageVariable::MessageVariable(const std::string& name, const DataType& type) {
   impl.reset(new Impl(name, type));
 }
 
-MessageVariable::MessageVariable(const MessageVariable& src) :
-  MessageMember(src) {
-}
+MessageVariable::MessageVariable(const MessageVariable& src) = default;
 
-MessageVariable::MessageVariable(const MessageMember& src) :
-  MessageMember(src) {
-  if (impl)
+MessageVariable::MessageVariable(const MessageMember& src) : MessageMember(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<MessageVariable::Impl>(impl));
+  }
 }
 
-MessageVariable::~MessageVariable() {
-}
+MessageVariable::~MessageVariable() = default;
 
-MessageVariable::Impl::Impl(const std::string& name, const DataType& type) :
-  MessageMember::Impl(name),
-  type(type) {
-  if (!type.isValid())
+MessageVariable::Impl::Impl(const std::string& name, const DataType& type) : MessageMember::Impl(name), type(type) {
+  if (!type.isValid()) {
     throw InvalidDataTypeException();
+  }
 }
 
-MessageVariable::Impl::~Impl() {
-}
+MessageVariable::Impl::~Impl() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -72,4 +65,4 @@ void MessageVariable::Impl::write(std::ostream& stream) const {
   stream << type << " " << name;
 }
 
-}
+}  // namespace variant_topic_tools

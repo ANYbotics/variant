@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file BuiltinDataType.h
-  * \brief Header file providing the BuiltinDataType class interface
-  */
+ * \brief Header file providing the BuiltinDataType class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_BUILTIN_DATA_TYPE_H
 #define VARIANT_TOPIC_TOOLS_BUILTIN_DATA_TYPE_H
@@ -27,121 +27,120 @@
 #include <variant_topic_tools/DataType.h>
 
 namespace variant_topic_tools {
-  /** \brief Built-in data type
-    */
-  class BuiltinDataType :
-    public DataType {
+/** \brief Built-in data type
+ */
+class BuiltinDataType : public DataType {
   friend class DataType;
   friend class DataTypeRegistry;
-  public:
-    /** \brief Default constructor
-      */ 
-    BuiltinDataType();
-    
-    /** \brief Copy constructor
-      */ 
-    BuiltinDataType(const BuiltinDataType& src);
-    
-    /** \brief Copy constructor (overloaded version taking a data type)
-      */ 
-    BuiltinDataType(const DataType& src);
-    
+
+ public:
+  /** \brief Default constructor
+   */
+  BuiltinDataType();
+
+  /** \brief Copy constructor
+   */
+  BuiltinDataType(const BuiltinDataType& src);
+
+  /** \brief Copy constructor (overloaded version taking a data type)
+   */
+  BuiltinDataType(const DataType& src);
+
+  /** \brief Destructor
+   */
+  ~BuiltinDataType() override;
+
+  /** \brief Assignment operator
+   */
+  BuiltinDataType& operator=(const DataType& src) override;
+
+  /** \brief True, if this built-in data type is numeric
+   */
+  bool isNumeric() const;
+
+ protected:
+  /** \brief Built-in data type implementation
+   */
+  class Impl : public DataType::Impl {
+   public:
+    /** \brief Constructor
+     */
+    Impl(std::string identifier);
+
     /** \brief Destructor
-      */ 
-    virtual ~BuiltinDataType();
-    
-    /** \brief Assignment operator
-      */
-    BuiltinDataType& operator=(const DataType& src);
-    
-    /** \brief True, if this built-in data type is numeric
-      */
-    bool isNumeric() const;
-    
-  protected:
-    /** \brief Built-in data type implementation
-      */
-    class Impl :
-      public DataType::Impl {
-    public:
-      /** \brief Constructor
-        */
-      Impl(const std::string& identifier);
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-      
-      /** \brief Retrieve the identifier representing this data type
-        *   (implementation)
-        */ 
-      const std::string& getIdentifier() const;
-    
-      /** \brief True, if this built-in data type is numeric (abstract
-        *   declaration)
-        */
-      virtual bool isNumeric() const = 0;
-    
-      /** \brief The identifier representing this built-in data type
-        */
-      std::string identifier;
-    };
-    
-    /** \brief Built-in data type implementation (templated strong-typed
-      *   version)
-      */
-    template <typename T> class ImplT :
-      public Impl {
-    public:
-      BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
-      
-      /** \brief Constructor
-        */
-      ImplT(const std::string& identifier);
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
-    
-      /** \brief Retrieve the type information associated with this data type
-        *   (re-implementation)
-        */ 
-      const std::type_info& getTypeInfo() const;
-      
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
-      /** \brief True, if this data type represents a fixed-size data type
-        *   (implementation)
-        */ 
-      bool isFixedSize() const;
-      
-      /** \brief True, if this data type represents a simple data type
-        *   (implementation)
-        */ 
-      bool isSimple() const;
-      
-      /** \brief True, if this built-in data type is numeric (implementation)
-        */
-      bool isNumeric() const;
-    
-      /** \brief Create a serializer for this data type (re-implementation)
-        */ 
-      Serializer createSerializer(const DataType& type) const;
-      
-      /** \brief Create a variant from this data type (re-implementation)
-        */ 
-      Variant createVariant(const DataType& type) const;
-    };
-    
-    /** \brief Create a built-in data type
-      */ 
-    template <typename T> static BuiltinDataType create(const
-      std::string& identifier);    
+     */
+    ~Impl() override;
+
+    /** \brief Retrieve the identifier representing this data type
+     *   (implementation)
+     */
+    const std::string& getIdentifier() const override;
+
+    /** \brief True, if this built-in data type is numeric (abstract
+     *   declaration)
+     */
+    virtual bool isNumeric() const = 0;
+
+    /** \brief The identifier representing this built-in data type
+     */
+    std::string identifier;
   };
+
+  /** \brief Built-in data type implementation (templated strong-typed
+   *   version)
+   */
+  template <typename T>
+  class ImplT : public Impl {
+   public:
+    BOOST_STATIC_ASSERT(type_traits::IsBuiltin<T>::value);
+
+    /** \brief Constructor
+     */
+    ImplT(const std::string& identifier);
+
+    /** \brief Destructor
+     */
+    ~ImplT() override;
+
+    /** \brief Retrieve the type information associated with this data type
+     *   (re-implementation)
+     */
+    const std::type_info& getTypeInfo() const override;
+
+    /** \brief Retrieve the size of the instances of this data type
+     *   (implementation)
+     */
+    size_t getSize() const override;
+
+    /** \brief True, if this data type represents a fixed-size data type
+     *   (implementation)
+     */
+    bool isFixedSize() const override;
+
+    /** \brief True, if this data type represents a simple data type
+     *   (implementation)
+     */
+    bool isSimple() const override;
+
+    /** \brief True, if this built-in data type is numeric (implementation)
+     */
+    bool isNumeric() const override;
+
+    /** \brief Create a serializer for this data type (re-implementation)
+     */
+    Serializer createSerializer(const DataType& type) const override;
+
+    /** \brief Create a variant from this data type (re-implementation)
+     */
+    Variant createVariant(const DataType& type) const override;
+  };
+
+  /** \brief Create a built-in data type
+   */
+  template <typename T>
+  static BuiltinDataType create(const std::string& identifier);
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/BuiltinDataType.tpp>
 

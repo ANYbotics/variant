@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.       *
  ******************************************************************************/
 
-#include <limits.h>
+#include <climits>
 
 #include "variant_topic_tools/BuiltinVariant.h"
 
@@ -26,37 +26,32 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-BuiltinVariant::BuiltinVariant() {
-}
+BuiltinVariant::BuiltinVariant() = default;
 
-BuiltinVariant::BuiltinVariant(const BuiltinVariant& src) :
-  Variant(src) {
-}
+BuiltinVariant::BuiltinVariant(const BuiltinVariant& src) : Variant(src) {}
 
-BuiltinVariant::BuiltinVariant(const Variant& src) :
-  Variant(src) {
-  if (value)
+BuiltinVariant::BuiltinVariant(const Variant& src) : Variant(src) {
+  if (value) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Value>(value));
+  }
 }
 
-BuiltinVariant::~BuiltinVariant() {
-}
+BuiltinVariant::~BuiltinVariant() = default;
 
-BuiltinVariant::Value::Value() {
-}
+BuiltinVariant::Value::Value() = default;
 
-BuiltinVariant::Value::~Value() {
-}
+BuiltinVariant::Value::~Value() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 double BuiltinVariant::getNumericValue() const {
-  if (value)
+  if (value) {
     return boost::dynamic_pointer_cast<Value>(value)->getNumericValue();
-  else
+  } else {
     return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
-}
+}  // namespace variant_topic_tools

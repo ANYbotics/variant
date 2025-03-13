@@ -28,17 +28,24 @@ TEST(MD5Sum, StringHashing) {
   MD5Sum h3("Franz jagt im komplett verwahrlosten Taxi quer durch Bayern");
   MD5Sum h4("Frank jagt im komplett verwahrlosten Taxi quer durch Bayern");
   MD5Sum h5;
-  h5 << "Franz" << " jagt" << " im" << " komplett"<< " verwahrlosten" <<
-    " Taxi" << " quer" << " durch" << " Bayern";
+  h5 << "Franz"
+     << " jagt"
+     << " im"
+     << " komplett"
+     << " verwahrlosten"
+     << " Taxi"
+     << " quer"
+     << " durch"
+     << " Bayern";
 
   EXPECT_EQ(0, h1.getNumDigestedBits());
   EXPECT_EQ("d41d8cd98f00b204e9800998ecf8427e", h1.toString());
-  EXPECT_EQ(16*8, h2.getNumDigestedBits());
+  EXPECT_EQ(16 * 8, h2.getNumDigestedBits());
   EXPECT_EQ("4032af8d61035123906e58e067140cc5", h2.toString());
-  EXPECT_EQ(59*8, h3.getNumDigestedBits());
+  EXPECT_EQ(59 * 8, h3.getNumDigestedBits());
   EXPECT_EQ("a3cca2b2aa1e3b5b3b5aad99a8529074", h3.toString());
-  EXPECT_EQ(59*8, h4.getNumDigestedBits());
+  EXPECT_EQ(59 * 8, h4.getNumDigestedBits());
   EXPECT_EQ("7e716d0e702df0505fc72e2b89467910", h4.toString());
-  EXPECT_EQ(59*8, h5.getNumDigestedBits());
+  EXPECT_EQ(59 * 8, h5.getNumDigestedBits());
   EXPECT_EQ("a3cca2b2aa1e3b5b3b5aad99a8529074", h5.toString());
 }

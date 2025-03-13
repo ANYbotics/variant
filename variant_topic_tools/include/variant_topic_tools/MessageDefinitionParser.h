@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageDefinitionParser.h
-  * \brief Header file providing the MessageDefinitionParser class interface
-  */
+ * \brief Header file providing the MessageDefinitionParser class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_DEFINITION_PARSER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_DEFINITION_PARSER_H
@@ -32,106 +32,100 @@
 #include <variant_topic_tools/MessageType.h>
 
 namespace variant_topic_tools {
-  /** \brief Message definition parser
-    */
-  class MessageDefinitionParser {
-  public:
-    /** \brief Parse a message definition and generate the message types
-      */
-    static size_t parse(const std::string& messageDataType, const std::string&
-      messageDefinition, std::vector<MessageType>& messageTypes);
-        
-    /** \brief Match any message type expression
-      */
-    static bool matchType(const std::string& expression);
-    
-    /** \brief Match an array type expression
-      */
-    static bool matchArrayType(const std::string& expression, std::string&
-      memberType, size_t& size);
-    
-    /** \brief Match any message member expression
-      */
-    static bool match(const std::string& expression, std::string& name,
-      std::string& type);
-    
-    /** \brief Match a constant message member expression
-      */
-    static bool matchConstant(const std::string& expression, std::string&
-      name, std::string& type, std::string& value);
-    
-    /** \brief Match a variable message member expression
-      */
-    static bool matchVariable(const std::string& expression, std::string&
-      name, std::string& type);
-    
-    /** \brief Match an array message member expression
-      */
-    static bool matchArray(const std::string& expression, std::string& name,
-      std::string& memberType, size_t& size);
-  
-    /** \brief Match a separator expression
-      */
-    static bool matchSeparator(const std::string& expression);
-    
-  private:
-    /** \brief Regular expression for matching a comment
-      */
-    static const boost::regex commentExpression;
-    
-    /** \brief Regular expression for matching a message type separator
-      */
-    static const boost::regex separatorExpression;
-    
-    /** \brief Regular expression for matching a message type definition
-      */
-    static const boost::regex messageTypeExpression;
-    
-    /** \brief Regular expression for matching a message member name
-      */
-    static const boost::regex memberNameExpression;
-    
-    /** \brief Regular expression for matching any message member type
-      */
-    static const boost::regex memberTypeExpression;
-    
-    /** \brief Regular expression for matching an array message member type
-      */
-    static const boost::regex memberArrayTypeExpression;
-    
-    /** \brief Regular expression for matching a message member value
-      */
-    static const boost::regex memberValueExpression;
-    
-    /** \brief Regular expression for matching any message member
-      */
-    static const boost::regex memberExpression;
-    
-    /** \brief Regular expression for matching a constant message member
-      */
-    static const boost::regex constantMemberExpression;
-    
-    /** \brief Regular expression for matching a constant string message
-      *   member
-      */
-    static const boost::regex constantStringMemberExpression;
-    
-    /** \brief Regular expression for matching a variable message member
-      */
-    static const boost::regex variableMemberExpression;
-    
-    /** \brief Regular expression for matching an array message member
-      */
-    static const boost::regex arrayMemberExpression;
-    
-    /** \brief Default constructor
-      */ 
-    MessageDefinitionParser();
-    
-    /** \brief Destructor
-      */ 
-    ~MessageDefinitionParser();    
-  };  
+/** \brief Message definition parser
+ */
+class MessageDefinitionParser {
+ public:
+  /** \brief Parse a message definition and generate the message types
+   */
+  static size_t parse(const std::string& messageDataType, const std::string& messageDefinition, std::vector<MessageType>& messageTypes);
+
+  /** \brief Match any message type expression
+   */
+  static bool matchType(const std::string& expression);
+
+  /** \brief Match an array type expression
+   */
+  static bool matchArrayType(const std::string& expression, std::string& memberType, size_t& size);
+
+  /** \brief Match any message member expression
+   */
+  static bool match(const std::string& expression, std::string& name, std::string& type);
+
+  /** \brief Match a constant message member expression
+   */
+  static bool matchConstant(const std::string& expression, std::string& name, std::string& type, std::string& value);
+
+  /** \brief Match a variable message member expression
+   */
+  static bool matchVariable(const std::string& expression, std::string& name, std::string& type);
+
+  /** \brief Match an array message member expression
+   */
+  static bool matchArray(const std::string& expression, std::string& name, std::string& memberType, size_t& size);
+
+  /** \brief Match a separator expression
+   */
+  static bool matchSeparator(const std::string& expression);
+
+ private:
+  /** \brief Regular expression for matching a comment
+   */
+  static const boost::regex commentExpression;
+
+  /** \brief Regular expression for matching a message type separator
+   */
+  static const boost::regex separatorExpression;
+
+  /** \brief Regular expression for matching a message type definition
+   */
+  static const boost::regex messageTypeExpression;
+
+  /** \brief Regular expression for matching a message member name
+   */
+  static const boost::regex memberNameExpression;
+
+  /** \brief Regular expression for matching any message member type
+   */
+  static const boost::regex memberTypeExpression;
+
+  /** \brief Regular expression for matching an array message member type
+   */
+  static const boost::regex memberArrayTypeExpression;
+
+  /** \brief Regular expression for matching a message member value
+   */
+  static const boost::regex memberValueExpression;
+
+  /** \brief Regular expression for matching any message member
+   */
+  static const boost::regex memberExpression;
+
+  /** \brief Regular expression for matching a constant message member
+   */
+  static const boost::regex constantMemberExpression;
+
+  /** \brief Regular expression for matching a constant string message
+   *   member
+   */
+  static const boost::regex constantStringMemberExpression;
+
+  /** \brief Regular expression for matching a variable message member
+   */
+  static const boost::regex variableMemberExpression;
+
+  /** \brief Regular expression for matching an array message member
+   */
+  static const boost::regex arrayMemberExpression;
+
+  /** \brief Default constructor
+   */
+  MessageDefinitionParser();
+
+  /** \brief Destructor
+   */
+  ~MessageDefinitionParser();
 };
+}  // namespace variant_topic_tools
 
 #endif

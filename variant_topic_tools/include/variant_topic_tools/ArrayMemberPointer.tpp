@@ -28,39 +28,26 @@ ArrayMemberPointer<T>::ArrayMemberPointer(ValueType* array, int index) {
 }
 
 template <typename T>
-ArrayMemberPointer<T>::ArrayMemberPointer(const Pointer<ValueType>& array,
-    int index) {
+ArrayMemberPointer<T>::ArrayMemberPointer(const Pointer<ValueType>& array, int index) {
   this->impl.reset(new Impl(array, index));
 }
 
 template <typename T>
-ArrayMemberPointer<T>::ArrayMemberPointer(const ArrayMemberPointer<T>&
-    src) :
-  Pointer<MemberValueType>(src) {
+ArrayMemberPointer<T>::ArrayMemberPointer(const ArrayMemberPointer<T>& src) : Pointer<MemberValueType>(src) {}
+
+template <typename T>
+ArrayMemberPointer<T>::ArrayMemberPointer(const Pointer<MemberValueType>& src) : Pointer<MemberValueType>(src) {
+  if (this->impl) BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(this->impl));
 }
 
 template <typename T>
-ArrayMemberPointer<T>::ArrayMemberPointer(const Pointer<MemberValueType>&
-    src) :
-  Pointer<MemberValueType>(src) {
-  if (this->impl)
-    BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(this->impl));
-}
+ArrayMemberPointer<T>::~ArrayMemberPointer() {}
 
 template <typename T>
-ArrayMemberPointer<T>::~ArrayMemberPointer() {
-}
+ArrayMemberPointer<T>::Impl::Impl(const Pointer<ValueType>& array, size_t index) : array(array), index(index) {}
 
 template <typename T>
-ArrayMemberPointer<T>::Impl::Impl(const Pointer<ValueType>& array, size_t
-    index) :
-  array(array),
-  index(index) {
-}
-
-template <typename T>
-ArrayMemberPointer<T>::Impl::~Impl() {
-}
+ArrayMemberPointer<T>::Impl::~Impl() {}
 
 /*****************************************************************************/
 /* Accessors                                                                 */
@@ -72,8 +59,7 @@ void ArrayMemberPointer<T>::setArray(const Pointer<ValueType>& array) {
 }
 
 template <typename T>
-const Pointer<typename ArrayMemberPointer<T>::ValueType>&
-    ArrayMemberPointer<T>::getArray() const {
+const Pointer<typename ArrayMemberPointer<T>::ValueType>& ArrayMemberPointer<T>::getArray() const {
   return boost::static_pointer_cast<Impl>(this->impl)->array;
 }
 
@@ -88,12 +74,11 @@ size_t ArrayMemberPointer<T>::getIndex() const {
 }
 
 template <typename T>
-typename ArrayMemberPointer<T>::MemberValueType* ArrayMemberPointer<T>::
-    Impl::get() const {
+typename ArrayMemberPointer<T>::MemberValueType* ArrayMemberPointer<T>::Impl::get() const {
   if (this->array)
     return &((*this->array)[this->index]);
   else
     return 0;
 }
 
-}
+}  // namespace variant_topic_tools

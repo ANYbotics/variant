@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file ArrayDataType.h
-  * \brief Header file providing the ArrayDataType class interface
-  */
+ * \brief Header file providing the ArrayDataType class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_DATA_TYPE_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_DATA_TYPE_H
@@ -27,213 +27,212 @@
 #include <variant_topic_tools/DataType.h>
 
 namespace variant_topic_tools {
-  /** \brief Array data type
-    */
-  class ArrayDataType :
-    public DataType {
+/** \brief Array data type
+ */
+class ArrayDataType : public DataType {
   friend class ArraySerializer;
   friend class ArrayVariant;
   friend class DataType;
   friend class DataTypeRegistry;
-  public:
-    /** \brief Default constructor
-      */ 
-    ArrayDataType();
-    
-    /** \brief Copy constructor
-      */ 
-    ArrayDataType(const ArrayDataType& src);
-    
-    /** \brief Copy constructor (overloaded version taking a data type)
-      */ 
-    ArrayDataType(const DataType& src);
-    
+
+ public:
+  /** \brief Default constructor
+   */
+  ArrayDataType();
+
+  /** \brief Copy constructor
+   */
+  ArrayDataType(const ArrayDataType& src);
+
+  /** \brief Copy constructor (overloaded version taking a data type)
+   */
+  ArrayDataType(const DataType& src);
+
+  /** \brief Destructor
+   */
+  ~ArrayDataType() override;
+
+  /** \brief Retrieve the member type of this array data type
+   */
+  const DataType& getMemberType() const;
+
+  /** \brief Retrieve the number of members of this array data type
+   */
+  size_t getNumMembers() const;
+
+  /** \brief True, if this array data type represents a dynamic array
+   */
+  bool isDynamic() const;
+
+  /** \brief Assignment operator
+   */
+  ArrayDataType& operator=(const DataType& src) override;
+
+ protected:
+  /** \brief Array data type implementation
+   */
+  class Impl : public DataType::Impl {
+   public:
+    /** \brief Constructor
+     */
+    Impl(const DataType& memberType);
+
     /** \brief Destructor
-      */ 
-    virtual ~ArrayDataType();
-  
-    /** \brief Retrieve the member type of this array data type
-      */
-    const DataType& getMemberType() const;
-    
+     */
+    ~Impl() override;
+
+    /** \brief Retrieve the identifier representing this data type
+     *   (implementation)
+     */
+    const std::string& getIdentifier() const override;
+
     /** \brief Retrieve the number of members of this array data type
-      */
-    size_t getNumMembers() const;
-    
+     *   (abstract declaration)
+     */
+    virtual size_t getNumMembers() const = 0;
+
     /** \brief True, if this array data type represents a dynamic array
-      */
-    bool isDynamic() const;
-    
-    /** \brief Assignment operator
-      */
-    ArrayDataType& operator=(const DataType& src);
-    
-  protected:
-    /** \brief Array data type implementation
-      */
-    class Impl :
-      public DataType::Impl {
-    public:
-      /** \brief Constructor
-        */
-      Impl(const DataType& memberType);
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-      
-      /** \brief Retrieve the identifier representing this data type
-        *   (implementation)
-        */ 
-      const std::string& getIdentifier() const;
-    
-      /** \brief Retrieve the number of members of this array data type
-        *   (abstract declaration)
-        */
-      virtual size_t getNumMembers() const = 0;
-      
-     /** \brief True, if this array data type represents a dynamic array
-        *   (abstract declaration)
-        */ 
-      virtual bool isDynamic() const = 0;
-      
-       /** \brief The identifier representing this array data type
-        */
-      mutable std::string identifier;
-      
-      /** \brief The member type of the array data type
-        */
-      DataType memberType;
-    };
-    
-    /** \brief Array data type implementation (variant-typed version)
-      */
-    class ImplV :
-      public Impl {
-    public:
-      /** \brief Constructor
-        */
-      ImplV(const DataType& memberType, size_t numMembers);
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplV();
-      
-      /** \brief Retrieve the number of members of this array data type
-        *   (implementation)
-        */
-      size_t getNumMembers() const;
-      
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
-      /** \brief True, if this array data type represents a dynamic array
-        *   (implementation)
-        */ 
-      bool isDynamic() const;
-      
-      /** \brief True, if this data type represents a fixed-size data type
-        *   (implementation)
-        */ 
-      bool isFixedSize() const;
-      
-      /** \brief True, if this data type represents a simple data type
-        *   (implementation)
-        */ 
-      bool isSimple() const;
-      
-      /** \brief Create a serializer for this data type (re-implementation)
-        */ 
-      Serializer createSerializer(const DataType& type) const;
-      
-      /** \brief Create a variant from this data type (re-implementation)
-        */ 
-      Variant createVariant(const DataType& type) const;
-      
-      /** \brief The number of members of the array data type
-        */
-      size_t numMembers;
-    };
-    
-    /** \brief Array data type implementation (templated strong-typed version)
-      */
-    template <typename T> class ImplT :
-      public Impl {
-    public:
-      BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
-      
-      /** \brief Default constructor
-        */
-      ImplT();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
-      
-      /** \brief Retrieve the type information associated with this data type
-        *   (re-implementation)
-        */ 
-      const std::type_info& getTypeInfo() const;
-      
-      /** \brief Retrieve the number of members of this array data type
-        *   (implementation)
-        */
-      size_t getNumMembers() const;
-      
-      /** \brief True, if this array data type represents a dynamic array
-        *   (implementation)
-        */ 
-      bool isDynamic() const;
-      
-      /** \brief Retrieve the size of the instances of this data type
-        *   (implementation)
-        */
-      size_t getSize() const;
-      
-      /** \brief True, if this data type represents a fixed-size data type
-        *   (implementation)
-        */ 
-      bool isFixedSize() const;
-      
-      /** \brief True, if this data type represents a simple data type
-        *   (implementation)
-        */ 
-      bool isSimple() const;
-      
-      /** \brief Create a serializer for this data type (re-implementation)
-        */ 
-      Serializer createSerializer(const DataType& type) const;
-      
-      /** \brief Create a variant from this data type (re-implementation)
-        */ 
-      Variant createVariant(const DataType& type) const;
-    };
-    
-    /** \brief Constructor (overloaded version taking an member type
-      *   and a number of members)
-      */ 
-    ArrayDataType(const DataType& memberType, size_t numMembers);
-    
-    /** \brief Create an array data type (version templated on the
-      *   array type)
-      */ 
-    template <typename T> static ArrayDataType create();
-    
-    /** \brief Create an array data type (overloaded version for creating
-      *   a dynamic array data type)
-      */ 
-    template <typename T, size_t N> static ArrayDataType create(typename
-      boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
-    
-    /** \brief Create an array data type (overloaded version for creating
-      *   a non-dynamic array data type)
-      */ 
-    template <typename T, size_t N> static ArrayDataType create(typename
-      boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type* = 0);
+     *   (abstract declaration)
+     */
+    virtual bool isDynamic() const = 0;
+
+    /** \brief The identifier representing this array data type
+     */
+    mutable std::string identifier;
+
+    /** \brief The member type of the array data type
+     */
+    DataType memberType;
   };
+
+  /** \brief Array data type implementation (variant-typed version)
+   */
+  class ImplV : public Impl {
+   public:
+    /** \brief Constructor
+     */
+    ImplV(const DataType& memberType, size_t numMembers);
+
+    /** \brief Destructor
+     */
+    ~ImplV() override;
+
+    /** \brief Retrieve the number of members of this array data type
+     *   (implementation)
+     */
+    size_t getNumMembers() const override;
+
+    /** \brief Retrieve the size of the instances of this data type
+     *   (implementation)
+     */
+    size_t getSize() const override;
+
+    /** \brief True, if this array data type represents a dynamic array
+     *   (implementation)
+     */
+    bool isDynamic() const override;
+
+    /** \brief True, if this data type represents a fixed-size data type
+     *   (implementation)
+     */
+    bool isFixedSize() const override;
+
+    /** \brief True, if this data type represents a simple data type
+     *   (implementation)
+     */
+    bool isSimple() const override;
+
+    /** \brief Create a serializer for this data type (re-implementation)
+     */
+    Serializer createSerializer(const DataType& type) const override;
+
+    /** \brief Create a variant from this data type (re-implementation)
+     */
+    Variant createVariant(const DataType& type) const override;
+
+    /** \brief The number of members of the array data type
+     */
+    size_t numMembers;
+  };
+
+  /** \brief Array data type implementation (templated strong-typed version)
+   */
+  template <typename T>
+  class ImplT : public Impl {
+   public:
+    BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+
+    /** \brief Default constructor
+     */
+    ImplT();
+
+    /** \brief Destructor
+     */
+    ~ImplT() override;
+
+    /** \brief Retrieve the type information associated with this data type
+     *   (re-implementation)
+     */
+    const std::type_info& getTypeInfo() const override;
+
+    /** \brief Retrieve the number of members of this array data type
+     *   (implementation)
+     */
+    size_t getNumMembers() const override;
+
+    /** \brief True, if this array data type represents a dynamic array
+     *   (implementation)
+     */
+    bool isDynamic() const override;
+
+    /** \brief Retrieve the size of the instances of this data type
+     *   (implementation)
+     */
+    size_t getSize() const override;
+
+    /** \brief True, if this data type represents a fixed-size data type
+     *   (implementation)
+     */
+    bool isFixedSize() const override;
+
+    /** \brief True, if this data type represents a simple data type
+     *   (implementation)
+     */
+    bool isSimple() const override;
+
+    /** \brief Create a serializer for this data type (re-implementation)
+     */
+    Serializer createSerializer(const DataType& type) const override;
+
+    /** \brief Create a variant from this data type (re-implementation)
+     */
+    Variant createVariant(const DataType& type) const override;
+  };
+
+  /** \brief Constructor (overloaded version taking an member type
+   *   and a number of members)
+   */
+  ArrayDataType(const DataType& memberType, size_t numMembers);
+
+  /** \brief Create an array data type (version templated on the
+   *   array type)
+   */
+  template <typename T>
+  static ArrayDataType create();
+
+  /** \brief Create an array data type (overloaded version for creating
+   *   a dynamic array data type)
+   */
+  template <typename T, size_t N>
+  static ArrayDataType create(typename boost::enable_if<boost::type_traits::ice_eq<N, 0> >::type* /*unused*/ = 0);
+
+  /** \brief Create an array data type (overloaded version for creating
+   *   a non-dynamic array data type)
+   */
+  template <typename T, size_t N>
+  static ArrayDataType create(typename boost::disable_if<boost::type_traits::ice_eq<N, 0> >::type* /*unused*/ = 0);
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/ArrayDataType.tpp>
 

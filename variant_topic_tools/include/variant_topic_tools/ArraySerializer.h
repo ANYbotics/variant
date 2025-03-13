@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file ArraySerializer.h
-  * \brief Header file providing the ArraySerializer class interface
-  */
+ * \brief Header file providing the ArraySerializer class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_ARRAY_SERIALIZER_H
@@ -28,126 +28,122 @@
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
-  /** \brief Array serializer
-    */
-  class ArraySerializer :
-    public Serializer {
+/** \brief Array serializer
+ */
+class ArraySerializer : public Serializer {
   friend class ArrayDataType;
   friend class ArrayVariant;
-  public:
+
+ public:
+  /** \brief Default constructor
+   */
+  ArraySerializer();
+
+  /** \brief Copy constructor
+   */
+  ArraySerializer(const ArraySerializer& src);
+
+  /** \brief Copy constructor (overloaded version taking a serializer)
+   */
+  ArraySerializer(const Serializer& src);
+
+  /** \brief Destructor
+   */
+  ~ArraySerializer();
+
+ protected:
+  /** \brief Array serializer implementation
+   */
+  class Impl : public virtual Serializer::Impl {
+   public:
     /** \brief Default constructor
-      */ 
-    ArraySerializer();
-    
-    /** \brief Copy constructor
-      */ 
-    ArraySerializer(const ArraySerializer& src);
-    
-    /** \brief Copy constructor (overloaded version taking a serializer)
-      */ 
-    ArraySerializer(const Serializer& src);
-    
+     */
+    Impl();
+
     /** \brief Destructor
-      */ 
-    ~ArraySerializer();
-    
-  protected:
-    /** \brief Array serializer implementation
-      */
-    class Impl :
-      public virtual Serializer::Impl {
-    public:
-      /** \brief Default constructor
-        */
-      Impl();
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-    };
-    
-    /** \brief Array serializer implementation (variant-typed version)
-      */
-    class ImplV :
-      public Impl {
-    public:
-      /** \brief Default constructor
-        */
-      ImplV(const Serializer& memberSerializer = Serializer(), size_t
-        numMembers = 0);
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplV();
-    
-      /** \brief Retrieve the serialized length of a variant value
-        *   (implementation)
-        */ 
-      size_t getSerializedLength(const Variant& value) const;
-      
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);
-        
-      /** \brief The array member serializer
-        */
-      Serializer memberSerializer;
-      
-      /** \brief The number of array members
-        */
-      size_t numMembers;
-    };
-    
-    /** \brief Array serializer implementation (templated strong-typed
-      *   version)
-      */
-    template <typename T> class ImplT :
-      public Impl {
-    public:
-      BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
-      
-      /** \brief Definition of the value type
-        */
-      typedef typename type_traits::ArrayType<T>::ValueType ValueType;
-      
-      /** \brief Default constructor
-        */
-      ImplT();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
-    
-      /** \brief Retrieve the serialized length of a variant value
-        *   (implementation)
-        */ 
-      size_t getSerializedLength(const Variant& value) const;
-      
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);        
-    };
-    
-    /** \brief Constructor (overloaded version taking a member serializer
-      *   and a number of members)
-      */ 
-    ArraySerializer(const Serializer& memberSerializer, size_t numMembers);
-    
-    /** \brief Create an array serializer
-      */ 
-    template <typename T> static ArraySerializer create();
+     */
+    ~Impl() override;
   };
+
+  /** \brief Array serializer implementation (variant-typed version)
+   */
+  class ImplV : public Impl {
+   public:
+    /** \brief Default constructor
+     */
+    ImplV(const Serializer& memberSerializer = Serializer(), size_t numMembers = 0);
+
+    /** \brief Destructor
+     */
+    ~ImplV() override;
+
+    /** \brief Retrieve the serialized length of a variant value
+     *   (implementation)
+     */
+    size_t getSerializedLength(const Variant& value) const override;
+
+    /** \brief Serialize a variant value (implementation)
+     */
+    void serialize(ros::serialization::OStream& stream, const Variant& value) override;
+
+    /** \brief Deserialize a variant value (implementation)
+     */
+    void deserialize(ros::serialization::IStream& stream, Variant& value) override;
+
+    /** \brief The array member serializer
+     */
+    Serializer memberSerializer;
+
+    /** \brief The number of array members
+     */
+    size_t numMembers;
+  };
+
+  /** \brief Array serializer implementation (templated strong-typed
+   *   version)
+   */
+  template <typename T>
+  class ImplT : public Impl {
+   public:
+    BOOST_STATIC_ASSERT(type_traits::IsArray<T>::value);
+
+    /** \brief Definition of the value type
+     */
+    using ValueType = typename type_traits::ArrayType<T>::ValueType;
+
+    /** \brief Default constructor
+     */
+    ImplT();
+
+    /** \brief Destructor
+     */
+    ~ImplT() override;
+
+    /** \brief Retrieve the serialized length of a variant value
+     *   (implementation)
+     */
+    size_t getSerializedLength(const Variant& value) const override;
+
+    /** \brief Serialize a variant value (implementation)
+     */
+    void serialize(ros::serialization::OStream& stream, const Variant& value) override;
+
+    /** \brief Deserialize a variant value (implementation)
+     */
+    void deserialize(ros::serialization::IStream& stream, Variant& value) override;
+  };
+
+  /** \brief Constructor (overloaded version taking a member serializer
+   *   and a number of members)
+   */
+  ArraySerializer(const Serializer& memberSerializer, size_t numMembers);
+
+  /** \brief Create an array serializer
+   */
+  template <typename T>
+  static ArraySerializer create();
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/ArraySerializer.tpp>
 

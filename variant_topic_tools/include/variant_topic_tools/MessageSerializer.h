@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageSerializer.h
-  * \brief Header file providing the MessageSerializer class interface
-  */
+ * \brief Header file providing the MessageSerializer class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_SERIALIZER_H
@@ -28,124 +28,118 @@
 #include <variant_topic_tools/Serializer.h>
 
 namespace variant_topic_tools {
-  /** \brief Message serializer
-    */
-  class MessageSerializer :
-    public Serializer {
+/** \brief Message serializer
+ */
+class MessageSerializer : public Serializer {
   friend class MessageDataType;
   friend class MessageVariant;
-  public:
+
+ public:
+  /** \brief Default constructor
+   */
+  MessageSerializer();
+
+  /** \brief Copy constructor
+   */
+  MessageSerializer(const MessageSerializer& src);
+
+  /** \brief Copy constructor (overloaded version taking a serializer)
+   */
+  MessageSerializer(const Serializer& src);
+
+  /** \brief Destructor
+   */
+  ~MessageSerializer();
+
+ protected:
+  /** \brief Message serializer implementation
+   */
+  class Impl : public virtual Serializer::Impl {
+   public:
     /** \brief Default constructor
-      */ 
-    MessageSerializer();
-    
-    /** \brief Copy constructor
-      */ 
-    MessageSerializer(const MessageSerializer& src);
-    
-    /** \brief Copy constructor (overloaded version taking a serializer)
-      */ 
-    MessageSerializer(const Serializer& src);
-    
+     */
+    Impl();
+
     /** \brief Destructor
-      */ 
-    ~MessageSerializer();
-    
-  protected:
-    /** \brief Message serializer implementation
-      */
-    class Impl :
-      public virtual Serializer::Impl {
-    public:
-      /** \brief Default constructor
-        */
-      Impl();
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-    };
-    
-    /** \brief Message serializer implementation (variant-typed version)
-      */
-    class ImplV :
-      public Impl {
-    public:
-      /** \brief Constructor
-        */
-      ImplV(const MessageFieldCollection<Serializer>& memberSerializers =
-        MessageFieldCollection<Serializer>());
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplV();
-    
-      /** \brief Retrieve the serialized length of a variant value
-        *   (implementation)
-        */ 
-      size_t getSerializedLength(const Variant& value) const;
-      
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);
-        
-      /** \brief The message member serializers
-        */
-      MessageFieldCollection<Serializer> memberSerializers;
-    };
-    
-    /** \brief Message serializer implementation (templated strong-typed
-      *   version)
-      */
-    template <typename T> class ImplT :
-      public Impl {
-    public:
-      BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
-      
-      /** \brief Definition of the value type
-        */
-      typedef typename type_traits::MessageType<T>::ValueType ValueType;
-      
-      /** \brief Default constructor
-        */
-      ImplT();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplT();
-    
-      /** \brief Retrieve the serialized length of a variant value
-        *   (implementation)
-        */ 
-      size_t getSerializedLength(const Variant& value) const;
-      
-      /** \brief Serialize a variant value (implementation)
-        */ 
-      void serialize(ros::serialization::OStream& stream, const
-        Variant& value);
-      
-      /** \brief Deserialize a variant value (implementation)
-        */ 
-      void deserialize(ros::serialization::IStream& stream, Variant& value);
-    };
-    
-    /** \brief Constructor (overloaded version taking a collection of member
-      *   serializers)
-      */ 
-    MessageSerializer(const MessageFieldCollection<Serializer>&
-      memberSerializers);
-    
-    
-    /** \brief Create a message serializer
-      */ 
-    template <typename T> static MessageSerializer create();
+     */
+    ~Impl() override;
   };
+
+  /** \brief Message serializer implementation (variant-typed version)
+   */
+  class ImplV : public Impl {
+   public:
+    /** \brief Constructor
+     */
+    ImplV(const MessageFieldCollection<Serializer>& memberSerializers = MessageFieldCollection<Serializer>());
+
+    /** \brief Destructor
+     */
+    ~ImplV() override;
+
+    /** \brief Retrieve the serialized length of a variant value
+     *   (implementation)
+     */
+    size_t getSerializedLength(const Variant& value) const override;
+
+    /** \brief Serialize a variant value (implementation)
+     */
+    void serialize(ros::serialization::OStream& stream, const Variant& value) override;
+
+    /** \brief Deserialize a variant value (implementation)
+     */
+    void deserialize(ros::serialization::IStream& stream, Variant& value) override;
+
+    /** \brief The message member serializers
+     */
+    MessageFieldCollection<Serializer> memberSerializers;
+  };
+
+  /** \brief Message serializer implementation (templated strong-typed
+   *   version)
+   */
+  template <typename T>
+  class ImplT : public Impl {
+   public:
+    BOOST_STATIC_ASSERT(type_traits::IsMessage<T>::value);
+
+    /** \brief Definition of the value type
+     */
+    using ValueType = typename type_traits::MessageType<T>::ValueType;
+
+    /** \brief Default constructor
+     */
+    ImplT();
+
+    /** \brief Destructor
+     */
+    ~ImplT() override;
+
+    /** \brief Retrieve the serialized length of a variant value
+     *   (implementation)
+     */
+    size_t getSerializedLength(const Variant& value) const override;
+
+    /** \brief Serialize a variant value (implementation)
+     */
+    void serialize(ros::serialization::OStream& stream, const Variant& value) override;
+
+    /** \brief Deserialize a variant value (implementation)
+     */
+    void deserialize(ros::serialization::IStream& stream, Variant& value) override;
+  };
+
+  /** \brief Constructor (overloaded version taking a collection of member
+   *   serializers)
+   */
+  MessageSerializer(const MessageFieldCollection<Serializer>& memberSerializers);
+
+  /** \brief Create a message serializer
+   */
+  template <typename T>
+  static MessageSerializer create();
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/MessageSerializer.tpp>
 

@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #include <sstream>
+#include <utility>
 
 #include "variant_topic_tools/DataTypeRegistry.h"
 #include "variant_topic_tools/Exceptions.h"
@@ -34,249 +35,237 @@ namespace variant_topic_tools {
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageDataType::MessageDataType() {
+MessageDataType::MessageDataType() = default;
+
+MessageDataType::MessageDataType(const std::string& identifier, const MessageFieldCollection<MessageConstant>& constantMembers,
+                                 const MessageFieldCollection<MessageVariable>& variableMembers) {
+  impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplV(identifier, constantMembers, variableMembers)));
 }
 
-MessageDataType::MessageDataType(const std::string& identifier,
-    const MessageFieldCollection<MessageConstant>& constantMembers,
-    const MessageFieldCollection<MessageVariable>& variableMembers) {
-  impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplV(identifier, constantMembers, variableMembers)));
+MessageDataType::MessageDataType(const std::string& identifier, const std::string& definition) {
+  impl.reset(new boost::shared_ptr<DataType::Impl>(new ImplV(identifier, definition)));
 }
 
-MessageDataType::MessageDataType(const std::string& identifier, const
-    std::string& definition) {
-  impl.reset(new boost::shared_ptr<DataType::Impl>(
-    new ImplV(identifier, definition)));
-}
+MessageDataType::MessageDataType(const MessageDataType& src) = default;
 
-MessageDataType::MessageDataType(const MessageDataType& src) :
-  DataType(src) {
-}
-
-MessageDataType::MessageDataType(const DataType& src) :
-  DataType(src) {
-  if (impl)
+MessageDataType::MessageDataType(const DataType& src) : DataType(src) {
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<Impl>(*impl));
+  }
 }
 
-MessageDataType::~MessageDataType() {
-}
+MessageDataType::~MessageDataType() = default;
 
-MessageDataType::Impl::Impl(const MessageFieldCollection<MessageConstant>&
-    constantMembers, const MessageFieldCollection<MessageVariable>&
-    variableMembers) :
-  constantMembers(constantMembers),
-  variableMembers(variableMembers) {
-  for (size_t i = 0; i < constantMembers.getNumFields(); ++i)
-    if (!constantMembers[i].isValid())
+MessageDataType::Impl::Impl(const MessageFieldCollection<MessageConstant>& constantMembers,
+                            const MessageFieldCollection<MessageVariable>& variableMembers)
+    : constantMembers(constantMembers), variableMembers(variableMembers) {
+  for (size_t i = 0; i < constantMembers.getNumFields(); ++i) {
+    if (!constantMembers[i].isValid()) {
       throw InvalidMessageMemberException();
+    }
+  }
 
-  for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
-    if (!variableMembers[i].isValid())
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
+    if (!variableMembers[i].isValid()) {
       throw InvalidMessageMemberException();
+    }
+  }
 }
 
-MessageDataType::Impl::Impl(const std::string& identifier, const std::string&
-    definition) {
+MessageDataType::Impl::Impl(const std::string& identifier, const std::string& definition) {
   BOOST_ASSERT(!definition.empty());
 
-  std::string package, plainType;
-  if (!MessageTypeParser::matchType(identifier, package, plainType))
+  std::string package;
+  std::string plainType;
+  if (!MessageTypeParser::matchType(identifier, package, plainType)) {
     throw InvalidMessageTypeException(identifier);
+  }
 
   DataTypeRegistry registry;
   std::istringstream stream(definition);
   std::string line;
 
   while (std::getline(stream, line)) {
-    std::string memberName, memberType, memberValue;
+    std::string memberName;
+    std::string memberType;
+    std::string memberValue;
 
-    if (MessageDefinitionParser::matchVariable(line, memberName,
-        memberType)) {
-      std::string bareMemberType, memberPackage, plainMemberType;
+    if (MessageDefinitionParser::matchVariable(line, memberName, memberType)) {
+      std::string bareMemberType;
+      std::string memberPackage;
+      std::string plainMemberType;
       bool isArrayMember = false;
-      size_t memberSize;
+      size_t memberSize = 0;
 
-      if (MessageDefinitionParser::matchArray(line, memberName,
-          bareMemberType, memberSize))
+      if (MessageDefinitionParser::matchArray(line, memberName, bareMemberType, memberSize)) {
         isArrayMember = true;
-      else
+      } else {
         bareMemberType = memberType;
+      }
 
-      if (!MessageTypeParser::matchType(bareMemberType, memberPackage,
-          plainMemberType))
+      if (!MessageTypeParser::matchType(bareMemberType, memberPackage, plainMemberType)) {
         throw InvalidMessageTypeException(bareMemberType);
+      }
 
       if (!registry.getDataType(bareMemberType).isBuiltin()) {
         if (memberPackage.empty()) {
-          if (plainMemberType == "Header")
+          if (plainMemberType == "Header") {
             memberPackage = "std_msgs";
-          else
+          } else {
             memberPackage = package;
+          }
 
           if (isArrayMember) {
-            if (memberSize)
-              memberType = memberPackage+"/"+plainMemberType+"["+
-                boost::lexical_cast<std::string>(memberSize)+"]";
-            else
-              memberType = memberPackage+"/"+plainMemberType+"[]";
+            if (memberSize != 0u) {
+              memberType = memberPackage + "/" + plainMemberType + "[" + std::to_string(memberSize) + "]";
+            } else {
+              memberType = memberPackage + "/" + plainMemberType + "[]";
+            }
+          } else {
+            memberType = memberPackage + "/" + plainMemberType;
           }
-          else
-            memberType = memberPackage+"/"+plainMemberType;
         }
       }
 
       if (registry.getDataType(memberType).isValid()) {
         MessageVariable member(memberName, memberType);
         variableMembers.appendField(memberName, member);
-      }
-      else
+      } else {
         throw NoSuchDataTypeException(memberType);
-    }
-    else if (MessageDefinitionParser::matchConstant(line, memberName,
-        memberType, memberValue)) {
+      }
+    } else if (MessageDefinitionParser::matchConstant(line, memberName, memberType, memberValue)) {
       if (registry.getDataType(memberType).isValid()) {
         MessageConstant member(memberName, memberType, memberValue);
         constantMembers.appendField(memberName, member);
-      }
-      else
+      } else {
         throw NoSuchDataTypeException(memberType);
-    }
-    else if (MessageDefinitionParser::matchSeparator(line))
+      }
+    } else if (MessageDefinitionParser::matchSeparator(line)) {
       break;
+    }
   }
 }
 
-MessageDataType::Impl::~Impl() {
-}
+MessageDataType::Impl::~Impl() = default;
 
-MessageDataType::ImplV::ImplV(const std::string& identifier,
-    const MessageFieldCollection<MessageConstant>& constantMembers,
-    const MessageFieldCollection<MessageVariable>& variableMembers) :
-  Impl(constantMembers, variableMembers),
-  identifier(identifier) {
+MessageDataType::ImplV::ImplV(std::string identifier, const MessageFieldCollection<MessageConstant>& constantMembers,
+                              const MessageFieldCollection<MessageVariable>& variableMembers)
+    : Impl(constantMembers, variableMembers), identifier(std::move(identifier)) {
   std::ostringstream stream;
 
-  for (size_t i = 0; i < constantMembers.getNumFields(); ++i)
+  for (size_t i = 0; i < constantMembers.getNumFields(); ++i) {
     stream << constantMembers[i] << "\n";
+  }
 
-  for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
     stream << variableMembers[i] << "\n";
+  }
 
   definition = stream.str();
 
   recalculateMD5Sum();
 }
 
-MessageDataType::ImplV::ImplV(const std::string& identifier, const
-    std::string& definition) :
-  Impl(identifier, definition),
-  identifier(identifier),
-  definition(definition) {
+MessageDataType::ImplV::ImplV(const std::string& identifier, const std::string& definition)
+    : Impl(identifier, definition), identifier(identifier), definition(definition) {
   recalculateMD5Sum();
 }
 
-MessageDataType::ImplV::~ImplV() {
-}
+MessageDataType::ImplV::~ImplV() = default;
 
 /*****************************************************************************/
 /* Accessors                                                                 */
 /*****************************************************************************/
 
 std::string MessageDataType::getMD5Sum() const {
-  if (impl)
+  if (impl) {
     return boost::static_pointer_cast<Impl>(*impl)->getMD5Sum();
-  else
+  } else {
     return std::string("*");
+  }
 }
 
 const std::string& MessageDataType::getDefinition() const {
   if (!impl) {
     static std::string definition;
     return definition;
-  }
-  else
+  } else {
     return boost::static_pointer_cast<Impl>(*impl)->getDefinition();
+  }
 }
 
 size_t MessageDataType::getNumMembers() const {
-  return getNumConstantMembers()+getNumVariableMembers();
+  return getNumConstantMembers() + getNumVariableMembers();
 }
 
 size_t MessageDataType::getNumConstantMembers() const {
-  if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->constantMembers.
-      getNumFields();
-  else
+  if (impl) {
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers.getNumFields();
+  } else {
     return 0;
+  }
 }
 
 size_t MessageDataType::getNumVariableMembers() const {
-  if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->variableMembers.
-      getNumFields();
-  else
+  if (impl) {
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers.getNumFields();
+  } else {
     return 0;
+  }
 }
 
-const MessageMember& MessageDataType::getMember(const std::string& name)
-    const {
-  if (hasConstantMember(name))
-    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].
-      getValue();
-  else if (hasVariableMember(name))
-    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].
-      getValue();
-  else
+const MessageMember& MessageDataType::getMember(const std::string& name) const {
+  if (hasConstantMember(name)) {
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].getValue();
+  } else if (hasVariableMember(name)) {
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].getValue();
+  } else {
     throw NoSuchMemberException(name);
+  }
 }
 
 const MessageMember& MessageDataType::getMember(int index) const {
   if (index >= 0) {
-    if (index < getNumConstantMembers())
-      return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].
-        getValue();
-    else if (index < getNumConstantMembers()+getNumVariableMembers())
-      return boost::static_pointer_cast<Impl>(*impl)->variableMembers[
-        index-getNumConstantMembers()].getValue();
+    if (index < getNumConstantMembers()) {
+      return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].getValue();
+    } else if (index < getNumConstantMembers() + getNumVariableMembers()) {
+      return boost::static_pointer_cast<Impl>(*impl)->variableMembers[index - getNumConstantMembers()].getValue();
+    }
   }
 
   throw NoSuchMemberException(index);
 }
 
-const MessageConstant& MessageDataType::getConstantMember(const std::string&
-    name) const {
-  if (hasConstantMember(name))
-    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].
-      getValue();
-  else
+const MessageConstant& MessageDataType::getConstantMember(const std::string& name) const {
+  if (hasConstantMember(name)) {
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[name].getValue();
+  } else {
     throw NoSuchMemberException(name);
+  }
 }
 
 const MessageConstant& MessageDataType::getConstantMember(int index) const {
-  if ((index >= 0) && (index < getNumConstantMembers()))
-    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].
-      getValue();
-  else
+  if ((index >= 0) && (index < getNumConstantMembers())) {
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers[index].getValue();
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
-const MessageVariable& MessageDataType::getVariableMember(const std::string&
-    name) const {
-  if (hasVariableMember(name))
-    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].
-      getValue();
-  else
+const MessageVariable& MessageDataType::getVariableMember(const std::string& name) const {
+  if (hasVariableMember(name)) {
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[name].getValue();
+  } else {
     throw NoSuchMemberException(name);
+  }
 }
 
 const MessageVariable& MessageDataType::getVariableMember(int index) const {
-  if ((index >= 0) && (index < getNumVariableMembers()))
-    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[index].
-      getValue();
-  else
+  if ((index >= 0) && (index < getNumVariableMembers())) {
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers[index].getValue();
+  } else {
     throw NoSuchMemberException(index);
+  }
 }
 
 bool MessageDataType::hasMember(const std::string& name) const {
@@ -284,29 +273,28 @@ bool MessageDataType::hasMember(const std::string& name) const {
 }
 
 bool MessageDataType::hasConstantMember(const std::string& name) const {
-  if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->constantMembers.
-      hasField(name);
-  else
+  if (impl) {
+    return boost::static_pointer_cast<Impl>(*impl)->constantMembers.hasField(name);
+  } else {
     return false;
+  }
 }
 
 bool MessageDataType::hasVariableMember(const std::string& name) const {
-  if (impl)
-    return boost::static_pointer_cast<Impl>(*impl)->variableMembers.
-      hasField(name);
-  else
+  if (impl) {
+    return boost::static_pointer_cast<Impl>(*impl)->variableMembers.hasField(name);
+  } else {
     return false;
+  }
 }
 
 bool MessageDataType::hasHeader() const {
-  if (impl)
-    return (boost::static_pointer_cast<Impl>(*impl)->variableMembers.
-        hasField("header") &&
-      (boost::static_pointer_cast<Impl>(*impl)->variableMembers["header"].
-        getValue().getType().getIdentifier() == "std_msgs/Header"));
-  else
+  if (impl) {
+    return (boost::static_pointer_cast<Impl>(*impl)->variableMembers.hasField("header") &&
+            (boost::static_pointer_cast<Impl>(*impl)->variableMembers["header"].getValue().getType().getIdentifier() == "std_msgs/Header"));
+  } else {
     return false;
+  }
 }
 
 const std::string& MessageDataType::ImplV::getIdentifier() const {
@@ -325,20 +313,22 @@ size_t MessageDataType::ImplV::getSize() const {
   if (isFixedSize()) {
     size_t size = 0;
 
-    for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
+    for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
       size += variableMembers[i].getValue().getType().getSize();
+    }
 
     return size;
-  }
-  else
+  } else {
     return 0;
+  }
 }
 
 bool MessageDataType::ImplV::isFixedSize() const {
   bool fixedSize = true;
 
-  for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
     fixedSize &= variableMembers[i].getValue().getType().isFixedSize();
+  }
 
   return fixedSize;
 }
@@ -352,14 +342,14 @@ bool MessageDataType::ImplV::isSimple() const {
 /*****************************************************************************/
 
 void MessageDataType::addConstantMember(const MessageConstant& member) {
-  if (impl)
+  if (impl) {
     boost::static_pointer_cast<Impl>(*impl)->addConstantMember(member);
-  else
+  } else {
     throw InvalidDataTypeException();
+  }
 }
 
-MessageConstant MessageDataType::addConstantMember(const std::string& name,
-    const Variant& value) {
+MessageConstant MessageDataType::addConstantMember(const std::string& name, const Variant& value) {
   MessageConstant member(name, value);
   addConstantMember(member);
 
@@ -367,27 +357,26 @@ MessageConstant MessageDataType::addConstantMember(const std::string& name,
 }
 
 void MessageDataType::addVariableMember(const MessageVariable& member) {
-  if (impl)
+  if (impl) {
     boost::static_pointer_cast<Impl>(*impl)->addVariableMember(member);
-  else
+  } else {
     throw InvalidDataTypeException();
+  }
 }
 
-MessageVariable MessageDataType::addVariableMember(const std::string& name,
-    const DataType& type) {
+MessageVariable MessageDataType::addVariableMember(const std::string& name, const DataType& type) {
   MessageVariable member(name, type);
   addVariableMember(member);
 
   return member;
 }
 
-Serializer MessageDataType::ImplV::createSerializer(const DataType& type)
-    const {
+Serializer MessageDataType::ImplV::createSerializer(const DataType& /*type*/) const {
   MessageFieldCollection<Serializer> memberSerializers;
 
-  for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
-    memberSerializers.appendField(variableMembers[i].getName(),
-      variableMembers[i].getValue().getType().createSerializer());
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
+    memberSerializers.appendField(variableMembers[i].getName(), variableMembers[i].getValue().getType().createSerializer());
+  }
 
   return MessageSerializer(memberSerializers);
 }
@@ -395,15 +384,14 @@ Serializer MessageDataType::ImplV::createSerializer(const DataType& type)
 Variant MessageDataType::ImplV::createVariant(const DataType& type) const {
   MessageFieldCollection<Variant> members;
 
-  for (size_t i = 0; i < variableMembers.getNumFields(); ++i)
-    members.appendField(variableMembers[i].getName(),
-      variableMembers[i].getValue().getType().createVariant());
+  for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
+    members.appendField(variableMembers[i].getName(), variableMembers[i].getValue().getType().createVariant());
+  }
 
   return MessageVariant(type, members);
 }
 
-void MessageDataType::ImplV::addConstantMember(const MessageConstant&
-    member) {
+void MessageDataType::ImplV::addConstantMember(const MessageConstant& member) {
   constantMembers.appendField(member.getName(), member);
 
   std::ostringstream stream;
@@ -414,8 +402,7 @@ void MessageDataType::ImplV::addConstantMember(const MessageConstant&
   recalculateMD5Sum();
 }
 
-void MessageDataType::ImplV::addVariableMember(const MessageVariable&
-    member) {
+void MessageDataType::ImplV::addVariableMember(const MessageVariable& member) {
   variableMembers.appendField(member.getName(), member);
 
   std::ostringstream stream;
@@ -432,8 +419,7 @@ void MessageDataType::ImplV::recalculateMD5Sum() {
   for (size_t i = 0; i < constantMembers.getNumFields(); ++i) {
     const MessageConstant& constantMember = constantMembers[i].getValue();
 
-    stream << constantMember.getType().getIdentifier() << " " <<
-      constantMember.getName() << "=" << constantMember.getValue() << "\n";
+    stream << constantMember.getType().getIdentifier() << " " << constantMember.getName() << "=" << constantMember.getValue() << "\n";
   }
 
   for (size_t i = 0; i < variableMembers.getNumFields(); ++i) {
@@ -448,19 +434,17 @@ void MessageDataType::ImplV::recalculateMD5Sum() {
     }
 
     if (bareMemberType.isBuiltin()) {
-      stream << memberType.getIdentifier() << " " <<
-        variableMember.getName() << "\n";
-    }
-    else if (bareMemberType.isMessage()) {
+      stream << memberType.getIdentifier() << " " << variableMember.getName() << "\n";
+    } else if (bareMemberType.isMessage()) {
       MessageDataType messageMemberType = bareMemberType;
-      stream << messageMemberType.getMD5Sum() << " " <<
-        variableMember.getName() << "\n";
+      stream << messageMemberType.getMD5Sum() << " " << variableMember.getName() << "\n";
     }
   }
 
   std::string md5SumText = stream.str();
-  if (!md5SumText.empty())
-    md5SumText.erase(md5SumText.size()-1);
+  if (!md5SumText.empty()) {
+    md5SumText.erase(md5SumText.size() - 1);
+  }
 
   md5Sum.clear();
   md5Sum.update(md5SumText);
@@ -473,8 +457,9 @@ void MessageDataType::ImplV::recalculateMD5Sum() {
 MessageDataType& MessageDataType::operator=(const DataType& src) {
   DataType::operator=(src);
 
-  if (impl)
+  if (impl) {
     BOOST_ASSERT(boost::dynamic_pointer_cast<MessageDataType::Impl>(*impl));
+  }
 
   return *this;
 }
@@ -483,4 +468,4 @@ const MessageMember& MessageDataType::operator[](int index) const {
   return getMember(index);
 }
 
-}
+}  // namespace variant_topic_tools

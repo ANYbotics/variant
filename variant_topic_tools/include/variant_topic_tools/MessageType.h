@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageType.h
-  * \brief Header file providing the MessageType class interface
-  */
+ * \brief Header file providing the MessageType class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_H
@@ -28,112 +28,107 @@
 #include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
-  /** \brief Variant message type information
-    */
-  class MessageType {
-  public:
-    /** \brief Default constructor
-      */ 
-    MessageType(const std::string& dataType = std::string(),
-      const std::string& md5Sum = "*", const std::string&
-      definition = std::string());
-    
-    /** \brief Constructor (overloaded version accepting a message data type)
-      */ 
-    MessageType(const MessageDataType& dataType);
-    
-    /** \brief Copy constructor
-      */ 
-    MessageType(const MessageType& src);
-    
-    /** \brief Destructor
-      */ 
-    ~MessageType();
+/** \brief Variant message type information
+ */
+class MessageType {
+ public:
+  /** \brief Default constructor
+   */
+  MessageType(std::string dataType = std::string(), std::string md5Sum = "*", std::string definition = std::string());
 
-    /** \brief Set the data type of the message
-      */ 
-    void setDataType(const std::string& dataType);
-    
-    /** \brief Retrieve the data type of the message
-      */ 
-    const std::string& getDataType() const;
-    
-    /** \brief Set the MD5 sum of the message
-      */ 
-    void setMD5Sum(const std::string& md5Sum);
-    
-    /** \brief Retrieve the MD5 sum of the message
-      */ 
-    const std::string& getMD5Sum() const;
-    
-    /** \brief Set the message definition
-      */ 
-    void setDefinition(const std::string& definition);
-    
-    /** \brief Retrieve the message definition
-      */ 
-    const std::string& getDefinition() const;
-    
-    /** \brief True, if this message type is valid
-      */
-    bool isValid() const;
+  /** \brief Constructor (overloaded version accepting a message data type)
+   */
+  MessageType(const MessageDataType& dataType);
 
-    /** \brief Create a message type
-      */ 
-    template <typename T> static MessageType create();
-    
-    /** \brief Attempt to load the message type corresponding to the specified
-      *   message data type
-      */
-    void load(const std::string& messageDataType);
-    
-    /** \brief Clear the message type
-      */
-    void clear();
-    
-    /** \brief Write the message type to a stream
-      */
-    void write(std::ostream& stream) const;
-    
-    /** \brief Advertise this message type
-      */
-    Publisher advertise(ros::NodeHandle& nodeHandle, const
-      std::string& topic, size_t queueSize, bool latch = false,
-      const ros::SubscriberStatusCallback& connectCallback =
-      ros::SubscriberStatusCallback());
-    
-    /** \brief Subscribe to this message type
-      */
-    Subscriber subscribe(ros::NodeHandle& nodeHandle, const std::string&
-      topic, size_t queueSize, const SubscriberCallback& callback);
-    
-    /** \brief True, if this message type equals another message type
-      */
-    bool operator==(const MessageType& type) const;
-    
-    /** \brief True, if this message type does not equal another message type
-      */
-    bool operator!=(const MessageType& type) const;
-    
-  protected:
-    /** \brief The data type of this message
-      */ 
-    std::string dataType;
-    
-    /** \brief The MD5 sum of this message
-      */ 
-    std::string md5Sum;
-    
-    /** \brief The definition of this message
-      */ 
-    std::string definition;
-  };
-  
-  /** \brief Operator for writing the message type to a stream
-    */
-  std::ostream& operator<<(std::ostream& stream, const MessageType&
-    messageType);
+  /** \brief Copy constructor
+   */
+  MessageType(const MessageType& src);
+
+  /** \brief Destructor
+   */
+  ~MessageType();
+
+  /** \brief Set the data type of the message
+   */
+  void setDataType(const std::string& dataType);
+
+  /** \brief Retrieve the data type of the message
+   */
+  const std::string& getDataType() const;
+
+  /** \brief Set the MD5 sum of the message
+   */
+  void setMD5Sum(const std::string& md5Sum);
+
+  /** \brief Retrieve the MD5 sum of the message
+   */
+  const std::string& getMD5Sum() const;
+
+  /** \brief Set the message definition
+   */
+  void setDefinition(const std::string& definition);
+
+  /** \brief Retrieve the message definition
+   */
+  const std::string& getDefinition() const;
+
+  /** \brief True, if this message type is valid
+   */
+  bool isValid() const;
+
+  /** \brief Create a message type
+   */
+  template <typename T>
+  static MessageType create();
+
+  /** \brief Attempt to load the message type corresponding to the specified
+   *   message data type
+   */
+  void load(const std::string& messageDataType);
+
+  /** \brief Clear the message type
+   */
+  void clear();
+
+  /** \brief Write the message type to a stream
+   */
+  void write(std::ostream& stream) const;
+
+  /** \brief Advertise this message type
+   */
+  Publisher advertise(ros::NodeHandle& nodeHandle, const std::string& topic, size_t queueSize, bool latch = false,
+                      const ros::SubscriberStatusCallback& connectCallback = ros::SubscriberStatusCallback());
+
+  /** \brief Subscribe to this message type
+   */
+  Subscriber subscribe(ros::NodeHandle& nodeHandle, const std::string& topic, size_t queueSize, const SubscriberCallback& callback);
+
+  /** \brief True, if this message type equals another message type
+   */
+  bool operator==(const MessageType& type) const;
+
+  /** \brief True, if this message type does not equal another message type
+   */
+  bool operator!=(const MessageType& type) const;
+
+ protected:
+  /** \brief The data type of this message
+   */
+  std::string dataType;
+
+  /** \brief The MD5 sum of this message
+   */
+  std::string md5Sum;
+
+  /** \brief The definition of this message
+   */
+  std::string definition;
 };
+
+/** \brief Operator for writing the message type to a stream
+ */
+std::ostream& operator<<(std::ostream& stream, const MessageType& messageType);
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/MessageType.tpp>
 

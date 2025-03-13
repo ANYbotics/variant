@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file MessageTypeTraits.h
-  * \brief Header file providing the message type traits
-  */
+ * \brief Header file providing the message type traits
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_TRAITS_H
 #define VARIANT_TOPIC_TOOLS_MESSAGE_TYPE_TRAITS_H
@@ -26,21 +26,22 @@
 #include <ros/message_traits.h>
 
 namespace variant_topic_tools {
-  namespace type_traits {
-    template <typename T> struct IsMessage :
-      public ros::message_traits::IsMessage<T> {
-    };
+namespace type_traits {
+template <typename T>
+struct IsMessage : public ros::message_traits::IsMessage<T> {};
 
-    template <typename T> struct MessageType {
-      typedef T ValueType;
-      typedef ros::message_traits::IsFixedSize<ValueType> IsFixedSize;
-      typedef ros::message_traits::IsSimple<ValueType> IsSimple;
-    };
-    
-    template <typename T> struct ToMessageType {
-      typedef T MessageType;
-    };
-  };
+template <typename T>
+struct MessageType {
+  using ValueType = T;
+  using IsFixedSize = ros::message_traits::IsFixedSize<ValueType>;
+  using IsSimple = ros::message_traits::IsSimple<ValueType>;
 };
+
+template <typename T>
+struct ToMessageType {
+  using MessageType = T;
+};
+}  // namespace type_traits
+}  // namespace variant_topic_tools
 
 #endif

@@ -17,8 +17,8 @@
  ******************************************************************************/
 
 /** \file Pointer.h
-  * \brief Header file providing the Pointer class interface
-  */
+ * \brief Header file providing the Pointer class interface
+ */
 
 #ifndef VARIANT_TOPIC_TOOLS_POINTER_H
 #define VARIANT_TOPIC_TOOLS_POINTER_H
@@ -28,104 +28,104 @@
 #include <variant_topic_tools/Forwards.h>
 
 namespace variant_topic_tools {
-  /** \brief Shared pointer
-    */
-  template <typename T> class Pointer {
-  public:
-    /** \brief Default constructor
-      */ 
-    Pointer(T* pointer = 0);
-    
-    /** \brief Copy constructor
-      */ 
-    Pointer(const Pointer<T>& src);
-    
-    /** \brief Destructor
-      */ 
-    ~Pointer();
+/** \brief Shared pointer
+ */
+template <typename T>
+class Pointer {
+ public:
+  /** \brief Default constructor
+   */
+  Pointer(T* pointer = 0);
 
-    /** \brief Retrieve the stored pointer
-      */
-    T* get() const;
-      
-    /** \brief Reset this pointer
-      */
-    void reset();
-      
-    /** \brief Reference operator
-      */
-    T& operator*() const;
-    
-    /** \brief Pointer operator
-      */
-    T* operator->() const;
-    
-    /** \brief Void pointer conversion
-      */
-    operator void*() const;
-    
-    /** \brief Equality comparison operator
-      */
-    bool operator==(const Pointer<T>& pointer) const;
-    
-    /** \brief Inequality comparison operator
-      */
-    bool operator!=(const Pointer<T>& pointer) const;
-    
-  protected:
-    /** \brief Pointer implementation (abstract base)
-      */
-    class ImplA {
-    public:
-      /** \brief Constructor
-        */
-      ImplA();
-      
-      /** \brief Destructor
-        */
-      virtual ~ImplA();
-      
-      /** \brief Retrieve the stored pointer (abstract declaration)
-        */
-      virtual T* get() const = 0;
-    };
-    
-    /** \brief Pointer implementation
-      */
-    class Impl :
-      public ImplA {
-    public:
-      /** \brief Constructor
-        */
-      Impl(const boost::shared_ptr<T>& pointer = boost::shared_ptr<T>());
-      
-      /** \brief Destructor
-        */
-      virtual ~Impl();
-      
-      /** \brief Retrieve the stored pointer (implementation)
-        */
-      T* get() const;
-      
-      /** \brief The stored pointer
-        */
-      boost::shared_ptr<T> pointer;
-    };
-    
-    /** \brief Declaration of the pointer implementation pointer type
-      */
-    typedef boost::shared_ptr<ImplA> ImplPtr;
-    
-    /** \brief Declaration of the pointer implementation weak pointer
-      *   type
-      */
-    typedef boost::weak_ptr<ImplA> ImplWPtr;
-    
-    /** \brief The pointer's implementation
-      */
-    ImplPtr impl;
+  /** \brief Copy constructor
+   */
+  Pointer(const Pointer<T>& src);
+
+  /** \brief Destructor
+   */
+  ~Pointer();
+
+  /** \brief Retrieve the stored pointer
+   */
+  T* get() const;
+
+  /** \brief Reset this pointer
+   */
+  void reset();
+
+  /** \brief Reference operator
+   */
+  T& operator*() const;
+
+  /** \brief Pointer operator
+   */
+  T* operator->() const;
+
+  /** \brief Void pointer conversion
+   */
+  operator void*() const;
+
+  /** \brief Equality comparison operator
+   */
+  bool operator==(const Pointer<T>& pointer) const;
+
+  /** \brief Inequality comparison operator
+   */
+  bool operator!=(const Pointer<T>& pointer) const;
+
+ protected:
+  /** \brief Pointer implementation (abstract base)
+   */
+  class ImplA {
+   public:
+    /** \brief Constructor
+     */
+    ImplA();
+
+    /** \brief Destructor
+     */
+    virtual ~ImplA();
+
+    /** \brief Retrieve the stored pointer (abstract declaration)
+     */
+    virtual T* get() const = 0;
   };
+
+  /** \brief Pointer implementation
+   */
+  class Impl : public ImplA {
+   public:
+    /** \brief Constructor
+     */
+    Impl(const boost::shared_ptr<T>& pointer = boost::shared_ptr<T>());
+
+    /** \brief Destructor
+     */
+    virtual ~Impl();
+
+    /** \brief Retrieve the stored pointer (implementation)
+     */
+    T* get() const;
+
+    /** \brief The stored pointer
+     */
+    boost::shared_ptr<T> pointer;
+  };
+
+  /** \brief Declaration of the pointer implementation pointer type
+   */
+  using ImplPtr = boost::shared_ptr<ImplA>;
+
+  /** \brief Declaration of the pointer implementation weak pointer
+   *   type
+   */
+  using ImplWPtr = boost::weak_ptr<ImplA>;
+
+  /** \brief The pointer's implementation
+   */
+  ImplPtr impl;
 };
+}  // namespace variant_topic_tools
 
 #include <variant_topic_tools/Pointer.tpp>
 

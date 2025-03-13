@@ -19,55 +19,48 @@
 #include "variant_topic_tools/MessageTypeParser.h"
 
 namespace variant_topic_tools {
-  
+
 /*****************************************************************************/
 /* Static initializers                                                       */
 /*****************************************************************************/
 
-const boost::regex MessageTypeParser::packageExpression =
-  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
+const boost::regex MessageTypeParser::packageExpression = boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
 
-const boost::regex MessageTypeParser::typeExpression =
-  boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
-  
-const boost::regex MessageTypeParser::plainTypeExpression =
-  boost::regex("("+typeExpression.str()+")");
-  
+const boost::regex MessageTypeParser::typeExpression = boost::regex("[a-zA-Z][a-zA-Z0-9_]*");
+
+const boost::regex MessageTypeParser::plainTypeExpression = boost::regex("(" + typeExpression.str() + ")");
+
 const boost::regex MessageTypeParser::packageTypeExpression =
-  boost::regex("("+packageExpression.str()+")/("+typeExpression.str()+")");
-  
+    boost::regex("(" + packageExpression.str() + ")/(" + typeExpression.str() + ")");
+
 /*****************************************************************************/
 /* Constructors and Destructor                                               */
 /*****************************************************************************/
 
-MessageTypeParser::MessageTypeParser() {
-}
+MessageTypeParser::MessageTypeParser() = default;
 
-MessageTypeParser::~MessageTypeParser() {
-}
+MessageTypeParser::~MessageTypeParser() = default;
 
 /*****************************************************************************/
 /* Methods                                                                   */
 /*****************************************************************************/
 
-bool MessageTypeParser::matchType(const std::string& expression, std::string&
-    package, std::string& type) {
+bool MessageTypeParser::matchType(const std::string& expression, std::string& package, std::string& type) {
   boost::smatch match;
-  
+
   if (boost::regex_match(expression, match, packageTypeExpression)) {
     package = std::string(match[1].first, match[1].second);
     type = std::string(match[2].first, match[2].second);
-    
+
     return true;
-  }
-  else if (boost::regex_match(expression, match, plainTypeExpression)) {
+  } else if (boost::regex_match(expression, match, plainTypeExpression)) {
     package = std::string();
     type = std::string(match[1].first, match[1].second);
-    
+
     return true;
-  }
-  else
+  } else {
     return false;
+  }
 }
 
-}
+}  // namespace variant_topic_tools
