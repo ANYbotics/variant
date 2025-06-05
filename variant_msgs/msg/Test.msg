@@ -1,6 +1,6 @@
 # Test message for the variant topic tools
 std_msgs/Header header
-uint8 byte_constant = 42
+uint8 BYTE_CONSTANT = 42
 int32 builtin_int
 bool builtin_boolean
 std_msgs/Bool boolean

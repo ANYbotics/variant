@@ -44,7 +44,7 @@ TEST(MessageDefinition, Parse) {
   EXPECT_NO_THROW(d1.getField("header"));
   EXPECT_NO_THROW(d1.getField("string/data"));
   EXPECT_ANY_THROW(d1.getField("string/length"));
-  EXPECT_TRUE(d1.hasField("byte_constant"));
+  EXPECT_TRUE(d1.hasField("BYTE_CONSTANT"));
   EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
 
   variant_topic_tools::DataTypeRegistry::clear();
@@ -58,7 +58,7 @@ TEST(MessageDefinition, Load) {
   EXPECT_NO_THROW(d1.getField("header"));
   EXPECT_NO_THROW(d1.getField("string/data"));
   EXPECT_ANY_THROW(d1.getField("string/length"));
-  EXPECT_TRUE(d1.hasField("byte_constant"));
+  EXPECT_TRUE(d1.hasField("BYTE_CONSTANT"));
   EXPECT_EQ("std_msgs/Header", d1["header"].getValue().getIdentifier());
 
   variant_topic_tools::DataTypeRegistry::clear();
