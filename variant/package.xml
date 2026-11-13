@@ -4,8 +4,7 @@
   <version>0.1.30</version>
   <description>Meta-package for the universal variant library.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
-  <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
-  <maintainer email="rdiethelm@anybotics.com">Remo Diethelm</maintainer>
+  <maintainer email="support@anybotics.com">ANYbotics</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url type="website">http://github.com/anybotics/variant</url>
   <url type="bugtracker">http://github.com/anybotics/variant/issues</url>

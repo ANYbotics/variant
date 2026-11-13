@@ -3,8 +3,7 @@
   <version>0.1.31</version>
   <description>Topic tools for treating messages as variant types.</description>
   <author email="ralf.kaestner@gmail.com">Ralf Kaestner</author>
-  <maintainer email="sbachmann@anybotics.com">Samuel Bachmann</maintainer>
-  <maintainer email="rdiethelm@anybotics.com">Remo Diethelm</maintainer>
+  <maintainer email="support@anybotics.com">ANYbotics</maintainer>
   <license>GNU Lesser General Public License (LGPL)</license>
   <url>http://github.com/anybotics/variant</url>
 
